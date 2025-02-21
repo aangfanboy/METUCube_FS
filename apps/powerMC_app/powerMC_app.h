@@ -3,7 +3,7 @@
 
 #include "cfe.h"
 
-#define POWERMC_APP_PERF_ID            91
+#define POWERMC_APP_PERF_ID            0x64
 
 typedef struct
 {
