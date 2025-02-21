@@ -1,7 +1,13 @@
-CFE_LIB, cfe_assert,  CFE_Assert_LibInit, ASSERT_LIB,    0,   0,     0x0, 0;
-CFE_APP, ci_lab,      CI_LAB_AppMain,     CI_LAB_APP,   60,   16384, 0x0, 0;
-CFE_APP, to_lab,      TO_LAB_AppMain,     TO_LAB_APP,   70,   16384, 0x0, 0;
-CFE_APP, sch_lab,     SCH_LAB_AppMain,    SCH_LAB_APP,  80,   16384, 0x0, 0;
+CFE_LIB, cfe_assert,        CFE_Assert_LibInit,         ASSERT_LIB,         0,   0,     0x0, 0;
+CFE_APP, ci_lab,            CI_LAB_AppMain,             CI_LAB_APP,         60,   16384, 0x0, 0;
+CFE_APP, to_lab,            TO_LAB_AppMain,             TO_LAB_APP,         70,   16384, 0x0, 0;
+CFE_APP, sch_lab,           SCH_LAB_AppMain,            SCH_LAB_APP,        80,   16384, 0x0, 0;
+CFE_APP, powerMC_app,       POWERMC_App_Main,           POWERMC_APP,        50,   16384, 0x0, 0;
+CFE_APP, commMC_app,        COMMMC_App_Main,            COMMMC_APP,         50,   16384, 0x0, 0;
+CFE_APP, adcsMC_app,        ADCSMC_App_Main,            ADCSMC_APP,         50,   16384, 0x0, 0;
+CFE_APP, adcsttMC_app,      ADCSTTMC_App_Main,          ADCSTTMC_APP,       50,   16384, 0x0, 0;
+CFE_APP, payloadMC_app,     PAYLOADMC_App_Main,         PAYLOADMC_APP,      50,   16384, 0x0, 0;
+
 !
 ! Startup script fields:
 ! 1. Object Type      -- CFE_APP for an Application, or CFE_LIB for a library.
