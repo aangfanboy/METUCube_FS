@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "powermc_app.h": "c"
+        "powermc_app.h": "c",
+        "payloadmc_app.h": "c",
+        "powermc_app_dispatch.h": "c",
+        "powermc_config_msgids.h": "c",
+        "cfe_core_api_base_msgids.h": "c"
     }
 }
