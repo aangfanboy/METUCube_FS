@@ -141,6 +141,10 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(COMMMC_APP_SEND_HK_MID), 1001, 0},
 #endif
 
+#ifdef HAVE_HK
+        {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), 1001, 0, {HK_COMBINED_PKT1_MID}},
+#endif
+
     }};
 
 /*
