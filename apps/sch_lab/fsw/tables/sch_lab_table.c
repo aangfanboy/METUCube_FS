@@ -64,6 +64,7 @@
 #endif
 
 #ifdef HAVE_POWERMC
+#error "powerMC_msgids.h" not found.  Please add the appropriate header file to this list."
 #include "powerMC_config_msgids.h"
 #endif
 
