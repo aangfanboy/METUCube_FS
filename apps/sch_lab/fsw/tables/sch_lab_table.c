@@ -69,6 +69,11 @@
 #include "powerMC_config_msgids.h"
 #endif
 
+#ifdef HAVE_PAYLOADMC
+#error "payloadMC_msgids.h not found.  Please add the appropriate header file to this list."
+#include "payloadMC_msgids.h"
+#endif
+
 /*
 ** SCH Lab schedule table
 ** When populating this table:
