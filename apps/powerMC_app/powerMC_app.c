@@ -19,7 +19,6 @@ void POWERMC_App_Main(void){
         CFE_ES_PerfLogExit(POWERMC_APP_PERF_ID);
 
         status = CFE_SB_ReceiveBuffer(&SBBufPtr, POWERMC_AppData.CommandPipe, CFE_SB_PEND_FOREVER);
-        OS_printf("POWERMC received messag lopoop e");
 
         CFE_ES_PerfLogEntry(POWERMC_APP_PERF_ID);
 

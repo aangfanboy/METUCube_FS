@@ -9,8 +9,6 @@ void POWERMC_APP_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
-    OS_printf("POWERMC received message");
-
     switch (CFE_SB_MsgIdToValue(MsgId))
     {
         case POWERMC_APP_CMD_MID:
