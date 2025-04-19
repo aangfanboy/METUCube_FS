@@ -113,7 +113,7 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(LC_SAMPLE_AP_MID), 500, 0, 8, {0, 175, 1}},
 #endif
 #ifdef HAVE_POWERMC
-        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_APP_HK_TLM_MID), 104, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_APP_SEND_HK_MID), 104, 0},
 #endif
 
     }};
