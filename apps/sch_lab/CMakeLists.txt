@@ -5,11 +5,13 @@ project(CFS_SCH_LAB C)
 # it is easiest to add them as directory properties so they won't
 # be considered include directories for TO_LAB itself.  Each one
 # gets a macro for conditional inclusion in the subscription table.
-foreach(EXT_APP ci_lab to_lab sample_app sc hs lc ds fm HK DS POWERMC_APP PAYLOADMC_APP)
+foreach(EXT_APP ci_lab to_lab sample_app sc hs lc ds fm HK DS powerMC_app powerMC_app)
   list (FIND TGTSYS_${SYSVAR}_APPS ${EXT_APP} HAVE_APP)
+  if (HAVE_APP GREATER_EQUAL 0)
     include_directories($<TARGET_PROPERTY:${EXT_APP},INTERFACE_INCLUDE_DIRECTORIES>)
     string(TOUPPER "HAVE_${EXT_APP}" APP_MACRO)
     add_definitions(-D${APP_MACRO})
+  endif()
 endforeach()
 
 # Create the app module
