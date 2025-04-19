@@ -129,6 +129,7 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
+#error "PAYLOADMC_APP_SEND_HK_MID is not defined in payloadMC_config_msgids.h"
         {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_APP_SEND_HK_MID), 1001, 0},
 #endif
 #ifdef HAVE_ADCSMC_APP
