@@ -241,6 +241,17 @@ CFE_Status_t DS_AppInitialize(void)
         }
     }
 
+    if (Result == CFE_SUCCESS)
+    {
+        Result = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(0x089C), DS_AppData.CmdPipe);
+
+        if (Result != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DS_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "Unable to subscribe to DS commands, err = 0x%08X", (unsigned int)Result);
+        }
+    }
+
     /*
     ** Initialize application tables...
     */
