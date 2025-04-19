@@ -59,19 +59,12 @@
 #include "hk_msgids.h"
 #endif
 
-#ifdef HAVE_DS
-#error "ds_msgids.h not found.  Please add the appropriate header file to this list."
-#include "ds_msgids.h"
-#endif
-
 #ifdef HAVE_POWERMC_APP
 #error "powerMC_msgids.h not found.  Please add the appropriate header file to this list."
-#include "powerMC_config_msgids.h"
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
 #error "payloadMC_msgids.h not found.  Please add the appropriate header file to this list."
-#include "payloadMC_msgids.h"
 #endif
 
 /*
@@ -121,6 +114,10 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #endif
 #ifdef HAVE_POWERMC
         {CFE_SB_MSGID_WRAP_VALUE(POWERMC_APP_SEND_HK_MID), 104, 0},
+#endif
+
+#ifdef HAVE_PAYLOADMC
+        {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_APP_SEND_HK_MID), 105, 0},
 #endif
 
     }};
