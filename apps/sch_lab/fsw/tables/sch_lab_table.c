@@ -56,10 +56,12 @@
 #endif
 
 #ifdef HAVE_HK
+#error "hk_msgids.h not found.  Please add the appropriate header file to this list."
 #include "hk_msgids.h"
 #endif
 
 #ifdef HAVE_DS
+#error "ds_msgids.h not found.  Please add the appropriate header file to this list."
 #include "ds_msgids.h"
 #endif
 
