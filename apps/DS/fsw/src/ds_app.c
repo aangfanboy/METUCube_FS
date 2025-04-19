@@ -396,6 +396,7 @@ void DS_AppSendHkCmd(void)
 
 void DS_AppStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
 {
+    OS_printf("DSYE PAKET GELDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
     if (DS_AppData.AppEnableState == DS_DISABLED)
     {
         /*
