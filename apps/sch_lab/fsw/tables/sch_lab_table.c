@@ -73,12 +73,10 @@
 #endif
 
 #ifdef HAVE_ADCSTTMC_APP
-#error "ADCSTTMC_APP is not supported in this build. Please remove the #ifdef HAVE_ADCSTTMC_APP block."
 #include "adcsttMC_config_msgids.h"
 #endif
 
 #ifdef HAVE_COMMMC_APP
-#error "COMMMC_APP is not supported in this build. Please remove the #ifdef HAVE_COMMMC_APP block."
 #include "commMC_config_msgids.h"
 #endif
 
