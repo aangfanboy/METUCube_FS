@@ -60,11 +60,11 @@
 #endif
 
 #ifdef HAVE_POWERMC_APP
-#error "powerMC_msgids.h not found.  Please add the appropriate header file to this list."
+#include "powerMC_config_msgids.h"
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
-#error "payloadMC_msgids.h not found.  Please add the appropriate header file to this list."
+#include "payloadMC_msgids.h"
 #endif
 
 /*
