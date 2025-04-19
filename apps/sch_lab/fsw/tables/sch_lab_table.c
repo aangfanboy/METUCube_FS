@@ -68,7 +68,6 @@
 #endif
 
 #ifdef HAVE_ADCSMC_APP
-#error "ADCSMC_APP is not supported in this build. Please remove the #ifdef HAVE_ADCSMC_APP block."
 #include "adcsMC_config_msgids.h"
 #endif
 
@@ -126,11 +125,20 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(LC_SAMPLE_AP_MID), 500, 0, 8, {0, 175, 1}},
 #endif
 #ifdef HAVE_POWERMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_APP_SEND_HK_MID), 104, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_APP_SEND_HK_MID), 1001, 0},
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_APP_SEND_HK_MID), 105, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_APP_SEND_HK_MID), 1001, 0},
+#endif
+#ifdef HAVE_ADCSMC_APP
+        {CFE_SB_MSGID_WRAP_VALUE(ADCSMC_APP_SEND_HK_MID), 1001, 0},
+#endif
+#ifdef HAVE_ADCSTTMC_APP
+        {CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_APP_SEND_HK_MID), 1001, 0},
+#endif
+#ifdef HAVE_COMMMC_APP
+        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_APP_SEND_HK_MID), 1001, 0},
 #endif
 
     }};
