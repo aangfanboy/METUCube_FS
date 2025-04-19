@@ -9,6 +9,8 @@ void PAYLOADMC_APP_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
+    OS_printf("PAYLOADA TWASWKKKKK GELDIIIIIKJERJGHEHTLEJHNEHNEJTNHJ");
+
     switch (CFE_SB_MsgIdToValue(MsgId))
     {
         case PAYLOADMC_APP_CMD_MID:
