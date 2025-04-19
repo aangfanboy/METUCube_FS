@@ -64,6 +64,7 @@
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
+#error "payloadMC_app.h" not found.  Please include the appropriate header file for your application."
 #include "payloadMC_msgids.h"
 #endif
 
