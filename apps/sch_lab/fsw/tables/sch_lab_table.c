@@ -55,6 +55,14 @@
 #include "lc_msgids.h"
 #endif
 
+#ifdef HAVE_HK
+#include "hk_msgids.h"
+#endif
+
+#ifdef HAVE_DS
+#include "ds_msgids.h"
+#endif
+
 /*
 ** SCH Lab schedule table
 ** When populating this table:
@@ -99,6 +107,9 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #ifdef HAVE_LC
         {CFE_SB_MSGID_WRAP_VALUE(LC_SEND_HK_MID), 103, 0},
         {CFE_SB_MSGID_WRAP_VALUE(LC_SAMPLE_AP_MID), 500, 0, 8, {0, 175, 1}},
+#endif
+#ifdef HAVE_HK
+        {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_HK_MID), 104, 0},
 #endif
 
     }};
