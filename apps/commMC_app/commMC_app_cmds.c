@@ -42,7 +42,7 @@ CFE_Status_t COMMMC_APP_SEND_HK_TO_SB(const COMMMC_APP_SendDataCmd_t *Msg)
     return CFE_SUCCESS;
 }
 
-CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP()
+CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP(void)
 {
     COMMMC_AppData.CmdCounter++;
 

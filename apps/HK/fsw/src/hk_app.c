@@ -274,7 +274,7 @@ CFE_Status_t HK_TableInit(void)
 
     Status = CFE_TBL_GetAddress((void *)(&HK_AppData.CopyTablePtr), HK_AppData.CopyTableHandle);
     /* Status should be CFE_TBL_INFO_UPDATED because we loaded it above */
-    if (Status != CFE_TBL_INFO_UPDATED)
+    if (Status _TBL_INFO_UPDATED)
     {
         CFE_EVS_SendEvent(HK_CPTBL_GADR_ERR_EID, CFE_EVS_EventType_ERROR, "Error Getting Adr for Cpy Tbl,RC=0x%08X",
                           (unsigned int)Status);
