@@ -75,7 +75,7 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP()
     printf("Sent message to server.\n");
 
     close(client_socket);
-    return CFE_SUCCESS
+    return CFE_SUCCESS;
 
 }
 
