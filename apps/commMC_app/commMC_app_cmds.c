@@ -49,22 +49,22 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP()
     int client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket < 0) {
         OS_printf("Socket creation failed");
-        return CFE_ERROR;
+        return CFE_ERROR_H;
     }
 
     // Configure server address
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(8080);
-    if (inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr) <= 0) { // Replace with server IP
+    if (inet_pton(AF_INET, "192.198.1.88", &server_addr.sin_addr) <= 0) { // Replace with server IP
         OS_printf("Invalid address");
-        return CFE_ERROR;
+        return CFE_ERROR_H;
     }
 
     // Connect to server
     if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         OS_printf("Connection failed");
-        return CFE_ERROR;
+        return CFE_ERROR_H;
     }
 
     printf("Connected to server!\n");
@@ -75,7 +75,7 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP()
     printf("Sent message to server.\n");
 
     close(client_socket);
-    return CFE_SUCCESS;
+    return CFE_SUCCESS
 
 }
 
