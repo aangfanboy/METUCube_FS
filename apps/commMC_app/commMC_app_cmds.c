@@ -56,7 +56,7 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP(void)
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(8080);
-    if (inet_pton(AF_INET, "192.198.1.88", &server_addr.sin_addr) <= 0) { // Replace with server IP
+    if (inet_pton(AF_INET, "192.168.1.88", &server_addr.sin_addr) <= 0) { // Replace with server IP
         OS_printf("Invalid address");
         return -1;
     }
