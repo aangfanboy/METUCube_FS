@@ -24,7 +24,6 @@ void COMMMC_App_Main(void){
         if(telecommandStatus == -1){
             CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC AppM: Error in telecommand");
             COMMMC_AppData.ErrCounter++;
-            continue;
         }else if(telecommandStatus == 1){
             CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC_M: TELECOMMAND RECEIVED");
         }
@@ -42,6 +41,7 @@ void COMMMC_App_Main(void){
 
         if (status == CFE_SUCCESS){
             COMMMC_APP_TaskPipe(SBBufPtr);
+            COMMMC_APP_SEND_DATA_TO_IP();
 
         }else{
             CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: SB Pipe Read Error, RC = 0x%08X", status);

@@ -95,14 +95,12 @@ CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
     server_addr.sin_port = htons(8080);
     if (inet_pton(AF_INET, "192.168.1.88", &server_addr.sin_addr) <= 0) {
         OS_printf("Invalid address");
-        close(client_socket);
-        return -1;
+        return CFE_TIME_BAD_ARGUMENT;
     }
     // Connect to server
     if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         OS_printf("Connection failed");
-        close(client_socket);
-        return -1;
+        return CFE_TIME_BAD_ARGUMENT;
     }
     printf("Connected to server!\n");
     
