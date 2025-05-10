@@ -76,6 +76,51 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP(void)
 
     close(client_socket);
     return CFE_SUCCESS;
-
 }
+
+// ...existing code...
+CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
+{
+    COMMMC_AppData.CmdCounter++;
+
+    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket < 0) {
+        OS_printf("Socket creation failed");
+        return -1;
+    }
+
+    // Configure server address
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    if (inet_pton(AF_INET, "192.168.1.88", &server_addr.sin_addr) <= 0) {
+        OS_printf("Invalid address");
+        close(client_socket);
+        return -1;
+    }
+    // Connect to server
+    if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        OS_printf("Connection failed");
+        close(client_socket);
+        return -1;
+    }
+    printf("Connected to server!\n");
+    // Send a message to server
+    const char* msg = "Hello from C client!";
+    send(client_socket, msg, strlen(msg), 0);
+    printf("Sent message to server.\n");
+    // Wait for a response from the server
+
+    int bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
+    if (bytes_received < 0) {
+        OS_printf("Receive failed");
+        close(client_socket);
+        return -1;
+    }
+    buffer[bytes_received] = '\0'; // Null-terminate the received string
+    printf("Received from server: %s\n", buffer);
+    close(client_socket);
+    return CFE_SUCCESS;
+}
+// ...existing code...
 

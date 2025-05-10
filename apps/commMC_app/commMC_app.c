@@ -15,9 +15,27 @@ void COMMMC_App_Main(void){
         COMMMC_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
     }
 
+    int32 telecommandStatus;
+
     while(CFE_ES_RunLoop(&COMMMC_AppData.RunStatus) == true){
         CFE_ES_PerfLogExit(COMMMC_APP_PERF_ID);
 
+        telecommandStatus = COMMMC_App_TestConnection();
+        if(telecommandStatus == -1){
+            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in telecommand");
+            COMMMC_AppData.ErrCounter++;
+            continue;
+        }else if(telecommandStatus == 1){
+            CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: TELECOMMAND RECEIVED");
+        }
+        else if(telecommandStatus == 0){
+            CFE_EVS_SendEvent(COMMMC_APP_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: No telecommand received");
+        }
+        else {
+            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in telecommand");
+            COMMMC_AppData.ErrCounter++;
+        }
+        
         status = CFE_SB_ReceiveBuffer(&SBBufPtr, COMMMC_AppData.CommandPipe, CFE_SB_PEND_FOREVER);
 
         CFE_ES_PerfLogEntry(COMMMC_APP_PERF_ID);
@@ -41,6 +59,33 @@ void COMMMC_App_Main(void){
 
     CFE_ES_PerfLogExit(COMMMC_APP_PERF_ID);
     CFE_ES_ExitApp(COMMMC_AppData.RunStatus);
+}
+
+int32 COMMMC_App_TestConnection(void){
+    CFE_Status_t status;
+    CFE_SB_Buffer_t *SBBufPtr;
+
+    char buffer[1024]; // Buffer to receive data
+    size_t buffer_size = sizeof(buffer);
+
+    status = COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size);
+
+    if (status != CFE_SUCCESS){
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: SB Pipe Read Error, RC = 0x%08X", status);
+        COMMMC_AppData.ErrCounter++;
+
+        return -1;
+    }
+
+    if (status == CFE_SUCCESS){
+        COMMMC_AppData.CmdCounter++;
+        CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: TELECOMMAND RECEIVED");
+
+        OS_printf("Received data: %s\n", buffer);
+        return 1;
+    }
+
+    return 0;
 }
 
 CFE_Status_t COMMMC_App_Init(void){

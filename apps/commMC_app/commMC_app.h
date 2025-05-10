@@ -85,6 +85,7 @@ typedef struct
 extern COMMMC_AppData_t COMMMC_AppData;
 
 void COMMMC_App_Main(void);
+int32 COMMMC_App_TestConnection(void);
 int32 COMMMC_App_Init(void);
 
 #endif /* _COMMMC_APP_H_ */
