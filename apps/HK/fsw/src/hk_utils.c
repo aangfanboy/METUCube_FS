@@ -496,7 +496,7 @@ void HK_SendCombinedHkPacket(CFE_SB_MsgId_t WhichMidToSend)
                     OS_printf("First quaternion is %f, %f, %f, %f\n", q11, q12, q13, q14);
                     OS_printf("Second quaternion is %f, %f, %f, %f, uint8 is %d\n", q21, q22, q23, q24, number2);
                     // also print the total length of the MSG
-                    OS_printf("Total length of the message is %d\n", CFE_SB_GetUserDataLength(&OutBuffer->Msg)+16);
+                    OS_printf("Total length of the message is %ld\n", CFE_SB_GetUserDataLength(&OutBuffer->Msg)+16);
                     OS_printf("Sent to mid: %d\n", CFE_SB_MsgIdToValue(ThisEntrysOutMid));
                     OS_printf("\n-------------------------------------------------------------------\n");
 
