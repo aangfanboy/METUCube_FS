@@ -60,27 +60,34 @@ void COMMMC_App_Main(void){
     CFE_ES_ExitApp(COMMMC_AppData.RunStatus);
 }
 
-int32 COMMMC_App_TestConnection(void){
-    CFE_Status_t status;
-
+int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER with a thread
     char buffer[1024]; // Buffer to receive data
     size_t buffer_size = sizeof(buffer);
 
-    status = COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size);
+    uint32 task_id;
+    int32 status;
 
-    if (status != CFE_SUCCESS){
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: SB Pipe Read Error, RC = 0x%08X", status);
-        COMMMC_AppData.ErrCounter++;
+    status = OS_TaskCreate(&task_id, "COMMMC_APP_TestConnection", COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size), NULL, 2048, 100, 0);
 
+    OS_printf("COMMMC_APP_TestConnection: task_id = %d\n", task_id);
+
+    if (status != OS_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error creating task, RC = 0x%08X", status);
         return -1;
     }
 
+    // Wait for the task to finish
+    OS_printf("COMMMC_APP_TestConnection: waiting for task to finish\n");
+    status = OS_TaskJoin(task_id);
+    OS_printf("COMMMC_APP_TestConnection: task finished, status = %d\n", status);
     if (status == CFE_SUCCESS){
-        COMMMC_AppData.CmdCounter++;
-        CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: TELECOMMAND RECEIVED");
+        OS_printf("COMMMC_APP_TestConnection: task finished with CFE_SUCCESSS\n");
+        return 1; // Task finished successfully
+    }
 
-        OS_printf("Received data: %s\n", buffer);
-        return 1;
+    if (status != OS_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error joining task, RC = 0x%08X", status);
+        return -1;
     }
 
     return 0;

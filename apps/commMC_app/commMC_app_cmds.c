@@ -78,7 +78,6 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_IP(void)
     return CFE_SUCCESS;
 }
 
-// ...existing code...
 CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
 {
     COMMMC_AppData.CmdCounter++;
@@ -103,6 +102,8 @@ CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
         return CFE_TIME_BAD_ARGUMENT;
     }
     printf("Connected to server!\n");
+
+    int pipeResult;
     
     while (1) {
         // receive data from server
@@ -116,26 +117,45 @@ CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
             break;
         }
 
-        // if it says sendHK, send HK
-        buffer[bytes_received] = '\0'; // Null-terminate the received data
-        if (strcmp(buffer, "sendHK") == 0) {
-            // sent random text
-            const char* msg = "This is a HK message";
-            send(client_socket, msg, strlen(msg), 0);
-            printf("Sent HK to server.\n");
-        } else if (strcmp(buffer, "exit") == 0) {
-            printf("Exit command received. Closing connection.\n");
-            const char* msg = "exitApproved";
-            send(client_socket, msg, strlen(msg), 0);
-            printf("Sent exitApproved to server.\n");
-            close(client_socket);
+        buffer[bytes_received] = '\0'; // Null-terminate the received string
+        printf("Received data: %s\n", buffer);
+
+        pipeResult = COMMMC_APP_SEND_MESSAGE_TO_TASKPIPE(client_socket, buffer);
+
+        if (pipeResult == 0) {
+            break; // Exit command received
+        } else if (pipeResult == -1) {
+            OS_printf("Error sending message to server");
             break;
-        } else {
-            printf("Received: %s\n", buffer);
         }
+
     }
 
     return CFE_SUCCESS;
 }
-// ...existing code...
 
+// create a function that sends a message to the server given a message and a socket
+int COMMMC_APP_SEND_MESSAGE_TO_TASKPIPE(int client_socket, const char* msg)
+{
+    COMMMC_AppData.CmdCounter++;
+
+    // check given message for options such as sendHK, exit, etc.
+    if (strcmp(msg, "sendHK") == 0) {
+        // send HK message
+        const char* hk_msg = "This is a HK message";
+        send(client_socket, hk_msg, strlen(hk_msg), 0);
+        printf("Sent HK to server.\n");
+    } else if (strcmp(msg, "exit") == 0) {
+        printf("Exit command received. Closing connection.\n");
+        const char* exit_msg = "exitApproved";
+        send(client_socket, exit_msg, strlen(exit_msg), 0);
+        printf("Sent exitApproved to server.\n");
+        return 0;
+    } else {
+        // send the message
+        send(client_socket, msg, strlen(msg), 0);
+        printf("Sent message to server: %s\n", msg);
+    }
+
+    return 1;
+}
