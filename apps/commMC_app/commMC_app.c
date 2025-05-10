@@ -16,6 +16,7 @@ void COMMMC_App_Main(void){
     }
 
     int32 telecommandStatus;
+    OS_CountSemCreate(&PingSem, "PingSem", 0, 0);
 
     while(CFE_ES_RunLoop(&COMMMC_AppData.RunStatus) == true){
         CFE_ES_PerfLogExit(COMMMC_APP_PERF_ID);
@@ -77,9 +78,13 @@ int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER
     }
 
     // Wait for the task to finish
-    OS_printf("COMMMC_APP_TestConnection: waiting for task to finish\n");
-    status = OS_TaskJoin(task_id);
-    OS_printf("COMMMC_APP_TestConnection: task finished, status = %d\n", status);
+    OS_CountSemTake(PingSem);
+
+    OS_CountSemDelete(PingSem);  // Delete the old one
+
+    // Recreate with initial count 0
+    OS_CountSemCreate(&PingSem, "PingSem", 0, 0);
+    
     if (status == CFE_SUCCESS){
         OS_printf("COMMMC_APP_TestConnection: task finished with CFE_SUCCESSS\n");
         return 1; // Task finished successfully
@@ -87,7 +92,7 @@ int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER
 
     if (status != OS_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error joining task, RC = 0x%08X", status);
-        return -1;
+        return -1; 
     }
 
     return 0;
