@@ -35,7 +35,7 @@ void COMMMC_App_Main(void){
             CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in telecommand");
             COMMMC_AppData.ErrCounter++;
         }
-        
+
         status = CFE_SB_ReceiveBuffer(&SBBufPtr, COMMMC_AppData.CommandPipe, CFE_SB_PEND_FOREVER);
 
         CFE_ES_PerfLogEntry(COMMMC_APP_PERF_ID);
@@ -63,7 +63,6 @@ void COMMMC_App_Main(void){
 
 int32 COMMMC_App_TestConnection(void){
     CFE_Status_t status;
-    CFE_SB_Buffer_t *SBBufPtr;
 
     char buffer[1024]; // Buffer to receive data
     size_t buffer_size = sizeof(buffer);
