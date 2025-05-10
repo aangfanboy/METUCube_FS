@@ -105,21 +105,38 @@ CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
         return -1;
     }
     printf("Connected to server!\n");
-    // Send a message to server
-    const char* msg = "Hello from C client!";
-    send(client_socket, msg, strlen(msg), 0);
-    printf("Sent message to server.\n");
-    // Wait for a response from the server
+    
+    while (1) {
+        // receive data from server
+        ssize_t bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
+        if (bytes_received < 0) {
+            OS_printf("Receive failed");
+            close(client_socket);
+            return -1;
+        } else if (bytes_received == 0) {
+            OS_printf("Server closed connection");
+            break;
+        }
 
-    int bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
-    if (bytes_received < 0) {
-        OS_printf("Receive failed");
-        close(client_socket);
-        return -1;
+        // if it says sendHK, send HK
+        buffer[bytes_received] = '\0'; // Null-terminate the received data
+        if (strcmp(buffer, "sendHK") == 0) {
+            // sent random text
+            const char* msg = "This is a HK message";
+            send(client_socket, msg, strlen(msg), 0);
+            printf("Sent HK to server.\n");
+        } else if (strcmp(buffer, "exit") == 0) {
+            printf("Exit command received. Closing connection.\n");
+            const char* msg = "exitApproved";
+            send(client_socket, msg, strlen(msg), 0);
+            printf("Sent exitApproved to server.\n");
+            close(client_socket);
+            break;
+        } else {
+            printf("Received: %s\n", buffer);
+        }
     }
-    buffer[bytes_received] = '\0'; // Null-terminate the received string
-    printf("Received from server: %s\n", buffer);
-    close(client_socket);
+
     return CFE_SUCCESS;
 }
 // ...existing code...

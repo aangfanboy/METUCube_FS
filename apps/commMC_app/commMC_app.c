@@ -22,17 +22,17 @@ void COMMMC_App_Main(void){
 
         telecommandStatus = COMMMC_App_TestConnection();
         if(telecommandStatus == -1){
-            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in telecommand");
+            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC AppM: Error in telecommand");
             COMMMC_AppData.ErrCounter++;
             continue;
         }else if(telecommandStatus == 1){
-            CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: TELECOMMAND RECEIVED");
+            CFE_EVS_SendEvent(COMMMC_APP_MSG_SENT_EID, CFE_EVS_EventType_INFORMATION, "COMMMC_M: TELECOMMAND RECEIVED");
         }
         else if(telecommandStatus == 0){
-            CFE_EVS_SendEvent(COMMMC_APP_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: No telecommand received");
+            CFE_EVS_SendEvent(COMMMC_APP_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION, "COMMMC_M: No telecommand received");
         }
         else {
-            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in telecommand");
+            CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App_M: Error in telecommand");
             COMMMC_AppData.ErrCounter++;
         }
 
