@@ -10,4 +10,4 @@
 
 PAYLOADMC_ExampleTable_t ExampleTable = {15, 22};
 
-CFE_TBL_FILEDEF(ExampleTable, PAYLOADMC.ExampleTable, Table Utility Payload Table, payloadMC_tbl.tbl)
+CFE_TBL_FILEDEF(ExampleTable, PAYLOADMC_APP.ExampleTable, Table Utility Payload Table, payloadMC_tbl.tbl)
