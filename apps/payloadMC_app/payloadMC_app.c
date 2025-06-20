@@ -105,17 +105,13 @@ CFE_Status_t PAYLOADMC_App_Init(void)
                           "PAYLOADMC App: Error Subscribing to CMD, RC = 0x%08X\n", status);
         return status;
     }
-
-    // Register table with table services
-    status = CFE_TBL_Register(&PAYLOADMC_AppData.TblHandles[0], "ExampleTable", sizeof(PAYLOADMC_ExampleTable_t),
-                              CFE_TBL_OPT_DEFAULT, PAYLOADMC_TblValidationFunc);
-    if (status != CFE_SUCCESS)
-    {
-        OS_printf("PAYLOADMC App: Error Registering Table, RC = 0x%08X\n", status);
-    }
-    else
-    {
-        status = CFE_TBL_Load(PAYLOADMC_AppData.TblHandles[0], CFE_TBL_SRC_FILE, PAYLOADMC_TABLE_FILE);
+    status = CFE_TBL_Register(&PAYLOADMC_AppData.TblHandles[0], "ExampleTable", sizeof(PAYLOADMC_ExampleTable_t));
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "SENDER: Error in registering table\n");
+        return status;
+    } else {
+        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
+                          "PAYLOADMC: Successfully registered table\n");
     }
 
     return CFE_SUCCESS;
@@ -138,7 +134,8 @@ CFE_Status_t PAYLOADMC_App_ReadTableContent(void)
         status = CFE_TBL_Manage(PAYLOADMC_AppData.TblHandles[0]);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in managing table\n");
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC: Error in managing table\n");
             return status;
         }
         else
