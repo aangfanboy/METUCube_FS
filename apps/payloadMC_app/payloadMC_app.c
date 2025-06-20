@@ -119,7 +119,6 @@ CFE_Status_t PAYLOADMC_App_Init(void)
 
 CFE_Status_t PAYLOADMC_App_ReadTableContent(void)
 {
-    OS_printf("PAYLOADMC: Reading table content HHHHHHHHHHHHHHHHHHHHHHHHHH\n");
     CFE_Status_t status;
     status = CFE_TBL_Load(PAYLOADMC_AppData.TblHandles[0], CFE_TBL_SRC_FILE, PAYLOADMC_TABLE_FILE);
     if (status != CFE_SUCCESS)
