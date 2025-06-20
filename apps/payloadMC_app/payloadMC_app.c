@@ -105,7 +105,7 @@ CFE_Status_t PAYLOADMC_App_Init(void)
                           "PAYLOADMC App: Error Subscribing to CMD, RC = 0x%08X\n", status);
         return status;
     }
-    status = CFE_TBL_Register(&PAYLOADMC_AppData.TblHandles[0], "ExampleTable", sizeof(PAYLOADMC_ExampleTable_t));
+    status = CFE_TBL_Register(&PAYLOADMC_AppData.TblHandles[0], "ExampleTable", sizeof(PAYLOADMC_ExampleTable_t), CFE_TBL_OPT_DEFAULT, NULL);
     if (status != CFE_SUCCESS) {
         CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "SENDER: Error in registering table\n");
         return status;
