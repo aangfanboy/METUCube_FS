@@ -88,6 +88,4 @@ void COMMMC_App_Main(void);
 int32 COMMMC_App_TestConnection(void);
 int32 COMMMC_App_Init(void);
 
-OS_count_semid_t PingSem;
-
 #endif /* _COMMMC_APP_H_ */

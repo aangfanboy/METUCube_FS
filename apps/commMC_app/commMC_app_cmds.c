@@ -131,8 +131,6 @@ CFE_Status_t COMMMC_APP_SEND_PING_WAIT_ANSWER(char *buffer, size_t buffer_size)
 
     }
 
-    OS_CountSemGive(PingSem);
-
     return CFE_SUCCESS;
 }
 

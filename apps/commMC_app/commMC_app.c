@@ -76,14 +76,6 @@ int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER
         CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error creating task, RC = 0x%08X", status);
         return -1;
     }
-
-    // Wait for the task to finish
-    OS_CountSemTake(PingSem);
-
-    OS_CountSemDelete(PingSem);  // Delete the old one
-
-    // Recreate with initial count 0
-    OS_CountSemCreate(&PingSem, "PingSem", 0, 0);
     
     if (status == CFE_SUCCESS){
         OS_printf("COMMMC_APP_TestConnection: task finished with CFE_SUCCESSS\n");
