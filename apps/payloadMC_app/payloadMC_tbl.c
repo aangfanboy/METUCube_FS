@@ -8,6 +8,6 @@
 ** Example Table structure
 */
 
-PAYLOADMC_ExampleTable_t ExampleTable = {15, 22};
+PAYLOADMC_ExampleTable_t ExampleTable = {88, 10};
 
 CFE_TBL_FILEDEF(ExampleTable, PAYLOADMC_APP.ExampleTable, Table Utility Payload Table, payloadMC_tbl.tbl)
