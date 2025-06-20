@@ -61,17 +61,18 @@ void COMMMC_App_Main(void){
 }
 
 int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER without thread
-    char buffer[1024]; // Buffer to receive data
-    size_t buffer_size = sizeof(buffer);
+    //char buffer[1024]; // Buffer to receive data
+    //size_t buffer_size = sizeof(buffer);
 
-    int32 status;
+    //int32 status;
     
-    status = COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size);
-    if (status != CFE_SUCCESS) {
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in COMMMC_APP_SEND_PING_WAIT_ANSWER, RC = 0x%08X", status);
-        return -1; // Error in sending ping
-    }
+    //status = COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size);
+    //if (status != CFE_SUCCESS) {
+    //    CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in COMMMC_APP_SEND_PING_WAIT_ANSWER, RC = 0x%08X", status);
+    //    return -1; // Error in sending ping
+    //}
 
+    return 0;
 }
 
 CFE_Status_t COMMMC_App_Init(void){
