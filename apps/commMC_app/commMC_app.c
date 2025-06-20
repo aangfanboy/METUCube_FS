@@ -67,25 +67,19 @@ int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER
     uint32 task_id;
     int32 status;
 
-    status = OS_TaskCreate(&task_id, "COMMMC_APP_TestConnection", COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size), NULL, 2048, 100, 0);
-
-    OS_printf("COMMMC_APP_TestConnection: task_id = %d\n", task_id);
-
-    if (status != OS_SUCCESS) {
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error creating task, RC = 0x%08X", status);
+    status = CFE_ES_CreateChildTask(&task_id, "COMMMC_App_TestConnection", COMMMC_APP_SEND_PING_WAIT_ANSWER, NULL, 0, 0, CFE_ES_DEFAULT_STACK_SIZE, CFE_ES_DEFAULT_PRIORITY, 0);
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error creating child task, RC = 0x%08X", status);
         return -1;
     }
+    // Wait for the child task to complete
+    CFE_ES_WaitForChildTaskExit(task_id, &status);
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error waiting for child task exit, RC = 0x%08X", status);
+        return -1;
+    }
+    // Check the buffer for the exit command
     
-    if (status == CFE_SUCCESS){
-        OS_printf("COMMMC_APP_TestConnection: task finished with CFE_SUCCESSS\n");
-        return 1; // Task finished successfully
-    }
-
-    if (status != OS_SUCCESS) {
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error joining task, RC = 0x%08X", status);
-        return -1; 
-    }
-
     return 0;
 }
 
