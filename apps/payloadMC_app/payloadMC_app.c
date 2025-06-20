@@ -127,49 +127,49 @@ CFE_Status_t PAYLOADMC_App_ReadTableContent(void)
     status = CFE_TBL_Load(PAYLOADMC_AppData.TblHandles[0], CFE_TBL_SRC_FILE, PAYLOADMC_TABLE_FILE);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_ERROR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in loading table\n");
+        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in loading table\n");
         return status;
     }
     else
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
                           "PAYLOADMC: Successfully loaded table\n");
         // read table content and print it
         status = CFE_TBL_Manage(PAYLOADMC_AppData.TblHandles[0]);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_ERROR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in managing table\n");
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in managing table\n");
             return status;
         }
         else
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
                               "PAYLOADMC: Successfully managed table\n");
         }
         status = CFE_TBL_GetAddress((void **)&PAYLOADMC_TablePtr, PAYLOADMC_AppData.TblHandles[0]);
         if (status != CFE_TBL_INFO_UPDATED)
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_ERROR_EID, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
                               "PAYLOADMC: Error in getting table address\n, status: %d\n", status);
             return status;
         }
         else
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
                               "PAYLOADMC: Successfully got table address\n");
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_CONTENT_EID, CFE_EVS_EventType_INFORMATION,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
                               "PAYLOADMC: Table content: %d, %d\n", PAYLOADMC_TablePtr->Int1, PAYLOADMC_TablePtr->Int2);
         }
         status = CFE_TBL_ReleaseAddress(PAYLOADMC_AppData.TblHandles[0]);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_ERROR_EID, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
                               "PAYLOADMC: Error in releasing table address\n, status: %d\n", status);
             return status;
         }
         else
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_TABLE_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
                               "PAYLOADMC: Successfully released table address\n");
         }
     }
