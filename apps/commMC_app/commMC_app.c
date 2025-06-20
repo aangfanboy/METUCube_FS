@@ -60,27 +60,19 @@ void COMMMC_App_Main(void){
     CFE_ES_ExitApp(COMMMC_AppData.RunStatus);
 }
 
-int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER with a thread
+int32 COMMMC_App_TestConnection(void){  // uses COMMMC_APP_SEND_PING_WAIT_ANSWER without thread
     char buffer[1024]; // Buffer to receive data
     size_t buffer_size = sizeof(buffer);
 
     uint32 task_id;
     int32 status;
-
-    status = CFE_ES_CreateChildTask(&task_id, "COMMMC_App_TestConnection", COMMMC_APP_SEND_PING_WAIT_ANSWER, NULL, 0, 0, CFE_ES_DEFAULT_STACK_SIZE, CFE_ES_DEFAULT_PRIORITY, 0);
-    if (status != CFE_SUCCESS) {
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error creating child task, RC = 0x%08X", status);
-        return -1;
-    }
-    // Wait for the child task to complete
-    CFE_ES_WaitForChildTaskExit(task_id, &status);
-    if (status != CFE_SUCCESS) {
-        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error waiting for child task exit, RC = 0x%08X", status);
-        return -1;
-    }
-    // Check the buffer for the exit command
     
-    return 0;
+    status = COMMMC_APP_SEND_PING_WAIT_ANSWER(buffer, buffer_size);
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "COMMMC App: Error in COMMMC_APP_SEND_PING_WAIT_ANSWER, RC = 0x%08X", status);
+        return -1; // Error in sending ping
+    }
+    
 }
 
 CFE_Status_t COMMMC_App_Init(void){
