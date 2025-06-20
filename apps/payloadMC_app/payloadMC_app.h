@@ -84,5 +84,6 @@ extern PAYLOADMC_AppData_t PAYLOADMC_AppData;
 
 void PAYLOADMC_App_Main(void);
 int32 PAYLOADMC_App_Init(void);
+CFE_Status_t PAYLOADMC_App_ReadTableContent(void);
 
 #endif /* _PAYLOADMC_APP_H_ */
