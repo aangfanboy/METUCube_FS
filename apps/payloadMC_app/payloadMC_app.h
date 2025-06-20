@@ -35,7 +35,7 @@ typedef struct
     uint32 ErrCounter;
 
     PAYLOADMC_APP_HkTlm_t HkTlm;
-    CFE_TBL_Handle_t TblHandle;
+    CFE_TBL_Handle_t TblHandles[1];
 
     CFE_SB_PipeId_t CommandPipe;
 
