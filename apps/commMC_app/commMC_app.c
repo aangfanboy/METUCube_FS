@@ -16,7 +16,6 @@ void COMMMC_App_Main(void){
     }
 
     int32 telecommandStatus;
-    OS_CountSemCreate(&PingSem, "PingSem", 0, 0);
 
     while(CFE_ES_RunLoop(&COMMMC_AppData.RunStatus) == true){
         CFE_ES_PerfLogExit(COMMMC_APP_PERF_ID);
