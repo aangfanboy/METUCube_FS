@@ -97,7 +97,7 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
-    CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "PAYLOADMC: Table content: %d, %d, %d, %d\n", PAYLOADMC_Config_TablePtr->Int1, PAYLOADMC_Config_TablePtr->Int2, PAYLOADMC_Config_TablePtr->Int3, PAYLOADMC_Config_TablePtr->Int4);
+    CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "PAYLOADMC: Table content: %d, %d, %d, %d\n", PAYLOADMC_Config_TablePtr->MinorVersion, PAYLOADMC_Config_TablePtr->Revision, PAYLOADMC_Config_TablePtr->someRandomCameraConfig, PAYLOADMC_Config_TablePtr->someRandomTemperatureConfig);
 
     return CFE_SUCCESS;
 }
