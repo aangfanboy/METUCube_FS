@@ -4,5 +4,13 @@
 #include "cfe.h"
 
 void PAYLOADMC_APP_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
+/**
+ * @brief Dispatches messages received by the PayloadMC application task.
+ * 
+ * This function processes incoming messages from the software bus, handling commands and telemetry requests.
+ * It identifies the message type and calls the appropriate handler based on the message ID.
+ * 
+ * @param SBBufPtr Pointer to the software bus buffer containing the received message.
+ */
 
 #endif /* PAYLOADMC_APP_DISPATCH_H */

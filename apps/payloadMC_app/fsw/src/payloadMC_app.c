@@ -1,19 +1,18 @@
 #include "cfe.h"
 #include "payloadMC_app.h"
-#include "payloadMC_app_dispatch.c"
 #include "payloadMC_tbl.h"
 
-PAYLOADMC_AppData_t       PAYLOADMC_AppData;
-PAYLOADMC_ExampleTable_t *PAYLOADMC_TablePtr;
+PAYLOADMC_AppData_t         PAYLOADMC_AppData;
+PAYLOADMC_ConfigTbl_entry_t *PAYLOADMC_Config_TablePtr;
 
-void PAYLOADMC_App_Main(void)
+void PAYLOADMC_appMain(void)
 {
-    CFE_Status_t     status;
-    CFE_SB_Buffer_t *SBBufPtr;
+    CFE_Status_t     status     = CFE_SUCCESS;
+    CFE_SB_Buffer_t *SBBufPtr   = NULL;
 
-    CFE_ES_PerfLogEntry(PAYLOADMC_APP_PERF_ID);
+    CFE_ES_PerfLogEntry(PAYLOADMC_PERFORMANCE_ID);
 
-    status = PAYLOADMC_App_Init();
+    status = PAYLOADMC_appInit();
     if (status != CFE_SUCCESS)
     {
         PAYLOADMC_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
@@ -23,7 +22,7 @@ void PAYLOADMC_App_Main(void)
     {
         CFE_ES_PerfLogExit(PAYLOADMC_APP_PERF_ID);
 
-        status = CFE_SB_ReceiveBuffer(&SBBufPtr, PAYLOADMC_AppData.CommandPipe, CFE_SB_PEND_FOREVER);
+        status = CFE_SB_ReceiveBuffer(&SBBufPtr, PAYLOADMC_AppData.CommandPipe, PAYLOADMC_SB_TIMEOUT);
 
         CFE_ES_PerfLogEntry(PAYLOADMC_APP_PERF_ID);
 
@@ -32,143 +31,166 @@ void PAYLOADMC_App_Main(void)
             status = PAYLOADMC_App_ReadTableContent();
             PAYLOADMC_APP_TaskPipe(SBBufPtr);
         }
+        else if (status == CFE_SB_TIME_OUT)
+        {
+            // No message received, continue to next iteration
+            // if desired, you can add a table check here
+            continue;
+        }
         else
         {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "PAYLOADMC App: SB Pipe Read Error, RC = 0x%08X", status);
+            CFE_EVS_SendEvent(PAYLOADMC_RCV_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC App: Error Receiving SB Msg, error 0x%08X", (unsigned int)status);
 
-            PAYLOADMC_AppData.ErrCounter++;
+            CFE_ES_WriteToSysLog("PAYLOADMC App: Exiting due to error receiving SB message, error 0x%08X\n",
+                                 (unsigned int)status);
+
+            PAYLOADMC_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
     }
 
-    if (status != CFE_SUCCESS)
-    {
-        CFE_ES_PerfLogExit(PAYLOADMC_APP_PERF_ID);
-        OS_TaskDelay(100000);
-        CFE_ES_RestartApp(PAYLOADMC_AppData.RunStatus);
-    }
-
-    CFE_ES_PerfLogExit(PAYLOADMC_APP_PERF_ID);
+    CFE_ES_PerfLogExit(PAYLOADMC_PERFORMANCE_ID);
     CFE_ES_ExitApp(PAYLOADMC_AppData.RunStatus);
 }
 
-CFE_Status_t PAYLOADMC_App_Init(void)
+CFE_Status_t PAYLOADMC_appInit(void)
 {
     CFE_Status_t status;
 
-    memset(&PAYLOADMC_AppData, 0, sizeof(PAYLOADMC_AppData_t));
     PAYLOADMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
-    PAYLOADMC_AppData.PipeDepth = PAYLOADMC_APP_PIPE_DEPTH;
-
-    strncpy(PAYLOADMC_AppData.PipeName, "PAYLOADMC_APP_CMD_PIPE", sizeof(PAYLOADMC_AppData.PipeName));
-    PAYLOADMC_AppData.PipeName[sizeof(PAYLOADMC_AppData.PipeName) - 1] = 0;
-
-    PAYLOADMC_AppData.activeCameraN = 6; // TODO: THIS IS A RANDOM INITIALIZATION
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
-        CFE_ES_WriteToSysLog("PAYLOADMC App: Error Registering Events, RC = 0x%08X\n", status);
+        CFE_ES_WriteToSysLog("PAYLOADMC App: Error Registering Events, error 0x%08X", (unsigned int)status);
         return status;
     }
 
-    CFE_EVS_SendEvent(PAYLOADMC_APP_INIT_INF_EID, CFE_EVS_EventType_INFORMATION, "PAYLOADMC App Initialized");
-
-    // Initialize the housekeeping telemetry packet
-
-    CFE_MSG_Init(CFE_MSG_PTR(PAYLOADMC_AppData.HkTlm.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_APP_HK_TLM_MID),
-                 sizeof(PAYLOADMC_AppData.HkTlm));
-
     // Create a software bus pipe ---------------------
-    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CommandPipe, PAYLOADMC_AppData.PipeDepth, PAYLOADMC_AppData.PipeName);
+    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CmdPipe, PAYLOADMC_PIPE_DEPTH, PAYLOADMC_SEND_HK_MID_NAME);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "PAYLOADMC App: Error Creating SB Pipe, RC = 0x%08X\n", status);
+        CFE_EVS_SendEvent(PAYLOADMC_CREATE_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Creating SB Pipe, error 0x%08X", (unsigned int)status);
         return status;
     }
 
     // Subscribe to housekeeping request commands
-    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_APP_SEND_HK_MID), PAYLOADMC_AppData.CommandPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_SEND_HK_MID), PAYLOADMC_AppData.CmdPipe);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "PAYLOADMC App: Error Subscribing to HK, RC = 0x%08X\n", status);
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to HK, error 0x%08X", (unsigned int)status);
         return status;
     }
 
     // Subscribe to ground command packets
-    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_APP_CMD_MID), PAYLOADMC_AppData.CommandPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_CMD_MID), PAYLOADMC_AppData.CmdPipe);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "PAYLOADMC App: Error Subscribing to CMD, RC = 0x%08X\n", status);
         return status;
     }
-    status = CFE_TBL_Register(&PAYLOADMC_AppData.TblHandles[0], "ExampleTable", sizeof(PAYLOADMC_ExampleTable_t), CFE_TBL_OPT_DEFAULT, NULL);
-    if (status != CFE_SUCCESS) {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "SENDER: Error in registering table\n");
+
+    // register to table(s)
+    status = PAYLOADMC_appTableInit(&PAYLOADMC_AppData.ConfigTableHandle, &PAYLOADMC_Config_TablePtr);
+    if (status != CFE_SUCCESS)
+    {
         return status;
-    } else {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                          "PAYLOADMC: Successfully registered table\n");
+    }
+
+    CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "PAYLOADMC: Table content: %d, %d, %d, %d\n", PAYLOADMC_TablePtr->Int1, PAYLOADMC_TablePtr->Int2, PAYLOADMC_TablePtr->Int3, PAYLOADMC_TablePtr->Int4);
+
+    return CFE_SUCCESS;
+}
+
+CFE_Status_t PAYLOADMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, PAYLOADMC_ConfigTbl_entry_t **TblPtr)
+{
+    CFE_Status_t status;
+
+    // Register the table
+    status = CFE_TBL_Register(TblHandlePtr, PAYLOADMC_CONFIG_TABLE_NAME, sizeof(PAYLOADMC_ConfigTbl_entry_t), CFE_TBL_OPT_DEFAULT, NULL);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_TBL_REGISTER_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Error registering table, status: %d\n", status);
+        return status;
+    }
+
+    // Load the table
+    status = CFE_TBL_Load(*TblHandlePtr, CFE_TBL_SRC_FILE, PAYLOADMC_CONFIG_TABLE_FILENAME);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_TBL_LOAD_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Error loading table, status: %d\n", status);
+        return status;
+    }
+
+    // Manage the table
+    status = CFE_TBL_Manage(*TblHandlePtr);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_TBL_MANAGE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Error managing table, status: %d\n", status);
+        return status;
+    }
+
+    // Get the address of the table
+    status = CFE_TBL_GetAddress((void **)TblPtr, *TblHandlePtr);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_TBL_GET_ADDR_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Error getting table address, status: %d\n", status);
+        return status;
     }
 
     return CFE_SUCCESS;
 }
 
-CFE_Status_t PAYLOADMC_App_ReadTableContent(void)
+CFE_Status_t PAYLOADMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, PAYLOADMC_ConfigTbl_entry_t **TblPtr)
 {
     CFE_Status_t status;
-    status = CFE_TBL_Load(PAYLOADMC_AppData.TblHandles[0], CFE_TBL_SRC_FILE, PAYLOADMC_TABLE_FILE);
+
+    // Release the address of the table
+    status = CFE_TBL_ReleaseAddress(*TblHandlePtr);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "PAYLOADMC: Error in loading table\n");
+        CFE_EVS_SendEvent(PAYLOADMC_TBL_RELEASE_ADDR_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Error releasing table address, status: %d\n", status);
         return status;
     }
-    else
+
+    // Reload the table
+    status = PAYLOADMC_appTableInit(TblHandlePtr, TblPtr);
+    if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                          "PAYLOADMC: Successfully loaded table\n");
-        // read table content and print it
-        status = CFE_TBL_Manage(PAYLOADMC_AppData.TblHandles[0]);
-        if (status != CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "PAYLOADMC: Error in managing table\n");
-            return status;
-        }
-        else
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                              "PAYLOADMC: Successfully managed table\n");
-        }
-        status = CFE_TBL_GetAddress((void **)&PAYLOADMC_TablePtr, PAYLOADMC_AppData.TblHandles[0]);
-        if (status != CFE_TBL_INFO_UPDATED)
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "PAYLOADMC: Error in getting table address\n, status: %d\n", status);
-            return status;
-        }
-        else
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                              "PAYLOADMC: Successfully got table address\n");
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                              "PAYLOADMC: Table content: %d, %d\n", PAYLOADMC_TablePtr->Int1, PAYLOADMC_TablePtr->Int2);
-        }
-        status = CFE_TBL_ReleaseAddress(PAYLOADMC_AppData.TblHandles[0]);
-        if (status != CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "PAYLOADMC: Error in releasing table address\n, status: %d\n", status);
-            return status;
-        }
-        else
-        {
-            CFE_EVS_SendEvent(PAYLOADMC_APP_PIPE_ERR_EID, CFE_EVS_EventType_INFORMATION,
-                              "PAYLOADMC: Successfully released table address\n");
-        }
+        return status;
     }
-    return status;
+
+    return CFE_SUCCESS;
+}
+
+CFE_Status_t PAYLOADMC_appResetHkData(void)
+{
+    PAYLOADMC_AppData.CmdCounter = 0;
+    PAYLOADMC_AppData.ErrCounter = 0;
+    PAYLOADMC_AppData.ActiveCameraN = 0;
+    PAYLOADMC_AppData.NumberOfTakenPhotos = 0;
+    
+    return CFE_SUCCESS;
+}
+
+CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
+{
+
+    PAYLOADMC_AppData.HkPacket.Payload.CmdCounter = PAYLOADMC_AppData.CmdCounter;
+    PAYLOADMC_AppData.HkPacket.Payload.ErrCounter = PAYLOADMC_AppData.ErrCounter;
+    PAYLOADMC_AppData.HkPacket.Payload.ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
+    PAYLOADMC_AppData.HkPacket.Payload.NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
+
+    CFE_MSG_Init(CFE_MSG_PTR(PAYLOADMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_HK_TLM_MID),
+                 sizeof(PAYLOADMC_AppData.HkPacket));
+
+    return CFE_SUCCESS;
 }

@@ -5,7 +5,11 @@
 #include "cfe_msg.h"
 #include "cfe_core_api_base_msgids.h"
 
-#include "payloadMC_config_msgids.h"
+#include "payloadMC_app_config.h"
+#include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
+#include "payloadMC_app_extern_typedefs.h"
+#include "payloadMC_app_events.h"
 
 /*************************************************************************/
 /*
@@ -30,60 +34,77 @@ typedef struct  // Integrated Housekeeping Telemetry
 
 typedef struct
 {
-    uint32 RunStatus;
-    uint32 CmdCounter;
-    uint32 ErrCounter;
+    PAYLOADMC_HkPacket_t    HkPacket; /**< \brief HK Housekeeping Packet */
 
-    PAYLOADMC_APP_HkTlm_t HkTlm;
-    CFE_TBL_Handle_t TblHandles[1];
+    CFE_SB_PipeId_t         CmdPipe;    /**< \brief Pipe Id for HK command pipe */
 
-    CFE_SB_PipeId_t CommandPipe;
+    uint8                   CmdCounter; /**< \brief Number of valid commands received */
+    uint8                   ErrCounter; /**< \brief Number of invalid commands received */
+    uint32                  ActiveCameraN; /**< \brief Active camera number */
+    uint32                  NumberOfTakenPhotos;
 
-    uint16 PipeDepth;
-    char   PipeName[CFE_MISSION_MAX_API_LEN];
+    CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
+    uint32                  RunStatus;     /**< \brief HK App run status */
 
-    uint8 activeCameraN;
+    CFE_TBL_Handle_t            ConfigTableHandle;    /**< \brief Copy Table handle */
+    PAYLOADMC_ConfigTbl_entry_t * ConfigTablePtr;    /**< \brief Ptr to copy table entry */
+
+    uint8 MemPoolBuffer[PAYLOADMC_NUM_BYTES_IN_MEM_POOL]; /**< \brief HK mempool buffer */
 } PAYLOADMC_AppData_t;
-
-/*************************************************************************/
-/*
-** TODO: I dont know what those are, add info
-*/
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-} PAYLOADMC_APP_NoopCmd_t;
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-} PAYLOADMC_APP_ResetCountersCmd_t;
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-} PAYLOADMC_APP_ProcessCmd_t;
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-} PAYLOADMC_APP_SendDataCmd_t;
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-} PAYLOADMC_APP_SendHkCmd_t;
-
-/*************************************************************************/
-/*
-** Outsorce the main data and definitions
-*/
 
 extern PAYLOADMC_AppData_t PAYLOADMC_AppData;
 
 void PAYLOADMC_App_Main(void);
-int32 PAYLOADMC_App_Init(void);
-CFE_Status_t PAYLOADMC_App_ReadTableContent(void);
+/**
+ * @brief Main function for the PayloadMC application
+ * 
+ * This function initializes the application, processes commands, and handles telemetry.
+ * It runs in a loop until the application is terminated, either by an error or entire shutdown.
+ */
+
+CFE_Status_t PAYLOADMC_appInit(void);
+/**
+ * @brief Initializes the PayloadMC application
+ * 
+ * This function sets up the application, registers events, creates software bus pipes, subscribes to messages, and initializes tables.
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful initialization, or an error code on failure.
+ */
+
+CFE_Status_t PAYLOADMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, PAYLOADMC_ConfigTbl_entry_t **TblPtr);
+/**
+ * @brief Initializes the configuration table for the PayloadMC application
+ * 
+ * This function registers the configuration table, gets its address, and initializes it.
+ * @param TblHandlePtr Pointer to the table handle
+ * @param TblPtr Pointer to the table pointer
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful initialization, or an error code on failure.
+ */
+
+CFE_Status_t PAYLOADMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, PAYLOADMC_ConfigTbl_entry_t **TblPtr);
+/**
+ * @brief Reloads the configuration table for the PayloadMC application
+ * 
+ * This function releases the current table address, reinitializes the table, and gets its address again.
+ * @param TblHandlePtr Pointer to the table handle
+ * @param TblPtr Pointer to the table pointer
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful reload, or an error code on failure.
+ */
+
+CFE_Status_t PAYLOADMC_appResetHkData(void);
+/**
+ * @brief Resets the housekeeping data for the PayloadMC application
+ * 
+ * This function resets the command and error counters, active camera number, and number of taken photos to their initial values.
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful reset.
+ */
+
+CFE_Status_t PAYLOADMC_appPrepareHkPacket(void);
+/**
+ * @brief Prepares the housekeeping packet for the PayloadMC application
+ * 
+ * This function populates the housekeeping packet with the current command and error counters, active camera number, and number of taken photos.
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful preparation, or an error code on failure.
+ */
+
 
 #endif /* _PAYLOADMC_APP_H_ */
