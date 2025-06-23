@@ -1,6 +1,4 @@
-#include "cfe.h"
 #include "payloadMC_app.h"
-#include "payloadMC_tbl.h"
 
 PAYLOADMC_AppData_t         PAYLOADMC_AppData;
 PAYLOADMC_ConfigTbl_entry_t *PAYLOADMC_Config_TablePtr;
