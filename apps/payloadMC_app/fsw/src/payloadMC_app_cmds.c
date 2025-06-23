@@ -18,7 +18,9 @@ CFE_Status_t PAYLOADMC_APP_SEND_HK_TO_SB()
         return status;
     }
 
-    status = CFE_SB_SendMsg((CFE_MSG_Message_t *)&PAYLOADMC_AppData.HkPacket);
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(PAYLOADMC_AppData.HkPacket.TelemetryHeader));
+    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(PAYLOADMC_AppData.HkPacket.TelemetryHeader), true);
+
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
