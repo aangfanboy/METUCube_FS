@@ -2,7 +2,7 @@
 #include "payloadMC_app_dispatch.h"
 #include "payloadMC_app_cmds.c"
 
-void PAYLOADMC_APP_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
+void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
     CFE_Status_t   status   = 0;

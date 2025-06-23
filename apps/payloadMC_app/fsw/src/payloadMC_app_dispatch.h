@@ -3,7 +3,7 @@
 
 #include "cfe.h"
 
-void PAYLOADMC_APP_TaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
+void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
 /**
  * @brief Dispatches messages received by the PayloadMC application task.
  * 

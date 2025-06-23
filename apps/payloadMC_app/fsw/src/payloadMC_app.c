@@ -20,14 +20,13 @@ void PAYLOADMC_appMain(void)
     {
         CFE_ES_PerfLogExit(PAYLOADMC_PERFORMANCE_ID);
 
-        status = CFE_SB_ReceiveBuffer(&SBBufPtr, PAYLOADMC_AppData.CommandPipe, PAYLOADMC_SB_TIMEOUT);
+        status = CFE_SB_ReceiveBuffer(&SBBufPtr, PAYLOADMC_AppData.CmdPipe, PAYLOADMC_SB_TIMEOUT);
 
         CFE_ES_PerfLogEntry(PAYLOADMC_PERFORMANCE_ID);
 
         if (status == CFE_SUCCESS)
         {
-            status = PAYLOADMC_App_ReadTableContent();
-            PAYLOADMC_APP_TaskPipe(SBBufPtr);
+            PAYLOADMC_appTaskPipe(SBBufPtr);
         }
         else if (status == CFE_SB_TIME_OUT)
         {
