@@ -1,7 +1,7 @@
 
 #include "payloadMC_app.h"
 #include "payloadMC_app_cmds.h"
-#include "payloadMC_config_msgids.h"
+#include "payloadMC_app_msgids.h"
 
 #include "cfe.h"
 
