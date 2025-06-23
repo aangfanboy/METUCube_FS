@@ -1,6 +1,5 @@
 #include "payloadMC_app.h"
 #include "payloadMC_app_dispatch.h"
-#include "payloadMC_app_cmds.c"
 
 void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
