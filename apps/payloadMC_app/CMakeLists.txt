@@ -3,7 +3,6 @@ project(CFS_PAYLOADMC_APP C)
 set(APP_SRC_FILES
   fsw/src/payloadMC_app.c
   fsw/src/payloadMC_app_cmds.c
-  fsw/src/payloadMC_app_utils.c
   fsw/src/payloadMC_app_dispatch.c
 )
 
