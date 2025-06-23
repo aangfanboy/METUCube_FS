@@ -1,7 +1,20 @@
-cmake_minimum_required(VERSION 3.5)
 project(CFS_PAYLOADMC_APP C)
 
-add_cfe_app(payloadMC_app payloadMC_app.c)
+set(APP_SRC_FILES
+  fsw/src/payloadMC_app.c
+  fsw/src/payloadMC_app_cmds.c
+  fsw/src/payloadMC_app_utils.c
+  fsw/src/payloadMC_app_dispatch.c
+)
 
-add_cfe_tables(payloadMC_app payloadMC_tbl.c)
+# Create the app module
+add_cfe_app(payloadMC_app ${APP_SRC_FILES})
 
+# This permits direct access to public headers in the fsw/inc directory
+target_include_directories(payloadMC_app PUBLIC fsw/inc)
+
+set(APP_TABLE_FILES
+  fsw/tables/payloadMC_config_tbl.c
+)
+
+add_cfe_tables(payloadMC_app ${APP_TABLE_FILES})
