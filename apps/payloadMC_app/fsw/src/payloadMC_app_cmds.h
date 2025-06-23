@@ -1,11 +1,9 @@
 #ifndef PAYLOADMC_APP_CMDS_H
 #define PAYLOADMC_APP_CMDS_H
 
-#include "cfe.h"
-#include "cfe_error.h"
 #include "payloadMC_app.h"
 
-CFE_Status_t PAYLOADMC_APP_SEND_HK_TO_SB();
+CFE_Status_t PAYLOADMC_APP_SEND_HK_TO_SB(void);
 /**
  * @brief Sends the housekeeping data to the software bus
  * 
