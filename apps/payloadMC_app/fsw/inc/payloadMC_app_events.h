@@ -154,7 +154,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to release the address of a table, which is essential for its configuration or operation.
  */
 
- #define PAYLOADMC_APP_HK_PREP_ERR_EID      208  // Error preparing housekeeping packet
+ #define PAYLOADMC_HK_PREP_ERR_EID      208  // Error preparing housekeeping packet
 /**
  * @brief Event ID for error in preparing a housekeeping packet in the PayloadMC application
  * 
@@ -167,7 +167,7 @@
  * for transmission, which is essential for monitoring the application's health and status.
  */
 
-#define PAYLOADMC_APP_HK_SEND_ERR_EID       209  // Error sending housekeeping packet
+#define PAYLOADMC_HK_SEND_ERR_EID       209  // Error sending housekeeping packet
 /**
  * @brief Event ID for error in sending a housekeeping packet in the PayloadMC application
  * 
@@ -179,6 +179,20 @@
  * This event indicates that the PayloadMC application encountered an error while trying to send a housekeeping packet
  * to the software bus, which is essential for monitoring the application's health and status.
  */
+
+ #define PAYLOADMC_UNKNOWN_MSG_ERR_EID  210  // Unknown message received
+/**
+ * @brief Event ID for receiving an unknown message in the PayloadMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the PayloadMC application received a message that it does not recognize or cannot process.
+ * It is logged when an unexpected message is received on the software bus, which may indicate a configuration or communication issue.
+ */
+
 
 
 // -----------------------------------------
