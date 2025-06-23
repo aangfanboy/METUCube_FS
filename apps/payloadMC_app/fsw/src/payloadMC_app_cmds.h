@@ -1,6 +1,7 @@
 #ifndef PAYLOADMC_APP_CMDS_H
 #define PAYLOADMC_APP_CMDS_H
 
+#include "cfe.h"
 #include "cfe_error.h"
 #include "payloadMC_app.h"
 
