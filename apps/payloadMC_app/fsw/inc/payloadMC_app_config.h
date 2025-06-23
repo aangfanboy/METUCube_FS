@@ -23,7 +23,7 @@
 // Set to CFE_SB_PEND_FOREVER if you want to wait indefinitely for a message, note that cfe.h needs to be included for this definition
 
 #define PAYLOADMC_MAX_COMBINED_PACKET_SIZE  1024       /**< \brief Maximum size of combined packets in bytes for PayloadMC application */
-#define PAYLOADMC_PIPE_DEPTH                32          /**< \brief Depth of the software bus pipe for PayloadMC application */
+#define PAYLOADMC_PIPE_DEPTH                12          /**< \brief Depth of the software bus pipe for PayloadMC application */
 
 #define PAYLOADMC_CONFIG_TABLE_NAME        "PayloadMC_ConfigTable" /**< \brief Name of the configuration table for PayloadMC application */
 #define PAYLOADMC_CONFIG_TABLE_FILENAME    "payloadMC_app_config_tbl.c"  /**< \brief Filename of the configuration table for PayloadMC application */

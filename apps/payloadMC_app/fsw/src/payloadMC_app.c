@@ -64,7 +64,7 @@ CFE_Status_t PAYLOADMC_appInit(void)
     }
 
     // Create a software bus pipe ---------------------
-    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CmdPipe, PAYLOADMC_PIPE_DEPTH, "PAYLOADMC_APP_CMD_PIPE");
+    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CmdPipe, PAYLOADMC_PIPE_DEPTH, PAYLOADMC_SEND_HK_MID_NAME);
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(PAYLOADMC_CREATE_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
