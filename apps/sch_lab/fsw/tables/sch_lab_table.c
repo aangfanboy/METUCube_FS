@@ -64,7 +64,7 @@
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
-#include "payloadMC_app_config_msgids.h"
+#include "payloadMC_app_msgids.h"
 #endif
 
 #ifdef HAVE_ADCSMC_APP
