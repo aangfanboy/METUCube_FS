@@ -11,6 +11,7 @@
 #include "payloadMC_app_extern_typedefs.h"
 #include "payloadMC_app_events.h"
 #include "payloadMC_app_tbldefs.h"
+#include "payloadMC_app_dispatch.h"
 
 /*************************************************************************/
 /*
