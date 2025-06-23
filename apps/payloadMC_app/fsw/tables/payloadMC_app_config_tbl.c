@@ -17,5 +17,5 @@
     250  // someRandomTemperatureConfig (example value, can be adjusted)
 };
 
-CFE_TBL_FILEDEF(PAYLOADMC_ConfigTbl, PAYLOADMC_APP.ConfigTable, PayloadMC App Conf, payloadMC_app_config_tbl.tbl)
+CFE_TBL_FILEDEF(PAYLOADMC_ConfigTbl, PAYLOADMC_APP.ConfigTable, PayloadCT, payloadMC_app_config_tbl.tbl)
 
