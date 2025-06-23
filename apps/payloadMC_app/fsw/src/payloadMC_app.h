@@ -12,6 +12,7 @@
 #include "payloadMC_app_events.h"
 #include "payloadMC_app_tbldefs.h"
 #include "payloadMC_app_dispatch.h"
+#include "payloadMC_app_cmds.h"
 
 /*************************************************************************/
 /*
