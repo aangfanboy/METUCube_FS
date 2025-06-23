@@ -10,7 +10,7 @@
 #include "payloadMC_app_msg.h"
 #include "payloadMC_app_extern_typedefs.h"
 #include "payloadMC_app_events.h"
-#include "payloadMC_app_tbl.h"
+#include "payloadMC_app_tbldefs.h"
 
 /*************************************************************************/
 /*
