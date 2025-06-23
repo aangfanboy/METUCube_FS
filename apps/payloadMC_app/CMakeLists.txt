@@ -14,7 +14,7 @@ add_cfe_app(payloadMC_app ${APP_SRC_FILES})
 target_include_directories(payloadMC_app PUBLIC fsw/inc)
 
 set(APP_TABLE_FILES
-  fsw/tables/payloadMC_config_tbl.c
+  fsw/tables/payloadMC_app_config_tbl.c
 )
 
 add_cfe_tables(payloadMC_app ${APP_TABLE_FILES})
