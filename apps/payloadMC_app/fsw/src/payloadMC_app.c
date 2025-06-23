@@ -18,11 +18,11 @@ void PAYLOADMC_appMain(void)
 
     while (CFE_ES_RunLoop(&PAYLOADMC_AppData.RunStatus) == true)
     {
-        CFE_ES_PerfLogExit(PAYLOADMC_APP_PERF_ID);
+        CFE_ES_PerfLogExit(PAYLOADMC_PERFORMANCE_ID);
 
         status = CFE_SB_ReceiveBuffer(&SBBufPtr, PAYLOADMC_AppData.CommandPipe, PAYLOADMC_SB_TIMEOUT);
 
-        CFE_ES_PerfLogEntry(PAYLOADMC_APP_PERF_ID);
+        CFE_ES_PerfLogEntry(PAYLOADMC_PERFORMANCE_ID);
 
         if (status == CFE_SUCCESS)
         {
