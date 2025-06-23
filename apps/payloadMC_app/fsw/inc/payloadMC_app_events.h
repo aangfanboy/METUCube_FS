@@ -17,7 +17,7 @@
 // -----------------------------------------
 
 // PayloadMC Application Information Event IDs
-#define PAYLOADMC_INIT_INF_EID                    0xAE1000  // Housekeeping initialized
+#define PAYLOADMC_INIT_INF_EID                  100  // Housekeeping initialized
 /**
  * * @brief Event ID for successful initialization of the PayloadMC application
  * 
@@ -29,7 +29,7 @@
  * It is logged when initialization routines complete without errors.
  */
 
-#define PAYLOADMC_MSG_RECEIVED_EID               0xAE1001  // Message received
+#define PAYLOADMC_MSG_RECEIVED_EID             101  // Message received
 /**
  * @brief Event ID for successful reception of a message from software bus in the PayloadMC application
  * 
@@ -41,7 +41,7 @@
  * It is logged when a command or telemetry message is processed without errors.
  */
 
- #define PAYLOADMC_APP_HK_SEND_SUCCESS_EID        0xAE1002  // Housekeeping packet sent successfully
+ #define PAYLOADMC_APP_HK_SEND_SUCCESS_EID      102  // Housekeeping packet sent successfully
 /**
  * @brief Event ID for successful sending of a housekeeping packet in the PayloadMC application
  * 
@@ -56,7 +56,7 @@
 // -----------------------------------------
 
 // PayloadMC Application Error Event IDs
-#define PAYLOADMC_RCV_MSG_ERR_EID          0xAE2000  // Error receiving message
+#define PAYLOADMC_RCV_MSG_ERR_EID          200  // Error receiving message
 /**
  * @brief Event ID for error in receiving a message in the PayloadMC application
  * 
@@ -69,7 +69,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to receive a message from software bus subscriptions.
  */
 
- #define PAYLOADMC_CREATE_PIPE_ERR_EID      0xAE2001  // Error creating software bus pipe
+ #define PAYLOADMC_CREATE_PIPE_ERR_EID      201  // Error creating software bus pipe
 /**
  * @brief Event ID for error in creating a software bus pipe in the PayloadMC application
  * 
@@ -81,7 +81,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to create a software bus pipe for communication.
  */
 
-#define PAYLOADMC_SUBSCRIBE_ERR_EID         0xAE2002  // Error subscribing to software bus messages
+#define PAYLOADMC_SUBSCRIBE_ERR_EID         202  // Error subscribing to software bus messages
 /**
  * @brief Event ID for error in subscribing to software bus messages in the PayloadMC application
  * 
@@ -94,7 +94,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to subscribe to software bus messages.
  */
 
- #define PAYLOADMC_TBL_REGISTER_ERR_EID   0xAE2003  // Error registering to table
+ #define PAYLOADMC_TBL_REGISTER_ERR_EID   203  // Error registering to table
 /**
  * @brief Event ID for error in registering to a table in the PayloadMC application
  * 
@@ -106,7 +106,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to register to a table for configuration or data storage.
  */
 
-#define PAYLOADMC_TBL_LOAD_ERR_EID          0xAE2004  // Error loading table
+#define PAYLOADMC_TBL_LOAD_ERR_EID          204  // Error loading table
 /**
  * @brief Event ID for error in loading a table in the PayloadMC application
  * 
@@ -118,7 +118,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to load a table, which is essential for its configuration or operation.
  */
 
-#define PAYLOADMC_TBL_MANAGE_ERR_EID       0xAE2005  // Error managing table
+#define PAYLOADMC_TBL_MANAGE_ERR_EID       205  // Error managing table
 /**
  * @brief Event ID for error in managing a table in the PayloadMC application
  * 
@@ -130,7 +130,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to manage a table, which is essential for its configuration or operation.
  */
 
-#define PAYLOADMC_TBL_GET_ADDR_ERR_EID     0xAE2006  // Error getting table address
+#define PAYLOADMC_TBL_GET_ADDR_ERR_EID     206  // Error getting table address
 /**
  * @brief Event ID for error in getting a table address in the PayloadMC application
  * 
@@ -142,7 +142,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to get the address of a table, which is essential for its configuration or operation.
  */
 
- #define PAYLOADMC_TBL_RELEASE_ADDR_ERR_EID  0xAE2007  // Error releasing table address
+ #define PAYLOADMC_TBL_RELEASE_ADDR_ERR_EID  207  // Error releasing table address
 /**
  * @brief Event ID for error in releasing a table address in the PayloadMC application
  * 
@@ -154,7 +154,7 @@
  * This event indicates that the PayloadMC application encountered an error while trying to release the address of a table, which is essential for its configuration or operation.
  */
 
- #define PAYLOADMC_APP_HK_PREP_ERR_EID      0xAE2008  // Error preparing housekeeping packet
+ #define PAYLOADMC_APP_HK_PREP_ERR_EID      208  // Error preparing housekeeping packet
 /**
  * @brief Event ID for error in preparing a housekeeping packet in the PayloadMC application
  * 
@@ -167,7 +167,7 @@
  * for transmission, which is essential for monitoring the application's health and status.
  */
 
-#define PAYLOADMC_APP_HK_SEND_ERR_EID       0xAE2009  // Error sending housekeeping packet
+#define PAYLOADMC_APP_HK_SEND_ERR_EID       209  // Error sending housekeeping packet
 /**
  * @brief Event ID for error in sending a housekeeping packet in the PayloadMC application
  * 
