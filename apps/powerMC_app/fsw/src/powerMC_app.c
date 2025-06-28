@@ -181,8 +181,8 @@ CFE_Status_t POWERMC_appResetHkData(void)
 {
     POWERMC_AppData.CmdCounter = 0;
     POWERMC_AppData.ErrCounter = 0;
-    POWERMC_AppData.ActiveCameraN = 0;
-    POWERMC_AppData.NumberOfTakenPhotos = 0;
+    POWERMC_AppData.CurrentVoltage = 0;
+    POWERMC_AppData.CurrentTemperature = 0;
     
     return CFE_SUCCESS;
 }
