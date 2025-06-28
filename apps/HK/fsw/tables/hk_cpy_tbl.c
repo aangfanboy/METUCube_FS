@@ -32,7 +32,7 @@
 #include "hk_tbldefs.h"
 #include "cfe_tbl_filedef.h"
 
-#include "powerMC_config_msgids.h"
+#include "powerMC_app_msgids.h"
 #include "commMC_config_msgids.h"
 #include "payloadMC_app_msgids.h"
 #include "adcsMC_config_msgids.h"
