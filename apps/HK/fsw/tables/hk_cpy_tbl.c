@@ -36,7 +36,7 @@
 #include "commMC_config_msgids.h"
 #include "payloadMC_app_msgids.h"
 #include "adcsMC_app_msgids.h"
-#include "adcsttMC_config_msgids.h"
+#include "adcsttMC_app_msgids.h"
 
 hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     /*         inputMid        inputOffset     outputMid    outputOffset  numBytes*/
@@ -66,7 +66,7 @@ hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     },
     /*   7 */
     {
-        CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_APP_HK_TLM_MID),
+        CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_HK_TLM_MID),
         16,
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
         73,
