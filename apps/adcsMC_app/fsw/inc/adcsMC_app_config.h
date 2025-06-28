@@ -17,7 +17,7 @@
 #define ADCSMC_MINOR_VERSION             0           /**< \brief Minor version of the AdcsMC application, needs to be updated from config table  */
 #define ADCSMC_REVISION                  0           /**< \brief Revision of the AdcsMC application, needs to be updated from config table */
 
-#define ADCSMC_PERFORMANCE_ID            0xE001     /**< \brief Performance ID for AdcsMC application performance monitoring */
+#define ADCSMC_PERFORMANCE_ID            0xc001     /**< \brief Performance ID for AdcsMC application performance monitoring */
 
 #define ADCSMC_SB_TIMEOUT                5000        /**< \brief Software bus timeout in milliseconds for AdcsMC application */
 // Set to CFE_SB_PEND_FOREVER if you want to wait indefinitely for a message, note that cfe.h needs to be included for this definition

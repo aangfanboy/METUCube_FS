@@ -12,9 +12,9 @@
 #define ADCSTTMC_MSGIDS_H
 
 /* Message IDs for AdcsttMC Application */
-#define ADCSTTMC_HK_TLM_MID           0xEC0
-#define ADCSTTMC_SEND_HK_MID          0xEC1
-#define ADCSTTMC_CMD_MID              0xEC2
+#define ADCSTTMC_HK_TLM_MID           0xDC0
+#define ADCSTTMC_SEND_HK_MID          0xDC1
+#define ADCSTTMC_CMD_MID              0xDC2
 
 #define ADCSTTMC_SEND_HK_MID_NAME        "ADCSTTMC_SEND_C"
 
