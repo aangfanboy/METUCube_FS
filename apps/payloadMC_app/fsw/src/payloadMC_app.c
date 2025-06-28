@@ -142,9 +142,9 @@ CFE_Status_t PAYLOADMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, PAYLOADMC_Co
         return status;
     }
 
-    // Get the address of the table
+    // Get the address of the table    
     status = CFE_TBL_GetAddress((void **)TblPtr, *TblHandlePtr);
-    if (status != CFE_SUCCESS)
+    if (status != CFE_TBL_INFO_UPDATED)
     {
         CFE_EVS_SendEvent(PAYLOADMC_TBL_GET_ADDR_ERR_EID, CFE_EVS_EventType_ERROR,
                           "PAYLOADMC: Error getting table address, status: %d\n", status);
