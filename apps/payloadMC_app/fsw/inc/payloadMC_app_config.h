@@ -26,7 +26,7 @@
 #define PAYLOADMC_PIPE_DEPTH                12          /**< \brief Depth of the software bus pipe for PayloadMC application */
 
 #define PAYLOADMC_CONFIG_TABLE_NAME        "PayConfigT" /**< \brief Name of the configuration table for PayloadMC application */
-#define PAYLOADMC_CONFIG_TABLE_FILENAME    "/cf/payloadMC_app_config_tbl.tbl"  /**< \brief Filename of the configuration table for PayloadMC application */
+#define PAYLOADMC_CONFIG_TABLE_FILENAME    "/cf/pconfig.tbl"  /**< \brief Filename of the configuration table for PayloadMC application */
 
 #define PAYLOADMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for PayloadMC application, set to 1MB */
 
