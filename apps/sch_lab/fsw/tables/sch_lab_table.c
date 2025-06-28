@@ -68,7 +68,7 @@
 #endif
 
 #ifdef HAVE_ADCSMC_APP
-#include "adcsMC_config_msgids.h"
+#include "adcsMC_app_msgids.h"
 #endif
 
 #ifdef HAVE_ADCSTTMC_APP
@@ -132,7 +132,7 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_SEND_HK_MID), 1001, 0},
 #endif
 #ifdef HAVE_ADCSMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(ADCSMC_APP_SEND_HK_MID), 1001, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(ADCSMC_SEND_HK_MID), 1001, 0},
 #endif
 #ifdef HAVE_ADCSTTMC_APP
         {CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_APP_SEND_HK_MID), 1001, 0},
