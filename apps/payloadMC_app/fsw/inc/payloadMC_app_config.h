@@ -25,7 +25,7 @@
 #define PAYLOADMC_MAX_COMBINED_PACKET_SIZE  1024       /**< \brief Maximum size of combined packets in bytes for PayloadMC application */
 #define PAYLOADMC_PIPE_DEPTH                12          /**< \brief Depth of the software bus pipe for PayloadMC application */
 
-#define PAYLOADMC_CONFIG_TABLE_NAME        "PayloadMC_ConfigT" /**< \brief Name of the configuration table for PayloadMC application */
+#define PAYLOADMC_CONFIG_TABLE_NAME        "PayConfigT" /**< \brief Name of the configuration table for PayloadMC application */
 #define PAYLOADMC_CONFIG_TABLE_FILENAME    "payloadMC_app_config_tbl.c"  /**< \brief Filename of the configuration table for PayloadMC application */
 
 #define PAYLOADMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for PayloadMC application, set to 1MB */
