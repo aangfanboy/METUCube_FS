@@ -106,7 +106,7 @@ CFE_Status_t POWERMC_appInit(void)
         return status;
     }
 
-    CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "POWERMC: Table content: %d, %d, %d, %d\n", POWERMC_Config_TablePtr->MinorVersion, POWERMC_Config_TablePtr->Revision, POWERMC_Config_TablePtr->someRandomCameraConfig, POWERMC_Config_TablePtr->someRandomTemperatureConfig);
+    CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "POWERMC: Table content: %d, %d, %d, %d\n", POWERMC_Config_TablePtr->MinorVersion, POWERMC_Config_TablePtr->Revision, POWERMC_Config_TablePtr->someRandomPowerConfig, POWERMC_Config_TablePtr->someRandomTemperatureConfig);
 
     return CFE_SUCCESS;
 }
