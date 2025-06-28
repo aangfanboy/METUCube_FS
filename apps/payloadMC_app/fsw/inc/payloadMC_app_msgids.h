@@ -16,6 +16,6 @@
 #define PAYLOADMC_SEND_HK_MID          0xEC1
 #define PAYLOADMC_CMD_MID              0xEC2
 
-#define PAYLOADMC_SEND_HK_MID_NAME        "PAYLOADMC_SEND"
+#define PAYLOADMC_SEND_HK_MID_NAME        "PAYLOADMC_SEND_C"
 
 #endif /* PAYLOADMC_MSGIDS_H */
