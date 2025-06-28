@@ -43,8 +43,8 @@ typedef struct
 
     uint8                   CmdCounter; /**< \brief Number of valid commands received */
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    uint32                  ActiveCameraN; /**< \brief Active camera number */
-    uint32                  NumberOfTakenPhotos;
+    uint32                  CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
+    uint32                  CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

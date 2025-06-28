@@ -192,8 +192,8 @@ CFE_Status_t POWERMC_appPrepareHkPacket(void)
 
     POWERMC_AppData.HkPacket.Power.CmdCounter = POWERMC_AppData.CmdCounter;
     POWERMC_AppData.HkPacket.Power.ErrCounter = POWERMC_AppData.ErrCounter;
-    POWERMC_AppData.HkPacket.Power.ActiveCameraN = POWERMC_AppData.ActiveCameraN;
-    POWERMC_AppData.HkPacket.Power.NumberOfTakenPhotos = POWERMC_AppData.NumberOfTakenPhotos;
+    POWERMC_AppData.HkPacket.Power.CurrentVoltage = POWERMC_AppData.CurrentVoltage;
+    POWERMC_AppData.HkPacket.Power.CurrentTemperature = POWERMC_AppData.CurrentTemperature;
 
     CFE_MSG_Init(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(POWERMC_HK_TLM_MID),
                  sizeof(POWERMC_AppData.HkPacket));
