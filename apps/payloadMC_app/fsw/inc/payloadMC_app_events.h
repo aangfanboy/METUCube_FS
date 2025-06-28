@@ -193,6 +193,21 @@
  * It is logged when an unexpected message is received on the software bus, which may indicate a configuration or communication issue.
  */
 
+#define PAYLOADMC_INIT_HK_ERR_EID          211  // Command error
+/**
+ * @brief Event ID for error in initializing housekeeping data in the PayloadMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the PayloadMC application encountered an error while trying to initialize the housekeeping data,
+ * which is essential for monitoring the application's health and status.
+ * It is logged when the initialization routines fail to complete successfully.
+ * This may occur due to issues with memory allocation, data structure initialization, or other critical setup tasks.
+ */
+
 
 
 // -----------------------------------------

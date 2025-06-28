@@ -63,9 +63,18 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
-    // Create a software bus pipe ---------------------
-    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CmdPipe, PAYLOADMC_PIPE_DEPTH, PAYLOADMC_SEND_HK_MID_NAME);
+    // Initialize housekeeping data
+    status = PAYLOADMC_appPrepareHkPacket();
     if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
+                            "PAYLOADMC App: Error Initializing HK Packet, error 0x%08X", (unsigned int)status);
+        return status;
+    }
+
+    // Create a software bus pipe ---------------------
+    status = CFE_SB_CreatePipe(&PAYLOADMC_AppData.CmdPipe, 12, "PAYLOADMC_SEND_HK_MID");
+    if (status != CFE_SUCCESS) 
     {
         CFE_EVS_SendEvent(PAYLOADMC_CREATE_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "PAYLOADMC App: Error Creating SB Pipe, error 0x%08X", (unsigned int)status);
