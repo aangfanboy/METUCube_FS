@@ -33,7 +33,7 @@
 #include "cfe_tbl_filedef.h"
 
 #include "powerMC_app_msgids.h"
-#include "commMC_config_msgids.h"
+#include "commMC_app_msgids.h"
 #include "payloadMC_app_msgids.h"
 #include "adcsMC_app_msgids.h"
 #include "adcsttMC_app_msgids.h"
@@ -50,7 +50,7 @@ hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     },
     /*   5 */
     {
-        CFE_SB_MSGID_WRAP_VALUE(COMMMC_APP_HK_TLM_MID),
+        CFE_SB_MSGID_WRAP_VALUE(COMMMC_HK_TLM_MID),
         16,
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
         32,
