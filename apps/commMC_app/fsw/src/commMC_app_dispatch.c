@@ -24,7 +24,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                     break;
                 default:
                     CFE_EVS_SendEvent(COMMMC_INVALID_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                        "COMMMC: Invalid command task ID = 0x%x", CmdPkt->CommandData[3]);
+                                        "COMMMC: Invalid command task ID = 0x%x", CmdPkt->CommandData[4]);
                     break;
             }
             break;
