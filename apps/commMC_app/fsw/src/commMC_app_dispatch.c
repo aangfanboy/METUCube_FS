@@ -21,12 +21,12 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
             {
-                CFE_EVS_SendEvent(COMMMC_MINIMAL_TM_SENT_EID, CFE_EVS_EventType_INFORMATION,
+                CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                     "COMMMC: Sent minimal telemetry to ground");
             }
             else if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
             {
-                CFE_EVS_SendEvent(COMMMC_MAX_TM_SENT_EID, CFE_EVS_EventType_INFORMATION,
+                CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                     "COMMMC: Sent max telemetry to ground");
             }
             else
