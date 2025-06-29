@@ -15,8 +15,7 @@
 
 typedef struct
 {
-    int OutMsgToSend; /**< \brief Command Task ID to specify the action to be taken */
-    
+   CFE_SB_MsgId_t CommandTaskId; /**< \brief Command Task ID */
 } COMMMC_APP_CommandPacket_Payload_t;
 
 typedef struct 
