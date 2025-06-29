@@ -15,7 +15,8 @@
 
 typedef struct
 {
-   CFE_SB_MsgId_t CommandTaskId; /**< \brief Command Task ID */
+   int CommandTaskId; /**< \brief Command Task ID */
+
 } COMMMC_APP_CommandPacket_Payload_t;
 
 typedef struct 
