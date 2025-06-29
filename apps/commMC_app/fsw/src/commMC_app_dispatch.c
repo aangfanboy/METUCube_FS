@@ -5,7 +5,6 @@
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
-    COMMMC_APP_CommandPacket_t *CmdPtr = NULL;
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
@@ -16,11 +15,17 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                               "COMMMC: Received command packet");
 
 
-            CmdPtr = (COMMMC_APP_CommandPacket_t *)SBBufPtr;
-            CFE_MSG_FcnCode_t CommandCode = 0;
-            CFE_MSG_GetFcnCode(&SBBufPtr->Msg, &CommandCode);
+            /**
+             * The signal is sent via following code from scheduler task
+             * {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 101, 0, 4, {COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND}},
+             * 
+             * In the switch statement below, we check the CommandCode, for the example above it would be COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND
+             */
 
-            switch (CommandCode)
+            COMMMC_APP_CommandPacket_Payload_t *PayloadPtr = (COMMMC_APP_CommandPacket_Payload_t *)CFE_SB_GetUserData(SBBufPtr);
+
+            CFE_MSG_GetFcnCode(&SBBufPtr->Msg, &CommandCode);
+            switch (PayloadPtr->OutMsgToSend)
             {
                 case COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND:
                     CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
@@ -29,7 +34,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                     break;
                 default:
                     CFE_EVS_SendEvent(COMMMC_INVALID_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                        "COMMMC: Invalid command task ID = 0x%x", CommandCode);
+                                        "COMMMC: Invalid command task ID = %d", PayloadPtr->OutMsgToSend);
                     break;
             }
             break;
