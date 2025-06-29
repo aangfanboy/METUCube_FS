@@ -5,7 +5,6 @@
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
-    CFE_MSG_FcnCode_t CommandCode = 0;
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
@@ -15,9 +14,8 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            CFE_MSG_GetFcnCode(&SBBufPtr->Msg, &CommandCode);
-
-            switch (CommandCode)
+            const COMMMC_APP_CommandPacket_t *CmdPkt = (const COMMMC_APP_CommandPacket_t *)SBBufPtr;
+            switch (CmdPkt->CommandData[3])
             {
                 case COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND:
                     CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
@@ -26,7 +24,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                     break;
                 default:
                     CFE_EVS_SendEvent(COMMMC_INVALID_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                        "COMMMC: Invalid command code received, CC = %d", CommandCode);
+                                        "COMMMC: Invalid command task ID = 0x%x", CmdPkt->CommandData[3]);
                     break;
             }
             break;
