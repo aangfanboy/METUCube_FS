@@ -6,6 +6,8 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
     CFE_Status_t status = CFE_SUCCESS;
+
+    MsgId = CFE_SB_GetMsgId(SBBufPtr);
     
     switch (CFE_SB_MsgIdToValue(MsgId))
     {
@@ -26,7 +28,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                     CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_ERR_EID, CFE_EVS_EventType_ERROR,
                                         "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
                 }
-                
+
             }
             break;
 
