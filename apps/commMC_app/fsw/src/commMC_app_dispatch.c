@@ -19,12 +19,12 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CmdPtr = &((const COMMMC_APP_CommandPacket_t *)SBBufPtr)->Payload;
             CommandTaskId = CmdPtr->CommandTaskId;
 
-            if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
+            if (CFE_SB_MsgId_Equal(CommandTaskId, COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND))
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                     "COMMMC: Sent minimal telemetry to ground");
             }
-            else if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
+            else if (CFE_SB_MsgId_Equal(CommandTaskId, COMMMC_APP_COMMAND_TASK_ID_SEND_MAX))
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                     "COMMMC: Sent max telemetry to ground");
@@ -32,7 +32,8 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             else
             {
                 CFE_EVS_SendEvent(COMMMC_INVALID_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                    "COMMMC: Invalid command task ID received: 0x%x", (unsigned int)CommandTaskId);
+                                    "COMMMC: Invalid command task ID received: 0x%08lX",
+                                    (unsigned long)CFE_SB_MsgIdToValue(CommandTaskId));
             }
             break;
 
