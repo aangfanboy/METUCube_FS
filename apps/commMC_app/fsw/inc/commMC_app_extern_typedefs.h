@@ -15,7 +15,7 @@
 
 typedef struct
 {
-    CFE_SB_MsgId_t OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
+    uint16 OutMsgToSend; /**< \brief Command Task ID to specify the action to be taken */
 } COMMMC_APP_CommandPacket_Payload_t;
 
 typedef struct 
