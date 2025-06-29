@@ -45,8 +45,7 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint32             NumberOfTakenPhotos; /**< \brief Number of photos taken by the comm camera */
-    uint32             ActiveCameraN;      /**< \brief Active camera number */
+    uint32             currentConnectionRate; /**< \brief Current connection rate in Hz */
 
     CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
 } COMMMC_HkTlm_Comm_t;
