@@ -13,9 +13,9 @@
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND 0x0001
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
 
-typedef struct 
+typedef struct // {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 301, 0, 4, {COMMMC_APP_COMMAND_TASK_ID_SEND_MAX}},
 {
-    uint16 CommandTaskId; /**< \brief Command task ID */
+    uint16 CommandTaskId; /**< Command Task ID */
 } COMMMC_APP_CommandPacket_t;
  /**
   * @brief Command Packet Structure for CommMC Application
