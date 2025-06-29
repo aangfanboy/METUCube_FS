@@ -1,5 +1,6 @@
 #include "commMC_app.h"
 #include "commMC_app_dispatch.h"
+#include "commMC_app_extern_typedefs.h"
 
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -12,6 +13,20 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
         case COMMMC_CMD_MID:
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
+
+            const COMMMC_APP_CommandPacket_t *CmdPkt = (const COMMMC_APP_CommandPacket_t *)SBBufPtr;
+            if (CmdPkt->CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
+            {
+                CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
+                                  "COMMMC: Received SEND_MINIMAL_TM_TO_GROUND command");
+                // Call the function to handle this command
+                
+            }
+            else
+            {
+                CFE_EVS_SendEvent(COMMMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "COMMMC: Unknown command task ID = %u", CmdPkt->CommandTaskId);
+            }
 
             break;
 

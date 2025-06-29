@@ -33,6 +33,12 @@
 #include "hk_events.h"
 #include <string.h>
 
+#include "powerMC_app_msgids.h"
+#include "commMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
+#include "adcsMC_app_msgids.h"
+#include "adcsttMC_app_msgids.h"
+
 /*************************************************************************
 ** Function definitions
 **************************************************************************/
@@ -113,7 +119,7 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                         CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA5, one uint8 is %d, copied total of %d bytes, starting at offset %d",
                                           lastOneByte, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
                         break;
-                    default:
+                    default: 
                         CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is not valid, it is %d",
                                           (int)CFE_SB_MsgIdToValue(MessageID));
                         break;
