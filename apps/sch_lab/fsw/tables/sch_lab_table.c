@@ -76,7 +76,7 @@
 #endif
 
 #ifdef HAVE_COMMMC_APP
-#include "commMC_config_msgids.h"
+#include "commMC_app_msgids.h"
 #endif
 
 /*
@@ -138,7 +138,7 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_SEND_HK_MID), 1001, 0},
 #endif
 #ifdef HAVE_COMMMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_APP_SEND_HK_MID), 1001, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_SEND_HK_MID), 1001, 0},
 #endif
 #ifdef HAVE_HK
         {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), 1002, 0, 4, {HK_COMBINED_PKT1_MID}},
