@@ -12,9 +12,9 @@
 #define COMMMC_MSGIDS_H
 
 /* Message IDs for CommMC Application */
-#define COMMMC_HK_TLM_MID           0xEC0
-#define COMMMC_SEND_HK_MID          0xEC1
-#define COMMMC_CMD_MID              0xEC2
+#define COMMMC_HK_TLM_MID           0xBC0
+#define COMMMC_SEND_HK_MID          0xBC1
+#define COMMMC_CMD_MID              0xBC2
 
 #define COMMMC_SEND_HK_MID_NAME        "COMMMC_SEND_C"
 
