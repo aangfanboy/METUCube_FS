@@ -5,6 +5,7 @@
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
+    COMMMC_APP_CommandPacket_t *CmdPtr = NULL;
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
