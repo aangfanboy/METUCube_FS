@@ -13,11 +13,16 @@
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND 0x0001
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
 
-typedef struct // {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 301, 0, 4, {COMMMC_APP_COMMAND_TASK_ID_SEND_MAX}},
+typedef struct
 {
-    uint16 CommandTaskId; /**< Command Task ID */
+    CFE_SB_MsgId_t OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
+} COMMMC_APP_CommandPacket_Payload_t;
 
-    uint8 CommandData[4]; /**< Command Data, size can vary based on command */
+typedef struct 
+{
+    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command Message Header */
+
+    COMMMC_APP_CommandPacket_Payload_t Payload;
     
 } COMMMC_APP_CommandPacket_t;
  /**
