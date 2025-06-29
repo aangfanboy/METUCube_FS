@@ -183,7 +183,7 @@ CFE_Status_t COMMMC_appResetHkData(void)
     COMMMC_AppData.ErrCounter = 0;
     COMMMC_AppData.currentConnectionRate = 0;
     
-    return CFE_SUCCESS;
+    return CFE_SUCCESS; 
 }
 
 CFE_Status_t COMMMC_appPrepareHkPacket(void)
