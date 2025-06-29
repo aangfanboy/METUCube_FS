@@ -235,6 +235,23 @@
  * 
  */
 
+ #define COMMMC_SEND_MINIMAL_TM_ERR_EID 213  // Error sending minimal telemetry to ground
+/**
+ * @brief Event ID for error in sending minimal telemetry to ground in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to send minimal telemetry data to the ground station.
+ * It is logged when the application processes a command to send minimal telemetry and fails to complete the operation successfully.
+ * This may occur due to issues with message formatting, communication errors, or other operational problems that prevent the telemetry data from being transmitted.
+ * 
+ * This event is critical for ensuring that the ground station receives essential telemetry data from the CommMC application.
+ * It helps in diagnosing issues related to telemetry transmission and ensuring that the application can communicate effectively with the ground station.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs
