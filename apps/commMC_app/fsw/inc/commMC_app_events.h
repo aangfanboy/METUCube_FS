@@ -53,6 +53,18 @@
  * It is logged when the housekeeping data is prepared and transmitted without errors.
  */
 
+#define COMMMC_SEND_MINIMAL_TM_EID          103  // Minimal telemetry sent to ground
+/**
+ * @brief Event ID for successful sending of minimal telemetry to ground in the CommMC application
+ * 
+ * Type: Information
+ * 
+ * Cause: NA
+ * 
+ * This event indicates that the CommMC application has successfully sent minimal telemetry data to the ground station.
+ * It is logged when the application processes a command to send minimal telemetry and completes the operation without errors.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Error Event IDs
@@ -208,7 +220,20 @@
  * This may occur due to issues with memory allocation, data structure initialization, or other critical setup tasks.
  */
 
-
+ #define COMMMC_INVALID_CMD_ERR_EID  212  // Invalid command error
+/**
+ * @brief Event ID for invalid command error in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application received a command with an invalid or unrecognized task ID.
+ * It is logged when a command packet is received with a task ID that does not match any known command tasks in the application.
+ * This may occur due to a misconfiguration, a software bug, or an attempt to send an unsupported command.
+ * 
+ */
 
 // -----------------------------------------
 

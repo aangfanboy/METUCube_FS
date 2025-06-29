@@ -15,19 +15,18 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                               "COMMMC: Received command packet");
 
             const COMMMC_APP_CommandPacket_t *CmdPkt = (const COMMMC_APP_CommandPacket_t *)SBBufPtr;
-            if (CmdPkt->CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
+            switch (CmdPkt->CommandTaskId)
             {
-                CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                                  "COMMMC: Received SEND_MINIMAL_TM_TO_GROUND command");
-                // Call the function to handle this command
-                
-            }
-            else
-            {
-                CFE_EVS_SendEvent(COMMMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "COMMMC: Unknown command task ID = %u", CmdPkt->CommandTaskId);
-            }
+                case COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND:
+                    CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
+                                        "COMMMC: Sending minimal telemetry to ground");
 
+                    break;
+                default:
+                    CFE_EVS_SendEvent(COMMMC_INVALID_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
+                                        "COMMMC: Invalid command task ID = 0x%x", CmdPkt->CommandTaskId);
+                    break;
+            }
             break;
 
         case COMMMC_SEND_HK_MID:
