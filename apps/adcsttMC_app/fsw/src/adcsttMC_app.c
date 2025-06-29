@@ -181,8 +181,10 @@ CFE_Status_t ADCSTTMC_appResetHkData(void)
 {
     ADCSTTMC_AppData.CmdCounter = 0;
     ADCSTTMC_AppData.ErrCounter = 0;
-    ADCSTTMC_AppData.ActiveCameraN = 0;
-    ADCSTTMC_AppData.NumberOfTakenPhotos = 0;
+    ADCSTTMC_AppData.quaternion1 = 0.0;
+    ADCSTTMC_AppData.quaternion2 = 0.0;
+    ADCSTTMC_AppData.quaternion3 = 0.0;
+    ADCSTTMC_AppData.quaternion4 = 0.0;
     
     return CFE_SUCCESS;
 }
@@ -192,8 +194,10 @@ CFE_Status_t ADCSTTMC_appPrepareHkPacket(void)
 
     ADCSTTMC_AppData.HkPacket.Adcstt.CmdCounter = ADCSTTMC_AppData.CmdCounter;
     ADCSTTMC_AppData.HkPacket.Adcstt.ErrCounter = ADCSTTMC_AppData.ErrCounter;
-    ADCSTTMC_AppData.HkPacket.Adcstt.ActiveCameraN = ADCSTTMC_AppData.ActiveCameraN;
-    ADCSTTMC_AppData.HkPacket.Adcstt.NumberOfTakenPhotos = ADCSTTMC_AppData.NumberOfTakenPhotos;
+    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion1 = ADCSTTMC_AppData.quaternion1;
+    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion2 = ADCSTTMC_AppData.quaternion2;
+    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion3 = ADCSTTMC_AppData.quaternion3;
+    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion4 = ADCSTTMC_AppData.quaternion4;
 
     CFE_MSG_Init(CFE_MSG_PTR(ADCSTTMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(ADCSTTMC_HK_TLM_MID),
                  sizeof(ADCSTTMC_AppData.HkPacket));

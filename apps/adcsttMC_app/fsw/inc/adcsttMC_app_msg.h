@@ -45,8 +45,10 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint32             NumberOfTakenPhotos; /**< \brief Number of photos taken by the adcstt camera */
-    uint32             ActiveCameraN;      /**< \brief Active camera number */
+    double             quaternion1;         /**< \brief Quaternion component 1 */
+    double             quaternion2;         /**< \brief Quaternion component 2 */
+    double             quaternion3;         /**< \brief Quaternion component 3 */
+    double             quaternion4;         /**< \brief Quaternion component 4 */
 
     CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
 } ADCSTTMC_HkTlm_Adcstt_t;

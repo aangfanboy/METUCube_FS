@@ -5,7 +5,7 @@ CFE_APP, sch_lab,           SCH_LAB_AppMain,            SCH_LAB_APP,        80, 
 CFE_APP, HK,                HK_AppMain,                 HK,                 60,   16384, 0x0, 0;
 CFE_APP, DS,                DS_AppMain,                 DS,                 60,   16384, 0x0, 0;
 CFE_APP, powerMC_app,       POWERMC_appMain,            POWERMC_APP,        50,   16384, 0x0, 0;
-CFE_APP, commMC_app,        COMMMC_App_Main,            COMMMC_APP,         50,   16384, 0x0, 0;
+CFE_APP, commMC_app,        COMMMC_appMain,            COMMMC_APP,         50,   16384, 0x0, 0;
 CFE_APP, adcsMC_app,        ADCSMC_appMain,             ADCSMC_APP,         50,   16384, 0x0, 0;
 CFE_APP, adcsttMC_app,      ADCSTTMC_appMain,           ADCSTTMC_APP,       50,   16384, 0x0, 0;
 CFE_APP, payloadMC_app,     PAYLOADMC_appMain,          PAYLOADMC_APP,      50,   16384, 0x0, 0;
