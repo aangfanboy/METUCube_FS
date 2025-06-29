@@ -13,7 +13,7 @@ CFE_Status_t COMMMC_APP_SEND_HK_TO_SB(void);
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  */
 
-CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND(void);
+CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length);
 /**
  * @brief Sends minimal telemetry data to the ground
  * 
@@ -22,6 +22,8 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND(void);
  * 
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  * */
+
+CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND(void);
 
 #endif /* COMMMC_APP_CMDS_H */
  

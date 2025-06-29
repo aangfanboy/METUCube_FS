@@ -39,17 +39,22 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 {
     CFE_Status_t status = CFE_SUCCESS;
 
-    // write data to serial port or prepare telemetry packet
-    // '/dev/ttyUSB0' is an example, 9600
-    // for now, just send hello world
+    const char *port = "/dev/ttyUSB0"; // Example port, adjust as necessary
+    const unsigned char data[] = "Minimal Telemetry Data\n"; // Example data, adjust as necessary
+    status = COMMMC_APP_SEND_DATA_TO_GROUND(port, data, sizeof(data));
 
-    int fd = open("/dev/ttyUSB0", O_WRONLY | O_NOCTTY);
+    return status;
+}
+
+CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length) {
+    CFE_Status_t status = CFE_SUCCESS;
+
+    int fd = open(port, O_WRONLY | O_NOCTTY);
     if (fd < 0) return 1;
 
     struct termios tty;
     tcgetattr(fd, &tty);
 
-    // Minimal setup for 9600 8N1
     tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     tty.c_iflag = 0;
     tty.c_oflag = 0;
@@ -57,7 +62,7 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     tcsetattr(fd, TCSANOW, &tty);
 
-    write(fd, "Hello\n", 6);
+    write(fd, data, length);
 
     close(fd);
 
