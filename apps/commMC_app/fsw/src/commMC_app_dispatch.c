@@ -24,7 +24,6 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             COMMMC_APP_CommandPacket_Payload_t *PayloadPtr = (COMMMC_APP_CommandPacket_Payload_t *)CFE_SB_GetUserData(SBBufPtr);
 
-            CFE_MSG_GetFcnCode(&SBBufPtr->Msg, &CommandCode);
             switch (PayloadPtr->OutMsgToSend)
             {
                 case COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND:
