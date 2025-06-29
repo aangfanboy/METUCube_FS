@@ -10,14 +10,12 @@
  #ifndef COMMMC_EXTERN_TYPEDEFS_H
  #define COMMMC_EXTERN_TYPEDEFS_H
 
-    #include "cfe.h"
-
- #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND CFE_SB_MSGID_WRAP_VALUE(0x0001) /**< \brief Command Task ID for sending minimal telemetry to ground */
- #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX CFE_SB_MSGID_WRAP_VALUE(0x0002) /**< \brief Command Task ID for sending maximum telemetry to ground */
+ #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND 0x0001
+ #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
 
 typedef struct
 {
-   int CommandTaskId; /**< \brief Command Task ID */
+   CFE_SB_MsgId_t CommandTaskId; /**< \brief Command Task ID */
 
 } COMMMC_APP_CommandPacket_Payload_t;
 
