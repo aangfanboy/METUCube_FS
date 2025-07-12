@@ -15,8 +15,14 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            // assume the command packet is valid
-            if (true) // replace with actual command validation logic
+            const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
+
+            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
+
+            CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
+            OS_printf("COMMMC: OutMsgToSend = 0x%x\n", (unsigned int)CFE_SB_MsgIdToValue(OutMsgToSend));
+
+            if (false) // replace with actual command validation logic
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                                     "COMMMC: Command requested to send minimal telemetry to ground");
@@ -36,14 +42,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received HK request"); 
 
-            const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
-
-            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
-
-            CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
-            OS_printf("COMMMC: OutMsgToSend = 0x%x\n", (unsigned int)CFE_SB_MsgIdToValue(OutMsgToSend));
-
-            //COMMMC_APP_SEND_HK_TO_SB();
+            COMMMC_APP_SEND_HK_TO_SB();
             break;
 
         default:
