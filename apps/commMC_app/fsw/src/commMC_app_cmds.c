@@ -56,7 +56,7 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     // Prepare the data to send
     COMMMC_APP_MinimalTelemetryPacket_t minimal_tm_packet;
-    minimal_tm_packet.TelemetryHeader.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER();
+    minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER();
     minimal_tm_packet.AdcsTelemetry = adcs_telemetry_data;
     minimal_tm_packet.PayloadTelemetry = payload_telemetry_data;
 
