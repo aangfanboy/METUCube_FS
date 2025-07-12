@@ -59,7 +59,9 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
     minimal_tm_packet.TelemetryPayload.PayloadTelemetry = payload_telemetry_data;
 
-    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const uint8 *)&minimal_tm_packet.TelemetryPayload, sizeof(minimal_tm_packet.TelemetryPayload), 0, CFE_ES_CrcType_CRC_32);
+    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const COMMMC_APP_MinimalTelemetryPacket_t *)&minimal_tm_packet.TelemetryPayload,
+                                                  sizeof(minimal_tm_packet.TelemetryPayload), 3, CFE_ES_CrcType_CRC_32);
+    
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
     minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength);
@@ -74,6 +76,7 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
               sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
     OS_printf("COMMMC: Total packet size: %zu\n",
               sizeof(minimal_tm_packet));
+    OS_printf("COMMMC: CRC32 of Payload: 0x%08X\n", crc32OfPayload);
 
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 
