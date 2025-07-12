@@ -55,7 +55,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received HK request"); 
 
-            COMMMC_APP_SEND_HK_TO_SB();
+            status = COMMMC_APP_SEND_HK_TO_SB();
             break;
 
         default:
