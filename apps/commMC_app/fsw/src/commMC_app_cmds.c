@@ -99,7 +99,6 @@ COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER() {
 
     current_time = CFE_TIME_GetTime();
 
-    // value is 3 bits wide, so we can use 0-7
     telemetry_header.value = 3; // Set to 3, can be modified as needed
     telemetry_header.timestamp = current_time.Seconds;
 

@@ -39,7 +39,7 @@ typedef struct
 
 typedef struct __attribute__((packed))
 {
-    unsigned int value : 3; /**< \brief Value representing the telemetry type */
+    uint32 value;
     uint32 timestamp; /**< \brief Timestamp of the telemetry packet */
 
 } COMMMC_APP_TelemetryHeaderPacket_t;
