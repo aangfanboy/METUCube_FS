@@ -15,7 +15,7 @@
 
 typedef struct
 {
-    CFE_SB_MsgId_t OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
+    uint32 OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
 } HK_SendCombinedPkt_Payload_t;
 
 /**
