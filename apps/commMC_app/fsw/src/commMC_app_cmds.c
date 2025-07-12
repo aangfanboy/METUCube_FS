@@ -59,9 +59,9 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
     minimal_tm_packet.TelemetryPayload.PayloadTelemetry = payload_telemetry_data;
 
-    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const PayloadMC_MinimalTelemetry_t *)&minimal_tm_packet.TelemetryPayload.PayloadTelemetry,
-                                                  sizeof(minimal_tm_packet.TelemetryPayload.PayloadTelemetry), 0, CFE_ES_CrcType_CRC_32);
-
+    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const void *)&minimal_tm_packet.TelemetryPayload,
+                                                  sizeof(minimal_tm_packet.TelemetryPayload), 0, CFE_ES_CrcType_CRC_32);
+    
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
     minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength);
