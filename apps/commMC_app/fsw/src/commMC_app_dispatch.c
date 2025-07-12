@@ -19,13 +19,12 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
             CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
 
-            CFE_SB_MsgId_t CommandTaskId = CmdPtr->OutMsgToSend;
+            CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
 
-            CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                              "COMMMC: Received command with Task ID: 0x%04X", CommandTaskId);
+            OS_printf("COMMMC: OutMsgToSend = 0x%04X\n", (unsigned int)OutMsgToSend);
 
             // Check if the command is to send minimal telemetry
-            if ((uint32)CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
+            if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                                     "COMMMC: Command requested to send minimal telemetry to ground");
@@ -38,7 +37,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                                         "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
                 }
             }
-            else if ((uint32)CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
+            else if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
             {
                 CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                                     "COMMMC: Command requested to send maximum telemetry to ground");
@@ -47,7 +46,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             else
             {
                 CFE_EVS_SendEvent(COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID, CFE_EVS_EventType_ERROR,
-                                    "COMMMC: Unknown command task ID: 0x%04X", CommandTaskId);
+                                    "COMMMC: Unknown command task ID: 0x%04X", OutMsgToSend);
             }
             break;
 
