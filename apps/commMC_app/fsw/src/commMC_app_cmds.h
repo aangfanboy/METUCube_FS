@@ -44,15 +44,26 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned cha
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  * */
 
- COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID);
+ COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader);
 /**
  * @brief Creates a telemetry header for the CommMC application
  * 
- * This function constructs a telemetry header packet that includes a timestamp and other necessary fields.
- * It is used to prepare the telemetry data before sending it to the ground station.
+ * This function constructs a telemetry header packet for the CommMC application.
  * 
  * @param packetIdentificationMTID The Message Type ID for the telemetry packet.
- * @return COMMMC_APP_TelemetryHeaderPacket_t Returns a telemetry header packet with the current timestamp and other fields initialized.
+ * @param sizeOfPayloadAndSecondaryHeader The size of the payload and secondary header.
+ * 
+ * @return COMMMC_APP_TelemetryHeaderPacket_t Returns a telemetry header packet with the specified Message Type ID and size.
  */
+
+COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(uint32 crc32OfPayload);
+/**
+ * @brief Creates a telemetry secondary header for the CommMC application
+ * 
+ * This function constructs a telemetry secondary header packet for the CommMC application.
+ * @param crc32OfPayload The CRC32 checksum of the payload to be included in the secondary header.
+ * @return COMMMC_APP_TelemetrySecondaryHeaderPacket_t Returns a telemetry secondary header packet with the specified CRC32 checksum.
+ * */
+
 
 #endif /* COMMMC_APP_CMDS_H */
