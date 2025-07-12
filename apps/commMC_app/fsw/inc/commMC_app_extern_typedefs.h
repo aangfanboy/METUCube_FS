@@ -20,19 +20,6 @@
 
  #define COMMMC_APP_MINIMAL_TM_MTID 0
 
-typedef struct
-{
-   uint32 CommandTaskId; /**< \brief Command Task ID */
-
-} COMMMC_APP_CommandPacket_Payload_t;
-
-typedef struct 
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command Message Header */
-
-    COMMMC_APP_CommandPacket_Payload_t Payload;
-    
-} COMMMC_APP_CommandPacket_t;
  /**
   * @brief Command Packet Structure for CommMC Application
   * 
