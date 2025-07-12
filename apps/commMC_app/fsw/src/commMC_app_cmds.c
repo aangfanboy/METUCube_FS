@@ -165,7 +165,7 @@ void COMMMC_APP_LISTENER_TASK(void)
             OS_printf("Received %zd bytes: ", n);
         }
 
-        OS_TaskDelay(10);  // Sleep for 10ms
+        OS_TaskDelay(100);  // Sleep for 10ms
     }
 
     close(serial_fd);
