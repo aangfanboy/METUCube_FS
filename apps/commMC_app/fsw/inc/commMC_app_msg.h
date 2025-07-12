@@ -33,7 +33,7 @@ typedef struct
     uint8 OutMsgToSend5; /**< \brief Fifth Message ID to send */
 } COMMMC_APP_ProcessCmd_t;
 
-typedef structd
+typedef struct
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } COMMMC_APP_SendDataCmd_t;
