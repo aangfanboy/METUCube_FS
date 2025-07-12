@@ -12,7 +12,7 @@
 
  typedef struct
  {
-     uint8 batteryPercentage;  /**< Battery percentage */
+     uint32 batteryPercentage; /**< \brief Battery percentage of the payload */
  } PayloadMC_MinimalTelemetry_t;
  
  #endif /* PAYLOADMC_EXTERN_TYPEDEFS_H */
