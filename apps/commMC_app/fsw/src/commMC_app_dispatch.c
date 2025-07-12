@@ -5,7 +5,7 @@
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
-    CFE_Status_t status = CFE_SUCCESS;
+    //CFE_Status_t status = CFE_SUCCESS;
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
     
@@ -21,7 +21,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
 
-            OS_printf("COMMMC: OutMsgToSend = 0x%04X\n", (unsigned int)OutMsgToSend);
+            OS_printf("COMMMC: OutMsgToSend = 0x%04X\n", (uint32)OutMsgToSend);
 
             /*
             if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
@@ -55,7 +55,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received HK request"); 
 
-            status = COMMMC_APP_SEND_HK_TO_SB();
+            COMMMC_APP_SEND_HK_TO_SB();
             break;
 
         default:
