@@ -21,9 +21,12 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             const COMMMC_APP_ProcessCmd_t *CmdPtr;
             CmdPtr = (const COMMMC_APP_ProcessCmd_t *)SBBufPtr;
 
-            uint16 OutMsgToSend = CmdPtr->OutMsgToSend;
-            uint16 OutMsgToSend2 = CmdPtr->OutMsgToSend2;
-            OS_printf("COMMMC: OutMsgToSend = 0x%x, OutMsgToSend2 = 0x%x", OutMsgToSend, OutMsgToSend2);
+            uint8 OutMsgToSend = CmdPtr->OutMsgToSend;
+            uint8 OutMsgToSend2 = CmdPtr->OutMsgToSend2;
+            uint8 OutMsgToSend3 = CmdPtr->OutMsgToSend3;
+            uint8 OutMsgToSend4 = CmdPtr->OutMsgToSend4;
+            OS_printf("COMMMC: OutMsgToSend = %d, OutMsgToSend2 = %d, OutMsgToSend3 = %d, OutMsgToSend4 = %d\n",
+                      OutMsgToSend, OutMsgToSend2, OutMsgToSend3, OutMsgToSend4);
             break;
 
         case COMMMC_SEND_HK_MID:
