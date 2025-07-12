@@ -17,24 +17,11 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            const HK_SendCombinedPkt_Payload_t *CmdPtr;
-
-            CmdPtr = &((const HK_SendCombinedPktCmd_t *)SBBufPtr)->Payload;
-            uint32 WhichMidToSend = CmdPtr->OutMsgToSend;
-
-            // print whether CFE_SB_MsgId_Equal(ThisEntrysOutMid, WhichMidToSend)
-            if (CFE_SB_MsgId_Equal(HK_COMBINED_PKT1_MID, WhichMidToSend))
-            {
-                OS_printf("Equal: HK_COMBINED_PKT1_MID");
-            }
-            else if (CFE_SB_MsgId_Equal(HK_COMBINED_PKT2_MID, WhichMidToSend))
-            {
-                OS_printf("Equal: HK_COMBINED_PKT2_MID");
-            }
-            else
-            {
-                OS_printf("Not Equal: HK_COMBINED_PKT1_MID or HK_COMBINED_PKT2_MID");
-            }
+            // Extract the command payload
+            const COMMMC_APP_ProcessCmd_t *CmdPtr;
+            CmdPtr = (const COMMMC_APP_ProcessCmd_t *)SBBufPtr;
+            uint32 OutMsgToSend = CmdPtr->OutMsgToSend;
+            OS_printf("COMMMC: OutMsgToSend = 0x%08X\n", OutMsgToSend);
 
             /*
             if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)

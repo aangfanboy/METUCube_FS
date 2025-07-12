@@ -15,21 +15,6 @@
 
 typedef struct
 {
-    uint32 OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
-} HK_SendCombinedPkt_Payload_t;
-
-/**
- *  \brief Send Combined Output Message Command
- */
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command Message Header */
-
-    HK_SendCombinedPkt_Payload_t Payload;
-} HK_SendCombinedPktCmd_t;
-
-typedef struct
-{
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } COMMMC_APP_NoopCmd_t;
 
@@ -40,12 +25,8 @@ typedef struct
 
 typedef struct
 {
-    uint32 OutMsgToSend; /**< \brief MsgId of combined telemetry packet to send */
-} COMMMC_APP_ProcessCmd_Payload_t;
-typedef struct
-{
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    COMMMC_APP_ProcessCmd_Payload_t Payload; /**< \brief Command payload */
+    uint32 OutMsgToSend; /**< \brief MsgId of combined telemetry packet to send */
 } COMMMC_APP_ProcessCmd_t;
 
 typedef struct
