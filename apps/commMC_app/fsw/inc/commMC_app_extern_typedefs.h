@@ -22,7 +22,7 @@
 
 typedef struct
 {
-   int CommandTaskId; /**< \brief Command Task ID */
+   uint32 CommandTaskId; /**< \brief Command Task ID */
 
 } COMMMC_APP_CommandPacket_Payload_t;
 

@@ -17,10 +17,10 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             // Extract the command parameter from the message
             const COMMMC_APP_CommandPacket_t *CmdPtr = (const COMMMC_APP_CommandPacket_t *)SBBufPtr;
-            int CommandTaskId = CmdPtr->Payload.CommandTaskId;
+            uint32 CommandTaskId = CmdPtr->Payload.CommandTaskId;
 
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                              "COMMMC: Received command with TaskId: 0x%04X", CommandTaskId);
+                              "COMMMC: Received command with Task ID: 0x%04X", CommandTaskId);
 
             // Check if the command is to send minimal telemetry
             if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
