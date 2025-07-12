@@ -16,4 +16,13 @@ set(APP_TABLE_FILES
   fsw/tables/adcsMC_app_config_tbl.c
 )
 
+foreach(EXT_APP powerMC_app payloadMC_app commMC_app adcsMC_app adcsttMC_app)
+  list (FIND TGTSYS_${SYSVAR}_APPS ${EXT_APP} HAVE_APP)
+  if (HAVE_APP GREATER_EQUAL 0)
+    include_directories($<TARGET_PROPERTY:${EXT_APP},INTERFACE_INCLUDE_DIRECTORIES>)
+    string(TOUPPER "HAVE_${EXT_APP}" APP_MACRO)
+    add_definitions(-D${APP_MACRO})
+  endif()
+endforeach()
+
 add_cfe_tables(adcsMC_app ${APP_TABLE_FILES})
