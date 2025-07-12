@@ -27,6 +27,9 @@ typedef struct
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
     uint32 OutMsgToSend; /**< \brief MsgId of combined telemetry packet to send */
+    uint32 OutMsgToSend2; /**< \brief MsgId of second combined telemetry packet to send */
+    uint32 OutMsgToSend3; /**< \brief MsgId of third combined telemetry packet to send */
+    uint32 OutMsgToSend4; /**< \brief MsgId of fourth combined telemetry packet to send */
 } COMMMC_APP_ProcessCmd_t;
 
 typedef struct
