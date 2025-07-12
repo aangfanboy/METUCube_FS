@@ -60,6 +60,8 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     minimal_tm_packet.AdcsTelemetry = adcs_telemetry_data;
     minimal_tm_packet.PayloadTelemetry = payload_telemetry_data;
 
+    OS_printf("Packet size: %zu\n", sizeof(COMMMC_APP_MinimalTelemetryPacket_t));
+
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 
     return status;
