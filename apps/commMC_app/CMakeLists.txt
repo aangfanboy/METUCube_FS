@@ -16,7 +16,7 @@ set(APP_TABLE_FILES
   fsw/tables/commMC_app_config_tbl.c
 )
 
-foreach(EXT_APP powerMC_app payloadMC_app commMC_app adcsMC_app adcsttMC_app)
+foreach(EXT_APP HK powerMC_app payloadMC_app commMC_app adcsMC_app adcsttMC_app)
   list (FIND TGTSYS_${SYSVAR}_APPS ${EXT_APP} HAVE_APP)
   if (HAVE_APP GREATER_EQUAL 0)
     include_directories($<TARGET_PROPERTY:${EXT_APP},INTERFACE_INCLUDE_DIRECTORIES>)

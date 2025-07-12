@@ -2,6 +2,8 @@
 #include "commMC_app_dispatch.h"
 #include "commMC_app_extern_typedefs.h"
 
+#include "hk_msgids.h"
+
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
@@ -15,12 +17,24 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            // Extract the command parameter from the message
-            const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
-            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
+            const HK_SendCombinedPkt_Payload_t *CmdPtr;
 
-            uint32 OutMsgToSend = CmdPtr->OutMsgToSend;
-            OS_printf("COMMMC: OutMsgToSend = 0x%04X\n", OutMsgToSend);
+            CmdPtr = &((const HK_SendCombinedPktCmd_t *)BufPtr)->Payload;
+            CFE_SB_MsgId_t WhichMidToSend = CmdPtr->OutMsgToSend;
+
+            // print whether CFE_SB_MsgId_Equal(ThisEntrysOutMid, WhichMidToSend)
+            if (CFE_SB_MsgId_Equal(HK_COMBINED_PKT1_MID, WhichMidToSend))
+            {
+                OS_printf("Equal: HK_COMBINED_PKT1_MID");
+            }
+            else if (CFE_SB_MsgId_Equal(HK_COMBINED_PKT2_MID, WhichMidToSend))
+            {
+                OS_printf("Equal: HK_COMBINED_PKT2_MID");
+            }
+            else
+            {
+                OS_printf("Not Equal: HK_COMBINED_PKT1_MID or HK_COMBINED_PKT2_MID");
+            }
 
             /*
             if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)

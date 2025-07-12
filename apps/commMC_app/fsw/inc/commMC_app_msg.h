@@ -15,6 +15,21 @@
 
 typedef struct
 {
+    CFE_SB_MsgId_t OutMsgToSend; /**< \brief MsgId of combined tlm pkt to send  */
+} HK_SendCombinedPkt_Payload_t;
+
+/**
+ *  \brief Send Combined Output Message Command
+ */
+typedef struct
+{
+    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command Message Header */
+
+    HK_SendCombinedPkt_Payload_t Payload;
+} HK_SendCombinedPktCmd_t;
+
+typedef struct
+{
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } COMMMC_APP_NoopCmd_t;
 
