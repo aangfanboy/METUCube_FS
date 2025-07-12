@@ -23,7 +23,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             OS_printf("COMMMC: OutMsgToSend = 0x%04X\n", (unsigned int)OutMsgToSend);
 
-            // Check if the command is to send minimal telemetry
+            /*
             if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
@@ -48,6 +48,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                 CFE_EVS_SendEvent(COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID, CFE_EVS_EventType_ERROR,
                                     "COMMMC: Unknown command task ID: 0x%04X", OutMsgToSend);
             }
+                                    */
             break;
 
         case COMMMC_SEND_HK_MID:
