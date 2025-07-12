@@ -11,7 +11,6 @@
  #define COMMMC_EXTERN_TYPEDEFS_H
 
  #include "cfe.h"
- #include "adcsMC_app_msgids.h"
  #include "adcsMC_app_extern_typedefs.h"
  #include "payloadMC_app_extern_typedefs.h"
 
