@@ -26,12 +26,8 @@ typedef struct
 typedef struct
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    uint8 OutMsgToSend; /**< \brief Message ID to send */
-    uint8 OutMsgToSend2; /**< \brief Second Message ID to send */
-    uint8 OutMsgToSend3; /**< \brief Third Message ID to send */
-    uint8 OutMsgToSend4; /**< \brief Fourth Message ID to send */
-    uint8 OutMsgToSend5; /**< \brief Fifth Message ID to send */
-    uint64 OutMsgToSend6; /**< \brief Sixth Message ID to send, using uint64 for larger IDs */
+    uint32 OutMsgToSend; /**< \brief Message ID to send */
+    uint32 OutMsgToSend2; /**< \brief Second Message ID to send */
 } COMMMC_APP_ProcessCmd_t;
 
 typedef struct
