@@ -31,6 +31,7 @@ typedef struct
     uint8 OutMsgToSend3; /**< \brief Third Message ID to send */
     uint8 OutMsgToSend4; /**< \brief Fourth Message ID to send */
     uint8 OutMsgToSend5; /**< \brief Fifth Message ID to send */
+    uint64 OutMsgToSend6; /**< \brief Sixth Message ID to send, using uint64 for larger IDs */
 } COMMMC_APP_ProcessCmd_t;
 
 typedef struct
