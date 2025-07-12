@@ -41,7 +41,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             }
             else
             {
-                CFE_EVS_SendEvent(COMMMC_UNKNOWN_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID, CFE_EVS_EventType_ERROR,
                                     "COMMMC: Invalid command task ID = %u", CmdPtr->OutMsgToSend);
             }
             break; 
