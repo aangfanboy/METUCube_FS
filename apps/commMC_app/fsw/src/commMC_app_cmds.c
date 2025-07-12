@@ -137,7 +137,7 @@ void COMMMC_APP_LISTENER_TASK(void)
     int serial_fd = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY | O_NONBLOCK);
     if (serial_fd < 0)
     {
-        CFE_EVS_SendEvent(0, CFE_EVS_ERROR, "COMM: Failed to open /dev/ttyUSB0");
+        CFE_EVS_SendEvent(0, CFE_EVS_EventType_ERROR, "COMM: Failed to open /dev/ttyUSB0");
         return;
     }
 
@@ -150,13 +150,10 @@ void COMMMC_APP_LISTENER_TASK(void)
     tty.c_cflag |= CS8;  // 8-bit
     tty.c_cflag &= ~PARENB;
     tty.c_cflag &= ~CSTOPB;
-    tty.c_cflag &= ~CRTSCTS;
     tty.c_lflag = 0;
     tty.c_oflag = 0;
     tty.c_iflag = 0;
     tcsetattr(serial_fd, TCSANOW, &tty);
-
-    COMM_IncomingMsg_t sb_msg;
 
     while (1)
     {
