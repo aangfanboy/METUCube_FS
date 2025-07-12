@@ -20,7 +20,15 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
 
             CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
-            OS_printf("COMMMC: OutMsgToSend = 0x%x\n", (unsigned int)CFE_SB_MsgIdToValue(OutMsgToSend));
+            // print wheter OutMsgToSend is equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX
+            if (OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
+            {
+                OS_printf("COMMMC: OutMsgToSend is equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX\n");
+            }
+            else
+            {
+                OS_printf("COMMMC: OutMsgToSend is not equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX, it is %d\n", OutMsgToSend);
+            }
 
             if (false) // replace with actual command validation logic
             {
