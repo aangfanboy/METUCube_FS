@@ -30,14 +30,10 @@ typedef struct
     uint8 OutMsgToSend2; /**< \brief Second Message ID to send */
     uint8 OutMsgToSend3; /**< \brief Third Message ID to send */
     uint8 OutMsgToSend4; /**< \brief Fourth Message ID to send */
-<<<<<<< HEAD
     uint8 OutMsgToSend5; /**< \brief Fifth Message ID to send */
-=======
-
->>>>>>> 43888f91ba67b779b93fe7ee48e0fcde69a7ecf1
 } COMMMC_APP_ProcessCmd_t;
 
-typedef struct
+typedef structd
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } COMMMC_APP_SendDataCmd_t;
