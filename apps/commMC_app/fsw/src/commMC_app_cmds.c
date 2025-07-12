@@ -154,10 +154,11 @@ void COMMMC_APP_LISTENER_TASK(void)
     tty.c_oflag = 0;
     tty.c_iflag = 0;
     tcsetattr(serial_fd, TCSANOW, &tty);
+    unsigned char buffer[256];  // Buffer for incoming data
 
     while (1)
     {
-        uint8_t buffer[128];
+
         ssize_t n = read(serial_fd, buffer, sizeof(buffer));
         if (n > 0)
         {
