@@ -265,6 +265,20 @@
  * It is logged when a command packet is received with a task ID that does not match any known command tasks in the application.
  */
 
+ #define COMMMC_TASK_CREATE_ERR_EID 215  // Error creating task
+/**
+ * @brief Event ID for error in creating a task in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to create a task.
+ * It is logged when the application fails to create a new task for handling commands or processing data.
+ * 
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs
