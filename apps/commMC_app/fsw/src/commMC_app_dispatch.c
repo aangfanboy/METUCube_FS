@@ -17,7 +17,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             // Extract the command parameter from the message
             const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
-            CmdPtr = &((const COMMMC_APP_CommandPacket_t *)SBBufPtr)->Payload;
+            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
 
             CFE_SB_MsgId_t CommandTaskId = CmdPtr->OutMsgToSend;
 
