@@ -4,7 +4,8 @@
 #include "commMC_app_msgids.h"
 
 #include "adcsMC_app_extern_typedefs.h"
-#include "payloadMC_app_extern_typedefs.h"
+#include "adcsttMC_app_extern_typedefs.h"
+#include "powerMC_app_extern_typedefs.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -47,17 +48,28 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
         .quaternion = {1.0, 0.0, 0.0, 0.0},
         .angular_velocity = {0.1, 0.2, 0.3},
         .speed_vector = {7.5, -3.2, 1.1},
-        .position_vector = {100.0, 200.0, 300.0}
+        .position_vector = {100.0, 200.0, 300.0},
+        .rw_speeds = {1500, 1600, 1700}
     };
 
-    PayloadMC_MinimalTelemetry_t payload_telemetry_data = {
-        .batteryPercentage = 85
+    AdcsttMC_MinimalTelemetry_t adcstt_telemetry_data = {
+        .quaternion = {0.7071, 0.0, 0.7071, 0.0},
+        .angular_velocity = {0.05, 0.1, 0.15},
+        .speed_vector = {5.0, -2.0, 0.5},
+        .position_vector = {50.0, 100.0, 150.0},
+        .rw_speeds = {1200, 1300, 1400}
+    };
+
+    PowerMC_MinimalTelemetry_t power_telemetry_data = {
+        .batteryPercentage = 85,
+        .batteryHealth = 95
     };
 
     // Prepare the data to send
     COMMMC_APP_MinimalTelemetryPacket_t minimal_tm_packet;
     minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
-    minimal_tm_packet.TelemetryPayload.PayloadTelemetry = payload_telemetry_data;
+    minimal_tm_packet.TelemetryPayload.AdcsttTelemetry = adcstt_telemetry_data;
+    minimal_tm_packet.TelemetryPayload.PowerTelemetry = power_telemetry_data;
 
     uint32 crc32OfPayload = CFE_ES_CalculateCRC((const void *)&minimal_tm_packet.TelemetryPayload,
                                                   sizeof(minimal_tm_packet.TelemetryPayload), 0, CFE_ES_CrcType_CRC_32);
@@ -66,18 +78,6 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength);
     minimal_tm_packet.TelemetrySecondaryHeader = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(crc32OfPayload);
-
-    OS_printf("COMMMC: Payload ADCS size: %zu, Payload size: %zu\n, Total Payload size: %zu\n",
-              sizeof(minimal_tm_packet.TelemetryPayload.AdcsTelemetry),
-              sizeof(minimal_tm_packet.TelemetryPayload.PayloadTelemetry),
-              sizeof(minimal_tm_packet.TelemetryPayload));
-    OS_printf("COMMMC: Header size: %zu\n",
-              sizeof(minimal_tm_packet.TelemetryHeader));
-    OS_printf("COMMMC: Secondary Header size: %zu\n",
-              sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
-    OS_printf("COMMMC: Total packet size: %zu\n",
-              sizeof(minimal_tm_packet));
-    OS_printf("COMMMC: CRC32 of Payload: 0x%08X\n", crc32OfPayload);
 
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 

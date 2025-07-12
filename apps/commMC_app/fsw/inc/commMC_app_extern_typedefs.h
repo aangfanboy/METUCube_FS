@@ -12,7 +12,8 @@
 
  #include "cfe.h"
  #include "adcsMC_app_extern_typedefs.h"
- #include "payloadMC_app_extern_typedefs.h"
+ #include "adcsttMC_app_extern_typedefs.h"
+ #include "powerMC_app_extern_typedefs.h"
 
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND 0x0001
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
@@ -58,20 +59,21 @@ typedef struct
 typedef struct
 {
     AdcsMC_MinimalTelemetry_t AdcsTelemetry; /**< \brief ADCS Minimal Telemetry Data */
-    PayloadMC_MinimalTelemetry_t PayloadTelemetry; /**< \brief Payload Minimal Telemetry Data */
+    AdcsttMC_MinimalTelemetry_t AdcsttTelemetry; /**< \brief Adcstt Minimal Telemetry Data */
+    PowerMC_MinimalTelemetry_t PowerTelemetry; /**< \brief Power Minimal Telemetry Data */
 } COMMMC_APP_MinimalTelemetryPayload_t;
 
 typedef struct
 {
     COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
     COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
-    COMMMC_APP_MinimalTelemetryPayload_t TelemetryPayload; /**< \brief Telemetry Payload containing ADCS and Payload telemetry data */
+    COMMMC_APP_MinimalTelemetryPayload_t TelemetryPayload; /**< \brief Telemetry Payload containing ADCS, ADCSTT, and Power telemetry data */
 } COMMMC_APP_MinimalTelemetryPacket_t;
 /**
  * @brief Minimal Telemetry Packet Structure for CommMC Application
  * 
  * This structure defines the minimal telemetry packet that the CommMC application sends to ground.
- * It includes telemetry data from both the ADCS and Payload subsystems.
+ * It includes telemetry data from both the ADCS and Power subsystems.
  */
 
 #endif /* COMMMC_EXTERN_TYPEDEFS_H */
