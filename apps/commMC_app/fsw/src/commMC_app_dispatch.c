@@ -19,7 +19,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             const HK_SendCombinedPkt_Payload_t *CmdPtr;
 
-            CmdPtr = &((const HK_SendCombinedPktCmd_t *)BufPtr)->Payload;
+            CmdPtr = &((const HK_SendCombinedPktCmd_t *)SBBufPtr)->Payload;
             CFE_SB_MsgId_t WhichMidToSend = CmdPtr->OutMsgToSend;
 
             // print whether CFE_SB_MsgId_Equal(ThisEntrysOutMid, WhichMidToSend)
