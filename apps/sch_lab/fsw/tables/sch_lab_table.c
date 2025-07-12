@@ -88,7 +88,7 @@
 **  2. You can have commented out entries or entries with a packet rate of 0
 **  3. If the table grows too big, increase SCH_LAB_MAX_SCHEDULE_ENTRIES
 */
-#define CLOCK_RATE_FOR_HK_CYCLE 1001
+#define CLOCK_RATE_FOR_HK_CYCLE 10001
 
 SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
     .TickRate = 100,
@@ -143,7 +143,6 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #ifdef HAVE_COMMMC_APP
         {CFE_SB_MSGID_WRAP_VALUE(COMMMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
         {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 1201, 0, 8, {0, 175, COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND}},
-        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 301, 0, 8, {0, 175, COMMMC_APP_COMMAND_TASK_ID_SEND_MAX}},
 #endif
 #ifdef HAVE_HK
         {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), CLOCK_RATE_FOR_HK_CYCLE+1, 0, 4, {HK_COMBINED_PKT1_MID}},
