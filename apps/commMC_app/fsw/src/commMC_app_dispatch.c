@@ -7,7 +7,9 @@
 void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
     CFE_SB_MsgId_t MsgId    = CFE_SB_INVALID_MSG_ID;
-    //CFE_Status_t status = CFE_SUCCESS;
+    CFE_Status_t status = CFE_SUCCESS;
+
+    const COMMMC_APP_ProcessCmd_t *CmdPtr;
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
     
@@ -17,14 +19,32 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            // Extract the command payload
-            const COMMMC_APP_ProcessCmd_t *CmdPtr;
             CmdPtr = (const COMMMC_APP_ProcessCmd_t *)SBBufPtr;
+            
+            if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
+            {
+                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION,
+                                    "COMMMC: Sending minimal telemetry to ground");
+                status = COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND();
+                if (status != CFE_SUCCESS)
+                {
+                    CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_ERR_EID, CFE_EVS_EventType_ERROR,
+                                      "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
+                }
+            }
+            else if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
+            {
+                // Handle sending maximum telemetry to ground
+                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION,
+                                    "COMMMC: Sending maximum telemetry to ground");
 
-            uint32 OutMsgToSend  = CmdPtr->OutMsgToSend;
-            uint32 OutMsgToSend2 = CmdPtr->OutMsgToSend2;
-            OS_printf("COMMMC: OutMsgToSend = 0x%08X, OutMsgToSend2 = 0x%08X\n", OutMsgToSend, OutMsgToSend2);
-            break;
+            }
+            else
+            {
+                CFE_EVS_SendEvent(COMMMC_UNKNOWN_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
+                                    "COMMMC: Invalid command task ID = %u", CmdPtr->OutMsgToSend);
+            }
+            break; 
 
         case COMMMC_SEND_HK_MID:
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
