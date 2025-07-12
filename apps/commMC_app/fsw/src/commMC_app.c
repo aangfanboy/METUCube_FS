@@ -108,6 +108,23 @@ CFE_Status_t COMMMC_appInit(void)
 
     CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "COMMMC: Table content: %d, %d, %d, %d\n", COMMMC_Config_TablePtr->MinorVersion, COMMMC_Config_TablePtr->Revision, COMMMC_Config_TablePtr->someRandomCommConfig, COMMMC_Config_TablePtr->someRandomTemperatureConfig);
 
+    uint32 task_id;
+    status = OS_TaskCreate(&task_id,
+                                "COMMMC_APP_LISTENER",
+                                COMMMC_APP_LISTENER_TASK,
+                                NULL,
+                                4096,
+                                100,
+                                0);
+
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(COMMMC_TASK_CREATE_ERR_EID, CFE_EVS_EventType_ERROR,
+                            "COMMMC App: Error Creating Task, error 0x%08X", (unsigned int)status);
+
+        return status;
+    }
+
     return CFE_SUCCESS;
 }
 

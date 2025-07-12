@@ -84,29 +84,6 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     return status;
 }
 
-CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length) {
-    CFE_Status_t status = CFE_SUCCESS;
-
-    int fd = open(port, O_WRONLY | O_NOCTTY);
-    if (fd < 0) return 1;
-
-    struct termios tty;
-    tcgetattr(fd, &tty);
-
-    tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-    tty.c_iflag = 0;
-    tty.c_oflag = 0;
-    tty.c_lflag = 0;
-
-    tcsetattr(fd, TCSANOW, &tty);
-
-    write(fd, data, length);
-
-    close(fd);
-
-    return status;
-}
-
 COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader) {
     COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
 
@@ -130,4 +107,68 @@ COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDAR
     telemetry_secondary_header.crc32 = crc32OfPayload;
 
     return telemetry_secondary_header;
+}
+
+CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length) {
+    CFE_Status_t status = CFE_SUCCESS;
+
+    int fd = open(port, O_WRONLY | O_NOCTTY);
+    if (fd < 0) return 1;
+
+    struct termios tty;
+    tcgetattr(fd, &tty);
+
+    tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    tty.c_iflag = 0;
+    tty.c_oflag = 0;
+    tty.c_lflag = 0;
+
+    tcsetattr(fd, TCSANOW, &tty);
+
+    write(fd, data, length);
+
+    close(fd);
+
+    return status;
+}
+
+void COMMMC_APP_LISTENER_TASK(void)
+{
+    int serial_fd = open("/dev/ttyUSB0", O_RDONLY | O_NOCTTY | O_NONBLOCK);
+    if (serial_fd < 0)
+    {
+        CFE_EVS_SendEvent(0, CFE_EVS_ERROR, "COMM: Failed to open /dev/ttyUSB0");
+        return;
+    }
+
+    // Configure serial port
+    struct termios tty;
+    tcgetattr(serial_fd, &tty);
+    cfsetispeed(&tty, B9600);  // Adjust to your baud rate
+    tty.c_cflag |= (CLOCAL | CREAD);
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8;  // 8-bit
+    tty.c_cflag &= ~PARENB;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_lflag = 0;
+    tty.c_oflag = 0;
+    tty.c_iflag = 0;
+    tcsetattr(serial_fd, TCSANOW, &tty);
+
+    COMM_IncomingMsg_t sb_msg;
+
+    while (1)
+    {
+        uint8_t buffer[128];
+        ssize_t n = read(serial_fd, buffer, sizeof(buffer));
+        if (n > 0)
+        {
+            OS_printf("Received %zd bytes: ", n);
+        }
+
+        OS_TaskDelay(10);  // Sleep for 10ms
+    }
+
+    close(serial_fd);
 }

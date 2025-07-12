@@ -44,6 +44,17 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned cha
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  * */
 
+void COMMMC_APP_LISTENER_TASK(void);
+/**
+ * @brief Listens for incoming messages from the ground station
+ * 
+ *  This function is responsible for continuously listening for incoming messages from the ground station.  
+ * It opens a serial port, configures it, and reads incoming messages, processing them as necessary.
+ * It handles any errors that may occur during the process, such as failure to open the port or read data.
+ * @param port The serial port to listen on (e.g., "/dev/ttyUSB0").
+ * 
+ * */
+
  COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader);
 /**
  * @brief Creates a telemetry header for the CommMC application
@@ -64,6 +75,5 @@ COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDAR
  * @param crc32OfPayload The CRC32 checksum of the payload to be included in the secondary header.
  * @return COMMMC_APP_TelemetrySecondaryHeaderPacket_t Returns a telemetry secondary header packet with the specified CRC32 checksum.
  * */
-
 
 #endif /* COMMMC_APP_CMDS_H */

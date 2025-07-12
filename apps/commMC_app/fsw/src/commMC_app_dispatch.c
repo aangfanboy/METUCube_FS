@@ -23,8 +23,6 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             
             if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
             {
-                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION,
-                                    "COMMMC: Sending minimal telemetry to ground");
                 status = COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND();
                 if (status != CFE_SUCCESS)
                 {
@@ -35,8 +33,6 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             else if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
             {
                 // Handle sending maximum telemetry to ground
-                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION,
-                                    "COMMMC: Sending maximum telemetry to ground");
 
             }
             else
