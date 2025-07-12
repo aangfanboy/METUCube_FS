@@ -38,7 +38,7 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
             const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
 
-            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)BufPtr)->Payload;
+            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
 
             CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
             OS_printf("COMMMC: OutMsgToSend = 0x%x\n", (unsigned int)CFE_SB_MsgIdToValue(OutMsgToSend));
