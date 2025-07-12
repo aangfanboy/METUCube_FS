@@ -44,13 +44,14 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned cha
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  * */
 
- COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(void);
+ COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID);
 /**
  * @brief Creates a telemetry header for the CommMC application
  * 
  * This function constructs a telemetry header packet that includes a timestamp and other necessary fields.
  * It is used to prepare the telemetry data before sending it to the ground station.
  * 
+ * @param packetIdentificationMTID The Message Type ID for the telemetry packet.
  * @return COMMMC_APP_TelemetryHeaderPacket_t Returns a telemetry header packet with the current timestamp and other fields initialized.
  */
 

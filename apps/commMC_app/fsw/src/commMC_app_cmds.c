@@ -56,14 +56,22 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     // Prepare the data to send
     COMMMC_APP_MinimalTelemetryPacket_t minimal_tm_packet;
-    minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER();
-    minimal_tm_packet.AdcsTelemetry = adcs_telemetry_data;
-    minimal_tm_packet.PayloadTelemetry = payload_telemetry_data;
+    minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
+    minimal_tm_packet.TelemetryPayload.PayloadTelemetry = payload_telemetry_data;
+    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const uint8 *)&minimal_tm_packet.TelemetryPayload, sizeof(minimal_tm_packet.TelemetryPayload));
 
-    OS_printf("Packet size: %zu\n", sizeof(COMMMC_APP_MinimalTelemetryPacket_t));
-    OS_printf("Teleöetry header size: %zu\n", sizeof(COMMMC_APP_TelemetryHeaderPacket_t));
-    OS_printf("ADCS telemetry size: %zu\n", sizeof(AdcsMC_MinimalTelemetry_t));
-    OS_printf("Payload telemetry size: %zu\n", sizeof(PayloadMC_MinimalTelemetry_t));
+    minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
+    minimal_tm_packet.TelemetrySecondaryHeader = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(crc32OfPayload);
+
+    OS_printf("COMMMC: Payload ADCS size: %zu, Payload size: %zu\n",
+              sizeof(minimal_tm_packet.TelemetryPayload.AdcsTelemetry),
+              sizeof(minimal_tm_packet.TelemetryPayload.PayloadTelemetry));
+    OS_printf("COMMMC: Header size: %zu\n",
+              sizeof(minimal_tm_packet.TelemetryHeader));
+    OS_printf("COMMMC: Secondary Header size: %zu\n",
+              sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
+    OS_printf("COMMMC: Total packet size: %zu\n",
+              sizeof(minimal_tm_packet));
 
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 
@@ -93,14 +101,27 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned cha
     return status;
 }
 
-COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER() {
+COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader) {
     COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
+
+    telemetry_header.packetVersion = 1; // Set to 1, can be modified as needed
+    telemetry_header.packetIdentificationType = 0; // Set to 0 for telemetry
+    telemetry_header.packetIdentificationMTID = packetIdentificationMTID; // Set to the appropriate Message ID
+    telemetry_header.packetSequenceControl = 3; // Set to 3 for unsegmented telemetry
+    telemetry_header.packetSequenceCount = 0; // Initialize sequence count to 0
+    telemetry_header.packetDataLength = sizeOfPayloadAndSecondaryHeader; // Set to the size of the payload and secondary header
+
+    return telemetry_header;
+}
+
+COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(uint32 crc32OfPayload) {
+    COMMMC_APP_TelemetrySecondaryHeaderPacket_t telemetry_secondary_header;
     CFE_TIME_SysTime_t current_time;
 
     current_time = CFE_TIME_GetTime();
 
-    telemetry_header.value = 3; // Set to 3, can be modified as needed
-    telemetry_header.timestamp = current_time.Seconds;
+    telemetry_secondary_header.timestamp = current_time.Seconds;
+    telemetry_secondary_header.crc32 = crc32OfPayload;
 
-    return telemetry_header;
+    return telemetry_secondary_header;
 }

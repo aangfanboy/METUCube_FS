@@ -17,6 +17,8 @@
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND 0x0001
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
 
+ #define COMMMC_APP_MINIMAL_TM_MTID 0
+
 typedef struct
 {
    int CommandTaskId; /**< \brief Command Task ID */
@@ -37,19 +39,33 @@ typedef struct
   * It includes a command task ID to specify the action to be taken.
   * */
 
-typedef struct __attribute__((packed))
+typedef struct
 {
-    uint32 value;
-    uint32 timestamp; /**< \brief Timestamp of the telemetry packet */
-
+    unsigned int packetVersion : 3; /**< \brief Value representing the telemetry type */
+    unsigned int packetIdentificationType : 1; /**< \brief Identification type of the telemetry packet */
+    unsigned int packetIdentificationMTID : 12; /**< \brief Message Type ID of the telemetry packet */
+    unsigned int packetSequenceControl : 2; /**< \brief Sequence control field of the telemetry packet */
+    unsigned int packetSequenceCount : 14; /**< \brief Sequence count of the telemetry packet */
+    unsigned int packetDataLength : 16; /**< \brief Length of the telemetry data */
 } COMMMC_APP_TelemetryHeaderPacket_t;
 
 typedef struct
 {
-    COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
+    uint32 timestamp; /**< \brief Timestamp of the telemetry packet */
+    uint32 crc32; /**< \brief CRC32 checksum of the telemetry packet */
+} COMMMC_APP_TelemetrySecondaryHeaderPacket_t;
 
+typedef struct
+{
     AdcsMC_MinimalTelemetry_t AdcsTelemetry; /**< \brief ADCS Minimal Telemetry Data */
     PayloadMC_MinimalTelemetry_t PayloadTelemetry; /**< \brief Payload Minimal Telemetry Data */
+} COMMMC_APP_MinimalTelemetryPayload_t;
+
+typedef struct
+{
+    COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
+    COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
+    COMMMC_APP_MinimalTelemetryPayload_t TelemetryPayload; /**< \brief Telemetry Payload containing ADCS and Payload telemetry data */
 } COMMMC_APP_MinimalTelemetryPacket_t;
 /**
  * @brief Minimal Telemetry Packet Structure for CommMC Application
