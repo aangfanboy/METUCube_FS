@@ -34,9 +34,16 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
         case COMMMC_SEND_HK_MID:
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                              "COMMMC: Received HK request");
+                              "COMMMC: Received HK request"); 
 
-            COMMMC_APP_SEND_HK_TO_SB();
+            const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
+
+            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)BufPtr)->Payload;
+
+            CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
+            OS_printf("COMMMC: OutMsgToSend = 0x%x\n", (unsigned int)CFE_SB_MsgIdToValue(OutMsgToSend));
+
+            //COMMMC_APP_SEND_HK_TO_SB();
             break;
 
         default:

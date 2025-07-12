@@ -81,15 +81,6 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 
-    // print the size of each telemetry data structure
-    OS_printf("Size of AdcsMC_MinimalTelemetry_t: %zu bytes\n", sizeof(AdcsMC_MinimalTelemetry_t));
-    OS_printf("Size of AdcsttMC_MinimalTelemetry_t: %zu bytes\n", sizeof(AdcsttMC_MinimalTelemetry_t));
-    OS_printf("Size of PowerMC_MinimalTelemetry_t: %zu bytes\n", sizeof(PowerMC_MinimalTelemetry_t));
-    OS_printf("Size of COMMMC_APP_MinimalTelemetryPayload_t: %zu bytes\n", sizeof(COMMMC_APP_MinimalTelemetryPayload_t));
-    OS_printf("Size of COMMMC_APP_TelemetryHeaderPacket_t: %zu bytes\n", sizeof(COMMMC_APP_TelemetryHeaderPacket_t));
-    OS_printf("Size of COMMMC_APP_TelemetrySecondaryHeaderPacket_t: %zu bytes\n", sizeof(COMMMC_APP_TelemetrySecondaryHeaderPacket_t));
-    OS_printf("Size of COMMMC_APP_MinimalTelemetryPacket_t: %zu bytes\n", sizeof(COMMMC_APP_MinimalTelemetryPacket_t));
-
     return status;
 }
 

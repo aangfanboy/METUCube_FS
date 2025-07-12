@@ -25,7 +25,12 @@ typedef struct
 
 typedef struct
 {
+    CFE_SB_MsgId_t OutMsgToSend; /**< \brief MsgId of combined telemetry packet to send */
+} COMMMC_APP_ProcessCmd_Payload_t;
+typedef struct
+{
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
+    COMMMC_APP_ProcessCmd_Payload_t Payload; /**< \brief Command payload */
 } COMMMC_APP_ProcessCmd_t;
 
 typedef struct
