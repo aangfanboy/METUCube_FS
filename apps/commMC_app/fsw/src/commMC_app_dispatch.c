@@ -20,35 +20,9 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             // Extract the command payload
             const COMMMC_APP_ProcessCmd_t *CmdPtr;
             CmdPtr = (const COMMMC_APP_ProcessCmd_t *)SBBufPtr;
+
             uint32 OutMsgToSend = CmdPtr->OutMsgToSend;
             OS_printf("COMMMC: OutMsgToSend = 0x%08X\n", OutMsgToSend);
-
-            /*
-            if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
-            {
-                CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
-                                    "COMMMC: Command requested to send minimal telemetry to ground");
-
-                status = COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND();
-
-                if (status != CFE_SUCCESS)
-                {
-                    CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_ERR_EID, CFE_EVS_EventType_ERROR,
-                                        "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
-                }
-            }
-            else if ((uint32)OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
-            {
-                CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                                    "COMMMC: Command requested to send maximum telemetry to ground");
-                // Add your SEND_MAX handling here
-            }
-            else
-            {
-                CFE_EVS_SendEvent(COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID, CFE_EVS_EventType_ERROR,
-                                    "COMMMC: Unknown command task ID: 0x%04X", OutMsgToSend);
-            }
-                                    */
             break;
 
         case COMMMC_SEND_HK_MID:
