@@ -15,22 +15,15 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
-            const COMMMC_APP_ProcessCmd_Payload_t *CmdPtr;
+            // Extract the command parameter from the message
+            const COMMMC_APP_CommandPacket_t *CmdPtr = (const COMMMC_APP_CommandPacket_t *)SBBufPtr;
+            int CommandTaskId = CmdPtr->Payload.CommandTaskId;
 
-            CmdPtr = &((const COMMMC_APP_ProcessCmd_t *)SBBufPtr)->Payload;
+            CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
+                              "COMMMC: Received command with TaskId: 0x%04X", CommandTaskId);
 
-            CFE_SB_MsgId_t OutMsgToSend = CmdPtr->OutMsgToSend;
-            // print wheter OutMsgToSend is equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX
-            if (OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
-            {
-                OS_printf("COMMMC: OutMsgToSend is equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX\n");
-            }
-            else
-            {
-                OS_printf("COMMMC: OutMsgToSend is not equal to COMMMC_APP_COMMAND_TASK_ID_SEND_MAX, it is %d\n", OutMsgToSend);
-            }
-
-            if (false) // replace with actual command validation logic
+            // Check if the command is to send minimal telemetry
+            if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)
             {
                 CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_EID, CFE_EVS_EventType_INFORMATION,
                                     "COMMMC: Command requested to send minimal telemetry to ground");
@@ -42,7 +35,17 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                     CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_ERR_EID, CFE_EVS_EventType_ERROR,
                                         "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
                 }
-
+            }
+            else if (CommandTaskId == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
+            {
+                CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
+                                    "COMMMC: Command requested to send maximum telemetry to ground");
+                // Add your SEND_MAX handling here
+            }
+            else
+            {
+                CFE_EVS_SendEvent(COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID, CFE_EVS_EventType_ERROR,
+                                    "COMMMC: Unknown command task ID: 0x%04X", CommandTaskId);
             }
             break;
 
