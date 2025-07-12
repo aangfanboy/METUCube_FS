@@ -252,6 +252,19 @@
  * It helps in diagnosing issues related to telemetry transmission and ensuring that the application can communicate effectively with the ground station.
  */
 
+ #define COMMMC_UNKNOWN_COMMAND_TASK_ID_ERR_EID 214  // Unknown command task ID error
+/**
+ * @brief Event ID for error in receiving a command with an unknown task ID in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application received a command with a task ID that is not recognized or supported.
+ * It is logged when a command packet is received with a task ID that does not match any known command tasks in the application.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs
