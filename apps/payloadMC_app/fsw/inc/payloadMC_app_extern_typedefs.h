@@ -9,5 +9,10 @@
 
  #ifndef PAYLOADMC_EXTERN_TYPEDEFS_H
  #define PAYLOADMC_EXTERN_TYPEDEFS_H
+
+ typedef struct
+ {
+     uint8 batteryPercentage;  /**< Battery percentage */
+ } PayloadMC_MinimalTelemetry_t;
  
  #endif /* PAYLOADMC_EXTERN_TYPEDEFS_H */

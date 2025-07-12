@@ -3,6 +3,9 @@
 #include "commMC_app_cmds.h"
 #include "commMC_app_msgids.h"
 
+#include "adcsMC_app_extern_typedefs.h"
+#include "payloadMC_app_extern_typedefs.h"
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
@@ -40,8 +43,24 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     CFE_Status_t status = CFE_SUCCESS;
 
     const char *port = "/dev/ttyUSB0"; // Example port, adjust as necessary
-    const unsigned char data[] = "Minimal Telemetry Data\n"; // Example data, adjust as necessary
-    status = COMMMC_APP_SEND_DATA_TO_GROUND(port, data, sizeof(data));
+    AdcsMC_MinimalTelemetry_t adcs_telemetry_data = {
+        .quaternion = {1.0, 0.0, 0.0, 0.0},
+        .angular_velocity = {0.1, 0.2, 0.3},
+        .speed_vector = {7.5, -3.2, 1.1},
+        .position_vector = {100.0, 200.0, 300.0}
+    };
+
+    PayloadMC_MinimalTelemetry_t payload_telemetry_data = {
+        .batteryPercentage = 85
+    };
+
+    // Prepare the data to send
+    COMMMC_APP_MinimalTelemetryPacket_t minimal_tm_packet;
+    minimal_tm_packet.TelemetryHeader.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER();
+    minimal_tm_packet.AdcsTelemetry = adcs_telemetry_data;
+    minimal_tm_packet.PayloadTelemetry = payload_telemetry_data;
+
+    status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
 
     return status;
 }
@@ -67,4 +86,13 @@ CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned cha
     close(fd);
 
     return status;
+}
+
+COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER() {
+    COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
+
+    telemetry_header.value = 0;
+    telemetry_header.timestamp = CFE_TIME_GetTime();
+
+    return telemetry_header;
 }
