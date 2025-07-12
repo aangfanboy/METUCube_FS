@@ -46,7 +46,7 @@ typedef struct
     unsigned int packetIdentificationMTID : 12; /**< \brief Message Type ID of the telemetry packet */
     unsigned int packetSequenceControl : 2; /**< \brief Sequence control field of the telemetry packet */
     unsigned int packetSequenceCount : 14; /**< \brief Sequence count of the telemetry packet */
-    unsigned int packetDataLength : 16; /**< \brief Length of the telemetry data */
+    uint32 packetDataLength; /**< \brief Length of the telemetry packet data */
 } COMMMC_APP_TelemetryHeaderPacket_t;
 
 typedef struct
