@@ -2,7 +2,7 @@
 #define COMMMC_APP_UTILS_H
 
 #include <stdio.h>
-#include <openssl/sha.h>
+#include <sha256.h>
 
 CFE_Status_t compute_sha256(FILE *file, unsigned char fileHash[32]);
 

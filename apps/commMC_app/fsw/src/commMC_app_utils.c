@@ -2,25 +2,25 @@
 #include "commMC_app_utils.h"
 
 CFE_Status_t compute_sha256(FILE *file, unsigned char fileHash[32]) {
-    if (!file || !fileHash) return -1;
+    if (!file || !fileHash) return CFE_SEVERITY_ERROR;
 
-    SHA256_CTX sha256;
-    unsigned char buffer[8192];
+    sha256_ctx ctx;
+    uint8_t buffer[8192];
     size_t bytesRead;
 
-    // Initialize SHA256 context
-    if (SHA256_Init(&sha256) != 1) return -1;
+    sha256_init(&ctx);
 
-    // Read file in chunks and update hash
     while ((bytesRead = fread(buffer, 1, sizeof(buffer), file)) > 0) {
-        if (SHA256_Update(&sha256, buffer, bytesRead) != 1) return -1;
+        sha256_update(&ctx, buffer, bytesRead);
     }
 
-    // Finalize and get the hash
-    if (SHA256_Final(fileHash, &sha256) != 1) return -1;
+    if (ferror(file)) {
+        return -1; // I/O error during read
+    }
 
-    // Reset file position to the beginning (optional)
-    rewind(file);
+    sha256_final(&ctx, fileHash);
+
+    rewind(file); // Optional: reset file pointer to start
 
     return CFE_SUCCESS;
 }
