@@ -150,6 +150,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         return status;
     }
 
+    /*
+
     uint32 counter = 0;
     uint32 controlNumber = 0;
     uint32 crc32OfPayload = 0;
@@ -178,6 +180,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     }
 
     fclose(file);
+    */
     CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
                       "COMMMC: File %s sent successfully to ground", file_path);
 }

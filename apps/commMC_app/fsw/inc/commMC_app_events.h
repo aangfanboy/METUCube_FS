@@ -279,6 +279,50 @@
  * 
  */
 
+ #define COMMMC_FILE_OPEN_ERR_EID 216  // Error opening file
+/**
+ * @brief Event ID for error in opening a file in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to open a file for reading or writing.
+ * It is logged when the application fails to access a file that is necessary for its operation, such as a configuration file or a data file.
+ *
+ */
+
+#define COMMMC_FILE_SIZE_ERR_EID 217  // Error getting file size or file size is zero
+/**
+ * @brief Event ID for error in getting file size or file size is zero in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to get the size of a file or the file size is zero.
+ * It is logged when the application fails to determine the size of a file that is necessary for its operation, such as a configuration file or a data file.
+ * 
+ * This may occur if the file does not exist, is inaccessible, or is empty.
+ */
+
+#define COMMMC_FILE_HASH_ERR_EID 218  // Error calculating file hash
+/**
+ * @brief Event ID for error in calculating file hash in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to calculate the hash of a file.
+ * It is logged when the application fails to compute the hash of a file that is necessary for its operation, such as a configuration file or a data file.
+ * 
+ * This may occur if the file does not exist, is inaccessible, or if there is an issue with the hashing algorithm.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs
