@@ -5,7 +5,7 @@ set(APP_SRC_FILES
   fsw/src/commMC_app_cmds.c
   fsw/src/commMC_app_dispatch.c
   fsw/src/commMC_app_utils.c
-  fsw/src/sha256.c
+  fsw/src/sha-256.c
 )
 
 # Create the app module
