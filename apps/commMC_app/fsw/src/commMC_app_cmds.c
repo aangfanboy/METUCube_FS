@@ -146,12 +146,13 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         return status;
     }
 
-    OS_printf("PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+    OS_printf("PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
                         numberOfPDUs, pduDataLengthBytes, totalFileSize,
                         fileHash[0], fileHash[1], fileHash[2], fileHash[3],
                         fileHash[4], fileHash[5], fileHash[6], fileHash[7],
                         fileHash[8], fileHash[9], fileHash[10], fileHash[11],
-                        fileHash[12], fileHash[13], fileHash[14], fileHash[15],
+                        fileHash[12], fileHash[13], fileHash[14], fileHash[15]);
+    OS_printf("%0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
                         fileHash[16], fileHash[17], fileHash[18], fileHash[19],
                         fileHash[20], fileHash[21], fileHash[22], fileHash[23],
                         fileHash[24], fileHash[25], fileHash[26], fileHash[27],
