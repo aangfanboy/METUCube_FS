@@ -154,13 +154,14 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     uint32 counter = 0;
     uint32 controlNumber = 0;
     uint32 crc32OfPayload = 0;
+    size_t bytes_read = 0; // Variable to store the number of bytes read from the file
 
     bool halfChunk = false; // Flag to indicate if we are sending a half chunk
 
     // Read the file contents
     unsigned char buffer[pduDataLengthBytes]; // Buffer for file data
     while (1) {
-        size_t bytes_read = fread(buffer, 1, sizeof(buffer), file);
+        bytes_read = fread(buffer, 1, sizeof(buffer), file);
         if (bytes_read == 0) {
             if (feof(file)) {
                 break; // End of file reached
@@ -244,7 +245,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     }
 
     CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: File %s sent successfully to ground", file_path);
-    
+
     return CFE_SUCCESS;
 }
 
