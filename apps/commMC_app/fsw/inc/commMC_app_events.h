@@ -65,6 +65,18 @@
  * It is logged when the application processes a command to send minimal telemetry and completes the operation without errors.
  */
 
+#define COMMMC_FILE_SEND_SUCCESS_EID        104  // File sent successfully to ground
+/**
+ * @brief Event ID for successful sending of a file to ground in the CommMC application
+ * 
+ * Type: Information
+ * 
+ * Cause: NA
+ * 
+ * This event indicates that the CommMC application has successfully sent a file to the ground station.
+ * It is logged when the application processes a command to send a file and completes the operation without errors.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Error Event IDs
