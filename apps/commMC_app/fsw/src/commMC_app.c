@@ -125,6 +125,9 @@ CFE_Status_t COMMMC_appInit(void)
         return status;
     }
 
+    // TODO REMOVE THIS LATER
+    COMMMC_APP_SEND_FILE_TO_GROUND("/cf/powerMC_Cfg.tbl");
+
     return CFE_SUCCESS;
 }
 

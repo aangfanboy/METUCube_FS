@@ -76,7 +76,7 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
-    minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength);
+    minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength, 3, 0); // 3 for non-sequence control, 0 for sequence count since not valid
     minimal_tm_packet.TelemetrySecondaryHeader = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(crc32OfPayload);
 
     status = COMMMC_APP_SEND_DATA_TO_GROUND(port, (const unsigned char *)&minimal_tm_packet, sizeof(minimal_tm_packet));
@@ -84,14 +84,112 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     return status;
 }
 
-COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader) {
+CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
+    CFE_Status_t status = CFE_ERROR_H;
+
+    // Open the file
+    FILE *file = fopen(file_path, "rb");
+    if (!file) {
+        CFE_EVS_SendEvent(COMMMC_FILE_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC: Error opening file %s", file_path);
+        return CFE_ERROR_H;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    if (file_size < 0) {
+        CFE_EVS_SendEvent(COMMMC_FILE_SIZE_ERR_EID, CFE_EVS_EventType_ERROR,
+                            "COMMMC: Error getting file size for %s", file_path);
+        fclose(file);
+        return CFE_ERROR_H;
+    }
+    uint32 totalFileSize = (uint32)file_size;
+    fseek(file, 0, SEEK_SET); // Reset file pointer to the beginning
+
+    uint16 pduDataLengthBytes = 256; // Example PDU data length, adjust as necessary
+    uint16 numberOfPDUs = (uint16)((totalFileSize + pduDataLengthBytes - 1) / pduDataLengthBytes); // Calculate number of PDUs
+
+    // calculate the SHA-256 hash of the file
+    unsigned char fileHash[32]; // 256 bits for SHA-256
+    if (CFE_FS_CalculateFileHash(file, fileHash, sizeof(fileHash)) != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_FILE_HASH_ERR_EID, CFE_EVS_EventType_ERROR,
+                            "COMMMC: Error calculating file hash for %s", file_path);
+        fclose(file);
+        return CFE_ERROR_H;
+    }
+
+    // Prepare the file transfer header
+    COMMMC_APP_FileTransferHeaderPacket_t file_transfer_header = {
+        .fileDataID = 0, // Unique identifier for the file transfer
+        .uniqueFileID = 12, // Unique identifier for the file transfer session
+        .fileSize = totalFileSize, // Size of the file being transferred
+        .fileHash = {0}, // Initialize file hash
+        .numberOfPDUs = numberOfPDUs, // Number of PDUs in the file transfer
+        .pduDataLength = pduDataLengthBytes // Length of each PDU in the file transfer
+    };
+
+    // Copy the file hash into the header
+    memcpy(file_transfer_header.fileHash, fileHash, sizeof(file_transfer_header.fileHash));
+    // Prepare the telemetry secondary header
+    COMMMC_APP_TelemetrySecondaryHeaderPacket_t telemetry_secondary_header;
+
+    telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(0); // 0 since no payload CRC for the init packet
+
+    // Create the file transfer init packet
+
+    COMMMC_APP_FileTransferInitPacket_t file_transfer_init_packet;
+    file_transfer_init_packet.FileTransferHeader = file_transfer_header;
+    file_transfer_init_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
+
+    // Send the file transfer init packet to ground
+    status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_init_packet, sizeof(file_transfer_init_packet));
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC: Error sending file transfer init packet to ground");
+        fclose(file);
+        return status;
+    }
+
+    uint32 counter = 0;
+    uint32 controlNumber = 0;
+    uint32 crc32OfPayload = 0;
+
+    // Read the file contents
+    unsigned char buffer[256];
+    while (1) {
+        size_t bytes_read = fread(buffer, 1, sizeof(buffer), file);
+        if (bytes_read == 0) {
+            if (feof(file)) {
+                break; // End of file reached
+            } else {
+                CFE_EVS_SendEvent(COMMMC_FILE_READ_ERR_EID, CFE_EVS_EventType_ERROR,
+                                    "COMMMC: Error reading file %s", file_path);
+                fclose(file);
+                return CFE_FS_ERR_FILE_READ;
+            }
+        }
+        
+        if (counter == 0) {
+            controlNumber = 1;  // Set control number for the first chunk
+        } else {
+            controlNumber = 0;  // Set control number for subsequent chunks
+        }
+
+    }
+
+    fclose(file);
+    CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                      "COMMMC: File %s sent successfully to ground", file_path);
+}
+
+COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader, uint32 packetSequenceControl, uint32 packetSequenceCount) {
     COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
 
     telemetry_header.packetVersion = 1; // Set to 1, can be modified as needed
     telemetry_header.packetIdentificationType = 0; // Set to 0 for telemetry
     telemetry_header.packetIdentificationMTID = packetIdentificationMTID; // Set to the appropriate Message ID
-    telemetry_header.packetSequenceControl = 3; // Set to 3 for unsegmented telemetry
-    telemetry_header.packetSequenceCount = 0; // Initialize sequence count to 0
+    telemetry_header.packetSequenceControl = packetSequenceControl; // Set to the appropriate sequence control value
+    telemetry_header.packetSequenceCount = packetSequenceCount; // Initialize sequence count to 0
     telemetry_header.packetDataLength = sizeOfPayloadAndSecondaryHeader; // Set to the size of the payload and secondary header
 
     return telemetry_header;

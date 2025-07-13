@@ -55,7 +55,19 @@ void COMMMC_APP_LISTENER_TASK(void);
  * 
  * */
 
- COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader);
+CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path);
+/**
+ * @brief Sends a file to the ground station
+ * 
+ * This function is responsible for sending a file from the CommMC application to the ground station.
+ * It opens the specified file, calculates its size and SHA-256 hash, prepares a file transfer header, and sends the file in PDUs (Protocol Data Units).
+ * 
+ * @param file_path The path to the file to be sent.
+ * 
+ * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
+ * */
+
+ COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader, uint32 packetSequenceControl, uint32 packetSequenceCount);
 /**
  * @brief Creates a telemetry header for the CommMC application
  * 
@@ -63,6 +75,8 @@ void COMMMC_APP_LISTENER_TASK(void);
  * 
  * @param packetIdentificationMTID The Message Type ID for the telemetry packet.
  * @param sizeOfPayloadAndSecondaryHeader The size of the payload and secondary header.
+ * @param packetSequenceControl The sequence control field for the telemetry packet.
+ * @param packetSequenceCount The sequence count for the telemetry packet.
  * 
  * @return COMMMC_APP_TelemetryHeaderPacket_t Returns a telemetry header packet with the specified Message Type ID and size.
  */

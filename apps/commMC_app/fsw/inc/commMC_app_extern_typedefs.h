@@ -19,6 +19,7 @@
  #define COMMMC_APP_COMMAND_TASK_ID_SEND_MAX 0x0002
 
  #define COMMMC_APP_MINIMAL_TM_MTID 0
+ #define COMMMC_APP_FILE_SEND_TM_MTID 1
 
  /**
   * @brief Command Packet Structure for CommMC Application
@@ -45,6 +46,17 @@ typedef struct
 
 typedef struct
 {
+    uint32 fileDataID; /**< \brief Unique identifier for the file being transferred */
+    uint32 uniqueFileID; /**< \brief Unique identifier for the file transfer session */
+    uint32 fileSize; /**< \brief Size of the file being transferred */
+    // 256bit for sha256 hash
+    uint8 fileHash[32]; /**< \brief SHA-256 hash of the file being transferred */
+    uint16 numberOfPDUs; /**< \brief Number of Protocol Data Units (PDUs) in the file transfer */
+    uint16 pduDataLength; /**< \brief Length of each PDU in the file transfer */
+} COMMMC_APP_FileTransferHeaderPacket_t;
+
+typedef struct
+{
     AdcsMC_MinimalTelemetry_t AdcsTelemetry; /**< \brief ADCS Minimal Telemetry Data */
     AdcsttMC_MinimalTelemetry_t AdcsttTelemetry; /**< \brief Adcstt Minimal Telemetry Data */
     PowerMC_MinimalTelemetry_t PowerTelemetry; /**< \brief Power Minimal Telemetry Data */
@@ -62,5 +74,11 @@ typedef struct
  * This structure defines the minimal telemetry packet that the CommMC application sends to ground.
  * It includes telemetry data from both the ADCS and Power subsystems.
  */
+
+typedef struct
+{   
+    COMMMC_APP_FileTransferHeaderPacket_t FileTransferHeader; /**< \brief File Transfer Header */
+    COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
+} COMMMC_APP_FileTransferInitPacket_t;
 
 #endif /* COMMMC_EXTERN_TYPEDEFS_H */
