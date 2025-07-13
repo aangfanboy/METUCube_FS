@@ -77,6 +77,18 @@
  * It is logged when the application processes a command to send a file and completes the operation without errors.
  */
 
+ #define COMMMC_FILE_SEND_INIT_SUCCESS_EID 105  // File transfer init packet sent successfully
+/**
+ * @brief Event ID for successful sending of a file transfer initialization packet in the CommMC application
+ * 
+ * Type: Information
+ * 
+ * Cause: NA
+ * 
+ * This event indicates that the CommMC application has successfully sent a file transfer initialization packet to the ground station.
+ * It is logged when the application processes a command to send a file and completes the operation without errors.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Error Event IDs

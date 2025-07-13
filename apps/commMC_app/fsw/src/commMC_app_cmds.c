@@ -146,6 +146,10 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         return status;
     }
 
+    CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                      "COMMMC: File transfer init packet sent successfully to ground, number of PDUs: %d, PDU data length: %d, file size: %d",
+                      numberOfPDUs, pduDataLengthBytes, totalFileSize);
+
     /*
 
     uint32 counter = 0;
