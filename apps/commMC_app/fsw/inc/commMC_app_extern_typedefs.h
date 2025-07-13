@@ -46,6 +46,13 @@ typedef struct
 
 typedef struct
 {
+    uint32 timestamp; /**< \brief Timestamp of the telecommand packet */
+    uint32 crc32; /**< \brief CRC32 checksum of the telecommand packet */
+    uint8  signature[64]; /**< \brief Signature for the telecommand packet */
+} COMMMC_APP_TelecommandSecondaryHeaderPacket_t;
+
+typedef struct
+{
     uint32 fileDataID; /**< \brief Unique identifier for the file being transferred */
     uint32 uniqueFileID; /**< \brief Unique identifier for the file transfer session */
     uint32 fileSize; /**< \brief Size of the file being transferred */
@@ -62,18 +69,14 @@ typedef struct
     PowerMC_MinimalTelemetry_t PowerTelemetry; /**< \brief Power Minimal Telemetry Data */
 } COMMMC_APP_MinimalTelemetryPayload_t;
 
+// -----------------------------------------------------------------------------------------------
+
 typedef struct
 {
     COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
     COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
     COMMMC_APP_MinimalTelemetryPayload_t TelemetryPayload; /**< \brief Telemetry Payload containing ADCS, ADCSTT, and Power telemetry data */
 } COMMMC_APP_MinimalTelemetryPacket_t;
-/**
- * @brief Minimal Telemetry Packet Structure for CommMC Application
- * 
- * This structure defines the minimal telemetry packet that the CommMC application sends to ground.
- * It includes telemetry data from both the ADCS and Power subsystems.
- */
 
 typedef struct
 {   
@@ -87,5 +90,13 @@ typedef struct
     COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
     unsigned char FileData[256]; /**< \brief File Data being transferred */
 } COMMMC_APP_FileTransferPacket_t;
+
+// --------------------------------------------- Telecommand Packets --------------------------------------------------
+
+typedef struct
+{
+    COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
+    COMMMC_APP_TelecommandSecondaryHeaderPacket_t TelecommandSecondaryHeader; /**< \brief Telecommand Secondary Header */
+} COMMMC_APP_TelecommandHeaderPacket_t;
 
 #endif /* COMMMC_EXTERN_TYPEDEFS_H */

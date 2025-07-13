@@ -24,3 +24,14 @@ CFE_Status_t compute_sha256(FILE *file, unsigned char fileHash[32]) {
 
     return CFE_SUCCESS;
 }
+
+CFE_Status_t compute_crc32(unsigned char *data, size_t length, uint32_t *crc32) {
+    if (!data || !crc32) return CFE_SEVERITY_ERROR;
+
+    struct Crc32 ctx;
+    crc32_init(&ctx);
+    crc32_write(&ctx, data, length);
+    *crc32 = crc32_close(&ctx);
+
+    return CFE_SUCCESS;
+}

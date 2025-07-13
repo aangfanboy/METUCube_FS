@@ -67,8 +67,10 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     minimal_tm_packet.TelemetryPayload.AdcsttTelemetry = adcstt_telemetry_data;
     minimal_tm_packet.TelemetryPayload.PowerTelemetry = power_telemetry_data;
 
-    uint32 crc32OfPayload = CFE_ES_CalculateCRC((const void *)&minimal_tm_packet.TelemetryPayload,
-                                                  sizeof(minimal_tm_packet.TelemetryPayload), 0, CFE_ES_CrcType_CRC_32);
+    uint32 crc32OfPayload = 0;
+    // Calculate the CRC32 of the telemetry payload
+    compute_crc32((const void *)&minimal_tm_packet.TelemetryPayload,
+                  sizeof(minimal_tm_packet.TelemetryPayload), &crc32OfPayload);
     
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
@@ -182,8 +184,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
             controlNumber = 0;  // Set control number for subsequent chunks
         }
 
-        // TODO Calculate CRC32 for the payload, assume 0 rn
-        crc32OfPayload = (uint32)(0); // Placeholder for CRC32 calculation, replace with actual calculation if needed
+        compute_crc32(buffer, bytes_read, &crc32OfPayload);
         
         if (bytes_read < sizeof(buffer)) {
             halfChunk = true; // If we read less than the buffer size, we are sending a half chunk
