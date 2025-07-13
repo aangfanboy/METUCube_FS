@@ -7,10 +7,6 @@
 #include "adcsttMC_app_extern_typedefs.h"
 #include "powerMC_app_extern_typedefs.h"
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <termios.h>
-
 CFE_Status_t COMMMC_APP_SEND_HK_TO_SB()
 {
     CFE_Status_t status = CFE_SUCCESS;
@@ -111,7 +107,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
 
     // calculate the SHA-256 hash of the file
     unsigned char fileHash[32]; // 256 bits for SHA-256
-    if (CFE_FS_CalculateFileHash(file, fileHash, sizeof(fileHash)) != CFE_SUCCESS) {
+    if (compute_sha256(file, fileHash) != CFE_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_FILE_HASH_ERR_EID, CFE_EVS_EventType_ERROR,
                             "COMMMC: Error calculating file hash for %s", file_path);
         fclose(file);

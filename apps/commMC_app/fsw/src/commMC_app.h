@@ -13,6 +13,7 @@
 #include "commMC_app_tbldefs.h"
 #include "commMC_app_dispatch.h"
 #include "commMC_app_cmds.h"
+#include "commMC_app_utils.h"
 
 /*************************************************************************/
 /*

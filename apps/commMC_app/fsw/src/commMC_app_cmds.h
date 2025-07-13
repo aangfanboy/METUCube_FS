@@ -4,6 +4,10 @@
 #include "commMC_app.h"
 #include "commMC_app_extern_typedefs.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+
 CFE_Status_t COMMMC_APP_SEND_HK_TO_SB(void);
 /**
  * @brief Sends the housekeeping data to the software bus
