@@ -25,7 +25,7 @@ CFE_Status_t compute_sha256(FILE *file, unsigned char fileHash[32]) {
     return CFE_SUCCESS;
 }
 
-CFE_Status_t compute_crc32(unsigned char *data, size_t length, uint32_t *crc32) {
+CFE_Status_t compute_crc32(const void *data, size_t length, uint32_t *crc32) {
     if (!data || !crc32) return CFE_SEVERITY_ERROR;
 
     struct Crc32 ctx;
