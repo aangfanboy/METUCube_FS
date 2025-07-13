@@ -59,7 +59,7 @@ typedef struct
 
 extern ADCSMC_AppData_t ADCSMC_AppData;
 
-void ADCSMC_App_Main(void);
+void ADCSMC_appMain(void);
 /**
  * @brief Main function for the AdcsMC application
  * 

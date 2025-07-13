@@ -57,7 +57,7 @@ typedef struct
 
 extern PAYLOADMC_AppData_t PAYLOADMC_AppData;
 
-void PAYLOADMC_App_Main(void);
+void PAYLOADMC_appMain(void);
 /**
  * @brief Main function for the PayloadMC application
  * 

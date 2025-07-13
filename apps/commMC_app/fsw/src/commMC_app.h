@@ -57,7 +57,7 @@ typedef struct
 
 extern COMMMC_AppData_t COMMMC_AppData;
 
-void COMMMC_App_Main(void);
+void COMMMC_appMain(void);
 /**
  * @brief Main function for the CommMC application
  * 

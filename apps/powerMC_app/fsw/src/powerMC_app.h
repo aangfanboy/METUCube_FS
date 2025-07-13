@@ -57,7 +57,7 @@ typedef struct
 
 extern POWERMC_AppData_t POWERMC_AppData;
 
-void POWERMC_App_Main(void);
+void POWERMC_appMain(void);
 /**
  * @brief Main function for the PowerMC application
  * 
