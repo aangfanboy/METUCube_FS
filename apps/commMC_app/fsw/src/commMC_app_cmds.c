@@ -69,9 +69,8 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 
     uint32 crc32OfPayload = 0;
     // Calculate the CRC32 of the telemetry payload
-    compute_crc32((const void *)&minimal_tm_packet.TelemetryPayload,
-                  sizeof(minimal_tm_packet.TelemetryPayload), &crc32OfPayload);
-    
+    compute_crc32(minimal_tm_packet.TelemetryPayload, sizeof(minimal_tm_packet.TelemetryPayload), &crc32OfPayload);
+
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
     minimal_tm_packet.TelemetryHeader = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_MINIMAL_TM_MTID, packetDataLength, 3, 0); // 3 for non-sequence control, 0 for sequence count since not valid
