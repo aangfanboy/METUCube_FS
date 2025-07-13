@@ -4,23 +4,23 @@
 CFE_Status_t compute_sha256(FILE *file, unsigned char fileHash[32]) {
     if (!file || !fileHash) return CFE_SEVERITY_ERROR;
 
-    sha256_ctx ctx;
+    struct Sha_256 ctx;
     uint8_t buffer[8192];
     size_t bytesRead;
 
-    sha256_init(&ctx);
+    sha_256_init(&ctx, fileHash);
 
     while ((bytesRead = fread(buffer, 1, sizeof(buffer), file)) > 0) {
-        sha256_update(&ctx, buffer, bytesRead);
+        sha_256_write(&ctx, buffer, bytesRead);
     }
 
     if (ferror(file)) {
-        return -1; // I/O error during read
+        return -1; // File read error
     }
 
-    sha256_final(&ctx, fileHash);
+    sha_256_close(&ctx);
 
-    rewind(file); // Optional: reset file pointer to start
+    rewind(file); // Optional: reset file pointer
 
     return CFE_SUCCESS;
 }
