@@ -146,7 +146,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         return status;
     }
 
-    OS_printf("COMMMC: File transfer init packet sent successfully to ground, number of PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+    OS_printf("PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
                       numberOfPDUs, pduDataLengthBytes, totalFileSize,
                       fileHash[0], fileHash[1], fileHash[2], fileHash[3],
                       fileHash[4], fileHash[5], fileHash[6], fileHash[7],
