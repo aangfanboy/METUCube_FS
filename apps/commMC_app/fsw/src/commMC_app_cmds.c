@@ -179,6 +179,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     */
     CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
                       "COMMMC: File %s sent successfully to ground", file_path);
+    fclose(file);
+    return CFE_SUCCESS;
 }
 
 COMMMC_APP_TelemetryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_HEADER(uint32 packetIdentificationMTID, uint32 sizeOfPayloadAndSecondaryHeader, uint32 packetSequenceControl, uint32 packetSequenceCount) {
