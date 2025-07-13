@@ -26,3 +26,4 @@ foreach(EXT_APP HK powerMC_app payloadMC_app commMC_app adcsMC_app adcsttMC_app)
 endforeach()
 
 add_cfe_tables(commMC_app ${APP_TABLE_FILES})
+target_link_libraries(commMC_app OpenSSL::Crypto)
