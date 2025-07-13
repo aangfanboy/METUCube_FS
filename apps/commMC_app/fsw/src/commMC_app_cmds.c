@@ -131,7 +131,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
     COMMMC_APP_FileTransferPacket_t file_transfer_packet;
 
-    file_transfer_packet.FileData = {0}; // Initialize file data buffer
+    // init file data buffer
+    memset(file_transfer_packet.FileData, 0, sizeof(file_transfer_packet.FileData));
 
     telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(0); // 0 since no payload CRC for the init packet
 
