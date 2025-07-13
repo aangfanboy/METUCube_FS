@@ -71,6 +71,8 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     // Calculate the CRC32 of the telemetry payload
     compute_crc32((const void *)&minimal_tm_packet.TelemetryPayload,
                   sizeof(minimal_tm_packet.TelemetryPayload), &crc32OfPayload);
+
+    OS_printf("COMMMC: Minimal telemetry payload CRC32: 0x%08X\n", crc32OfPayload);
     
     uint32 packetDataLength = (uint32)(sizeof(minimal_tm_packet.TelemetryPayload) + sizeof(minimal_tm_packet.TelemetrySecondaryHeader));
 
