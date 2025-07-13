@@ -81,4 +81,11 @@ typedef struct
     COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
 } COMMMC_APP_FileTransferInitPacket_t;
 
+typedef struct
+{
+    COMMMC_APP_TelemetryHeaderPacket_t TelemetryHeader; /**< \brief Telemetry Message Header */
+    COMMMC_APP_TelemetrySecondaryHeaderPacket_t TelemetrySecondaryHeader; /**< \brief Telemetry Secondary Header */
+    unsigned char FileData[256]; /**< \brief File Data being transferred */
+} COMMMC_APP_FileTransferPacket_t;
+
 #endif /* COMMMC_EXTERN_TYPEDEFS_H */

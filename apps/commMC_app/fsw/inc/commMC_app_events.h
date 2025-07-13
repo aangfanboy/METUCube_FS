@@ -369,6 +369,32 @@
  * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
  */
 
+ #define COMMMC_FILE_READ_ERR_EID 221  // Error reading file
+/**
+ * @brief Event ID for error in reading a file in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to read a file.
+ * It is logged when the application fails to access or read data from a file that is necessary for its operation, such as a configuration file or a data file.
+ */
+
+ #define COMMMC_FILE_SEND_LAST_ERR_EID 222  // Error sending last file transfer packet to ground
+/**
+ * @brief Event ID for error in sending the last file transfer packet to ground in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ * This event indicates that the CommMC application encountered an error while trying to send the last file transfer packet to the ground.
+ * It is logged when the application fails to transmit the final packet of a file transfer, which may be critical for the integrity of the transfer.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs

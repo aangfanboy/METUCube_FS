@@ -189,7 +189,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         }
         
         // Create the telemetry header for this chunk
-        telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_TRANSFER_TM_MTID, 
+        telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_SEND_TM_MTID, 
                                                                                   (uint32)(bytes_read + sizeof(COMMMC_APP_TelemetrySecondaryHeaderPacket_t)), 
                                                                                   controlNumber, 
                                                                                   counter);
@@ -221,7 +221,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         memset(buffer, 0, sizeof(buffer));
     }
 
-    telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_TRANSFER_TM_MTID,
+    telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_SEND_TM_MTID,
                                                            (uint32)(bytes_read + sizeof(COMMMC_APP_TelemetrySecondaryHeaderPacket_t)),
                                                            controlNumber,
                                                            counter);
