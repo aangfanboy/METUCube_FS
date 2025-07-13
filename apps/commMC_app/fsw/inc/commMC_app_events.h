@@ -358,6 +358,17 @@
  * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
  */
 
+#define COMMMC_FILE_SEND_ERR_EID 220  // Error sending file transfer packet to ground
+/**
+ * @brief Event ID for error in sending file transfer packet to ground in the CommMC application
+ * 
+ * Type: Error
+ * 
+ * Cause: Not found yet
+ * 
+ * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs

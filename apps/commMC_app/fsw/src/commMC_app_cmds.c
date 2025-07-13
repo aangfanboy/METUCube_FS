@@ -128,6 +128,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     memcpy(file_transfer_header.fileHash, fileHash, sizeof(file_transfer_header.fileHash));
     // Prepare the telemetry secondary header
     COMMMC_APP_TelemetrySecondaryHeaderPacket_t telemetry_secondary_header;
+    COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
+    COMMMC_APP_FileTransferPacket_t file_transfer_packet;
 
     telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(0); // 0 since no payload CRC for the init packet
 
@@ -146,26 +148,17 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         return status;
     }
 
-    OS_printf("PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-                        numberOfPDUs, pduDataLengthBytes, totalFileSize,
-                        fileHash[0], fileHash[1], fileHash[2], fileHash[3],
-                        fileHash[4], fileHash[5], fileHash[6], fileHash[7],
-                        fileHash[8], fileHash[9], fileHash[10], fileHash[11],
-                        fileHash[12], fileHash[13], fileHash[14], fileHash[15]);
-    OS_printf("%0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-                        fileHash[16], fileHash[17], fileHash[18], fileHash[19],
-                        fileHash[20], fileHash[21], fileHash[22], fileHash[23],
-                        fileHash[24], fileHash[25], fileHash[26], fileHash[27],
-                        fileHash[28], fileHash[29], fileHash[30], fileHash[31]);
-
-    /*
+    CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                      "COMMMC: File transfer init packet sent successfully to ground");
 
     uint32 counter = 0;
     uint32 controlNumber = 0;
     uint32 crc32OfPayload = 0;
 
+    bool halfChunk = false; // Flag to indicate if we are sending a half chunk
+
     // Read the file contents
-    unsigned char buffer[256];
+    unsigned char buffer[pduDataLengthBytes]; // Buffer for file data
     while (1) {
         size_t bytes_read = fread(buffer, 1, sizeof(buffer), file);
         if (bytes_read == 0) {
@@ -185,13 +178,73 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
             controlNumber = 0;  // Set control number for subsequent chunks
         }
 
+        // TODO Calculate CRC32 for the payload, assume 0 rn
+        crc32OfPayload = (uint32)(0); // Placeholder for CRC32 calculation, replace with actual calculation if needed
+        
+        if (bytes_read < sizeof(buffer)) {
+            halfChunk = true; // If we read less than the buffer size, we are sending a half chunk
+            counter++; // Increment counter for the last chunk
+            break; // If less than buffer size, we are at the end of the file
+        }
+        
+        // Create the telemetry header for this chunk
+        telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_TRANSFER_TM_MTID, 
+                                                                                  (uint32)(bytes_read + sizeof(COMMMC_APP_TelemetrySecondaryHeaderPacket_t)), 
+                                                                                  controlNumber, 
+                                                                                  counter);
+
+        // Create the telemetry secondary header for this chunk
+        telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(crc32OfPayload);
+        // Create the file transfer packet for this chunk
+        file_transfer_packet.TelemetryHeader = telemetry_header;
+        file_transfer_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
+        file_transfer_packet.FileData = buffer;
+
+        // Send the file transfer packet to ground
+        status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
+
+        if (status != CFE_SUCCESS) {
+            CFE_EVS_SendEvent(COMMMC_FILE_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                                "COMMMC: Error sending file transfer packet to ground, counter: %u, status: %d", counter, status);
+        }
+
+        counter++;
     }
 
+    controlNumber = 2; // Set control number for the last chunk
+    if (!halfChunk) {
+        bytes_read = 0; // If we didn't read a half chunk, set bytes_read to 0
+        crc32OfPayload = 0; // Set CRC32 to 0 for the last chunk
+        
+        // set whole buffer to 0 for the last chunk
+        memset(buffer, 0, sizeof(buffer));
+    }
+
+    telemetry_header = COMMMC_APP_CREATE_TELEMETRY_HEADER(COMMMC_APP_FILE_TRANSFER_TM_MTID,
+                                                           (uint32)(bytes_read + sizeof(COMMMC_APP_TelemetrySecondaryHeaderPacket_t)),
+                                                           controlNumber,
+                                                           counter);
+
+    telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(crc32OfPayload);
+
+    // Create the file transfer packet for the last chunk
+    file_transfer_packet.TelemetryHeader = telemetry_header;
+    file_transfer_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
+    file_transfer_packet.FileData = buffer;
+
+    // Send the last file transfer packet to ground
+    status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
+
     fclose(file);
-    */
-    CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
-                      "COMMMC: File %s sent successfully to ground", file_path);
-    fclose(file);
+
+    if (status != CFE_SUCCESS) {
+        CFE_EVS_SendEvent(COMMMC_FILE_SEND_LAST_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC: Error sending last file transfer packet to ground, counter: %u, status: %d", counter, status);
+        return status;
+    }
+
+    CFE_EVS_SendEvent(COMMMC_FILE_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION, "COMMMC: File %s sent successfully to ground", file_path);
+    
     return CFE_SUCCESS;
 }
 
