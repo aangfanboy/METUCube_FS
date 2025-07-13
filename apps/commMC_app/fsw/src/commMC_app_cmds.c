@@ -147,8 +147,12 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     }
 
     CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
-                      "COMMMC: File transfer init packet sent successfully to ground, number of PDUs: %d, PDU data length: %d, file size: %d",
-                      numberOfPDUs, pduDataLengthBytes, totalFileSize);
+                      "COMMMC: File transfer init packet sent successfully to ground, number of PDUs: %d, PDU data length: %d, file size: %u, sha256 hash: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+                      numberOfPDUs, pduDataLengthBytes, totalFileSize,
+                      fileHash[0], fileHash[1], fileHash[2], fileHash[3],
+                      fileHash[4], fileHash[5], fileHash[6], fileHash[7],
+                      fileHash[8], fileHash[9], fileHash[10], fileHash[11],
+                      fileHash[12], fileHash[13], fileHash[14], fileHash[15]);
 
     /*
 
