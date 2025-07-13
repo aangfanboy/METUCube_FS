@@ -131,6 +131,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     COMMMC_APP_TelemetryHeaderPacket_t telemetry_header;
     COMMMC_APP_FileTransferPacket_t file_transfer_packet;
 
+    file_transfer_packet.FileData = {0}; // Initialize file data buffer
+
     telemetry_secondary_header = COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(0); // 0 since no payload CRC for the init packet
 
     // Create the file transfer init packet
@@ -169,7 +171,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
                 CFE_EVS_SendEvent(COMMMC_FILE_READ_ERR_EID, CFE_EVS_EventType_ERROR,
                                     "COMMMC: Error reading file %s", file_path);
                 fclose(file);
-                return CFE_FS_ERR_FILE_READ;
+                return CFE_SEVERITY_ERROR;
             }
         }
         
@@ -199,7 +201,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         // Create the file transfer packet for this chunk
         file_transfer_packet.TelemetryHeader = telemetry_header;
         file_transfer_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
-        file_transfer_packet.FileData = buffer;
+        memcpy(file_transfer_packet.FileData, buffer, bytes_read); // Copy the read data into the file transfer packet
 
         // Send the file transfer packet to ground
         status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
@@ -231,7 +233,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     // Create the file transfer packet for the last chunk
     file_transfer_packet.TelemetryHeader = telemetry_header;
     file_transfer_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
-    file_transfer_packet.FileData = buffer;
+    memcpy(file_transfer_packet.FileData, buffer, sizeof(buffer));
 
     // Send the last file transfer packet to ground
     status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
