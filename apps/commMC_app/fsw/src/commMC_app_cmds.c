@@ -85,14 +85,14 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 }
 
 CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
-    CFE_Status_t status = CFE_ERROR_H;
+    CFE_Status_t status = CFE_SUCCESS;
 
     // Open the file
     FILE *file = fopen(file_path, "rb");
     if (!file) {
         CFE_EVS_SendEvent(COMMMC_FILE_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error opening file %s", file_path);
-        return CFE_ERROR_H;
+        return CFE_SEVERITY_ERROR;
     }
 
     fseek(file, 0, SEEK_END);
@@ -101,7 +101,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         CFE_EVS_SendEvent(COMMMC_FILE_SIZE_ERR_EID, CFE_EVS_EventType_ERROR,
                             "COMMMC: Error getting file size for %s", file_path);
         fclose(file);
-        return CFE_ERROR_H;
+        return CFE_SEVERITY_ERROR;
     }
     uint32 totalFileSize = (uint32)file_size;
     fseek(file, 0, SEEK_SET); // Reset file pointer to the beginning
@@ -115,7 +115,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         CFE_EVS_SendEvent(COMMMC_FILE_HASH_ERR_EID, CFE_EVS_EventType_ERROR,
                             "COMMMC: Error calculating file hash for %s", file_path);
         fclose(file);
-        return CFE_ERROR_H;
+        return CFE_SEVERITY_ERROR;
     }
 
     // Prepare the file transfer header
