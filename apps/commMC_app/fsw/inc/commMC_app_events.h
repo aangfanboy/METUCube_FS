@@ -332,7 +332,7 @@
  * Cause: Not found yet
  * 
  * Result: Application will break its main loop and exit. Might be restarted by the system if configured to do so.
- * /
+ */
 
 // -----------------------------------------
 
