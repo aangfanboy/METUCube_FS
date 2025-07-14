@@ -41,22 +41,19 @@ typedef struct
 /*
 ** PowerMC App housekeeping telemetry definition
 */
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
     uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
     uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
 
-    CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
-    uint8              Reserved[2];         /**< \brief Reserved for future use */  
-
 } POWERMC_HkTlm_Power_t;
 
 /**
  *  \brief HK Application housekeeping Packet
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
     POWERMC_HkTlm_Power_t Power;
