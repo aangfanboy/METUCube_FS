@@ -83,31 +83,6 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 DestPtr = ((uint8 *)RtTblEntry->OutputPktAddr) + CpyTblEntry->OutputOffset;
                 SrcPtr  = ((uint8 *)BufPtr) + CpyTblEntry->InputOffset;
 
-                // last 8 bytes of the copied message represent a double, save it to a variable
-                uint8 tm_CmdCounter;
-                uint8 tm_ErrCounter;
-                float quaternion1;
-                float quaternion2;
-                float quaternion3;
-                float quaternion4;
-                memcpy(&tm_CmdCounter, SrcPtr, 1);
-                memcpy(&tm_ErrCounter, SrcPtr + 1, 1);
-                memcpy(&quaternion1, SrcPtr + 4, 4);
-                memcpy(&quaternion2, SrcPtr + 8, 4);
-                memcpy(&quaternion3, SrcPtr + 12, 4);
-                memcpy(&quaternion4, SrcPtr + 16, 4);
-
-                // make a case switch with message id, where options are 0xA1 and 0xA2
-                switch (CFE_SB_MsgIdToValue(MessageID))
-                {
-                    case 0xCC0:
-                        OS_printf("CmdCounter: %hhu, ErrCounter: %hhu, Quaternion1: %f, Quaternion2: %f, Quaternion3: %f, Quaternion4: %f\n",
-                                  tm_CmdCounter, tm_ErrCounter, quaternion1, quaternion2, quaternion3, quaternion4);
-                        break;
-                    default: 
-                        break;
-                }
-
                 memcpy(DestPtr, SrcPtr, CpyTblEntry->NumBytes);
 
                 /* Set the data present field to indicate the data is there */
