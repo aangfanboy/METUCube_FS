@@ -212,9 +212,11 @@ CFE_Status_t COMMMC_appResetHkData(void)
 CFE_Status_t COMMMC_appPrepareHkPacket(void)
 {
 
-    COMMMC_AppData.HkPacket.Comm.CmdCounter = COMMMC_AppData.CmdCounter;
-    COMMMC_AppData.HkPacket.Comm.ErrCounter = COMMMC_AppData.ErrCounter;
-    COMMMC_AppData.HkPacket.Comm.currentConnectionRate = COMMMC_AppData.currentConnectionRate;
+    COMMMC_HkTlm_Comm_t *HkPacketPayload = &COMMMC_AppData.HkPacket.Comm;
+
+    HkPacketPayload->CmdCounter = COMMMC_AppData.CmdCounter;
+    HkPacketPayload->ErrCounter = COMMMC_AppData.ErrCounter;
+    HkPacketPayload->currentConnectionRate = COMMMC_AppData.currentConnectionRate;
 
     return CFE_SUCCESS;
 }

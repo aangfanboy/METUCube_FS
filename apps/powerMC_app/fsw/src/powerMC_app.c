@@ -192,11 +192,13 @@ CFE_Status_t POWERMC_appResetHkData(void)
 
 CFE_Status_t POWERMC_appPrepareHkPacket(void)
 {
+    
+    POWERMC_HkTlm_PowerMC_t *HkPacketPayload = &POWERMC_AppData.HkPacket.PowerMC;
 
-    POWERMC_AppData.HkPacket.Power.CmdCounter = POWERMC_AppData.CmdCounter;
-    POWERMC_AppData.HkPacket.Power.ErrCounter = POWERMC_AppData.ErrCounter;
-    POWERMC_AppData.HkPacket.Power.CurrentVoltage = POWERMC_AppData.CurrentVoltage;
-    POWERMC_AppData.HkPacket.Power.CurrentTemperature = POWERMC_AppData.CurrentTemperature;
+    HkPacketPayload->CmdCounter = POWERMC_AppData.CmdCounter;
+    HkPacketPayload->ErrCounter = POWERMC_AppData.ErrCounter;
+    HkPacketPayload->CurrentVoltage = POWERMC_AppData.CurrentVoltage;
+    HkPacketPayload->CurrentTemperature = POWERMC_AppData.CurrentTemperature;
 
     return CFE_SUCCESS;
 }

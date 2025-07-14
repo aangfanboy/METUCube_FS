@@ -194,13 +194,15 @@ CFE_Status_t ADCSTTMC_appResetHkData(void)
 
 CFE_Status_t ADCSTTMC_appPrepareHkPacket(void)
 {
+    
+    ADCSTTMC_HkTlm_Adcstt_t *HkPacketPayload = &ADCSTTMC_AppData.HkPacket.Adcstt;
 
-    ADCSTTMC_AppData.HkPacket.Adcstt.CmdCounter = ADCSTTMC_AppData.CmdCounter;
-    ADCSTTMC_AppData.HkPacket.Adcstt.ErrCounter = ADCSTTMC_AppData.ErrCounter;
-    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion1 = ADCSTTMC_AppData.quaternion1;
-    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion2 = ADCSTTMC_AppData.quaternion2;
-    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion3 = ADCSTTMC_AppData.quaternion3;
-    ADCSTTMC_AppData.HkPacket.Adcstt.quaternion4 = ADCSTTMC_AppData.quaternion4;
+    HkPacketPayload->CmdCounter = ADCSTTMC_AppData.CmdCounter;
+    HkPacketPayload->ErrCounter = ADCSTTMC_AppData.ErrCounter;
+    HkPacketPayload->quaternion1 = ADCSTTMC_AppData.quaternion1;
+    HkPacketPayload->quaternion2 = ADCSTTMC_AppData.quaternion2;
+    HkPacketPayload->quaternion3 = ADCSTTMC_AppData.quaternion3;
+    HkPacketPayload->quaternion4 = ADCSTTMC_AppData.quaternion4;
 
     return CFE_SUCCESS;
 }

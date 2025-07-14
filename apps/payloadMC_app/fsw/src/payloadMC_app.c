@@ -193,10 +193,12 @@ CFE_Status_t PAYLOADMC_appResetHkData(void)
 CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
 {
 
-    PAYLOADMC_AppData.HkPacket.Payload.CmdCounter = PAYLOADMC_AppData.CmdCounter;
-    PAYLOADMC_AppData.HkPacket.Payload.ErrCounter = PAYLOADMC_AppData.ErrCounter;
-    PAYLOADMC_AppData.HkPacket.Payload.ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
-    PAYLOADMC_AppData.HkPacket.Payload.NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
+    PAYLOADMC_HkTlm_Payload_t *HkPacketPayload = &PAYLOADMC_AppData.HkPacket.Payload;
+
+    HkPacketPayload->CmdCounter = PAYLOADMC_AppData.CmdCounter;
+    HkPacketPayload->ErrCounter = PAYLOADMC_AppData.ErrCounter;
+    HkPacketPayload->ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
+    HkPacketPayload->NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
 
     return CFE_SUCCESS;
 }

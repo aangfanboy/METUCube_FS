@@ -204,7 +204,7 @@ CFE_Status_t ADCSMC_appPrepareHkPacket(void)
     HkPacketPayload->ErrCounter = ADCSMC_AppData.ErrCounter;
     HkPacketPayload->quaternion1 = ADCSMC_AppData.quaternion1;
     HkPacketPayload->quaternion2 = ADCSMC_AppData.quaternion2;
-    HkPacketPayload->quaternion3 = ADCSMC_AppData.quaternion3;
+    HkPacketPayload->quaternion3 = ADCSMC_AppData.quaternion3; 
     HkPacketPayload->quaternion4 = ADCSMC_AppData.quaternion4;
 
     return CFE_SUCCESS;
