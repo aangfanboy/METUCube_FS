@@ -45,6 +45,8 @@
 #include "cfe_msgids.h"
 #include "ds_msgids.h"
 
+#include "hk_msgids.h"
+
 /* #include "ci_lab_msgids.h"  */
 /* #include "to_lab_msgids.h"  */
 
@@ -77,7 +79,7 @@ DS_FilterTable_t DS_FilterTable = {
     /* .Descriptor = */ "Sample filter table data",
     /* .Packet     = */
     {/* Packet Index 000 */
-     {/* .MessageID = */ CFE_SB_MSGID_WRAP_VALUE(0x089C),
+     {/* .MessageID = */ CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
       /* .Filter    = */
       {/* File table index, filter type, N, X, O */
        {HOUSEKEEPING_DATA_FILE, DS_BY_COUNT, 1, 1, 0},

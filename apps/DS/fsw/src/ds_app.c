@@ -396,7 +396,6 @@ void DS_AppSendHkCmd(void)
 
 void DS_AppStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
 {
-    OS_printf("DSYE PAKET GELDOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
     if (DS_AppData.AppEnableState == DS_DISABLED)
     {
         /*
@@ -417,6 +416,6 @@ void DS_AppStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
         /*
         ** Store packet (if permitted by filter table)...
         */
-        DS_FileStorePacket(MessageID, BufPtr);
+        DS_FileStorePacket(MessageID, BufPtr); 
     }
 }
