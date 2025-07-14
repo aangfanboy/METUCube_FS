@@ -41,12 +41,15 @@ typedef struct
 /*
 ** PowerMC App housekeeping telemetry definition
 */
-typedef struct __attribute__((packed))
+typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
     uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
     uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
+
+    // add for alignment
+    uint8             Reserved[2];
 
 } POWERMC_HkTlm_Power_t;
 
