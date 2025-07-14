@@ -57,7 +57,10 @@ typedef struct
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
 
-    POWERMC_HkTlm_Power_t Power;
+    uint8              CmdCounter;          /**< \brief Count of valid commands received */
+    uint8              ErrCounter;          /**< \brief Count of invalid commands received */
+    uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
+    uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
 } POWERMC_HkPacket_t;
 
 #endif /* POWERMC_MSG_H_ */
