@@ -56,7 +56,6 @@ typedef struct
 typedef struct
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
-
     POWERMC_HkTlm_Power_t Power;
 } POWERMC_HkPacket_t;
 

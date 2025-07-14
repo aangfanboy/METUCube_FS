@@ -18,6 +18,10 @@ CFE_Status_t POWERMC_APP_SEND_HK_TO_SB()
         return status;
     }
 
+    OS_printf("POWERMC: current voltage: %u, current temperature: %u\n",
+              POWERMC_AppData.HkPacket.Power.CurrentVoltage,
+              POWERMC_AppData.HkPacket.Power.CurrentTemperature);
+
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader));
     status = CFE_SB_TransmitMsg(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), true);
 

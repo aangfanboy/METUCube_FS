@@ -56,6 +56,9 @@ CFE_Status_t POWERMC_appInit(void)
 
     POWERMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
+    CFE_MSG_Init(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(POWERMC_HK_TLM_MID),
+                 sizeof(POWERMC_AppData.HkPacket));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -194,9 +197,6 @@ CFE_Status_t POWERMC_appPrepareHkPacket(void)
     POWERMC_AppData.HkPacket.Power.ErrCounter = 10;
     POWERMC_AppData.HkPacket.Power.CurrentVoltage = 200;
     POWERMC_AppData.HkPacket.Power.CurrentTemperature = 300;
-
-    CFE_MSG_Init(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(POWERMC_HK_TLM_MID),
-                 sizeof(POWERMC_AppData.HkPacket));
 
     return CFE_SUCCESS;
 }
