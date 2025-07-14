@@ -21,6 +21,15 @@ set(APP_TABLE_FILES
 
 add_cfe_tables(DS ${APP_TABLE_FILES})
 
+foreach(EXT_APP HK)
+  list (FIND TGTSYS_${SYSVAR}_APPS ${EXT_APP} HAVE_APP)
+  if (HAVE_APP GREATER_EQUAL 0)
+    include_directories($<TARGET_PROPERTY:${EXT_APP},INTERFACE_INCLUDE_DIRECTORIES>)
+    string(TOUPPER "HAVE_${EXT_APP}" APP_MACRO)
+    add_definitions(-D${APP_MACRO})
+  endif()
+endforeach()
+
 # If UT is enabled, then add the tests from the subdirectory
 # Note that this is an app, and therefore does not provide
 # stub functions, as other entities would not typically make
