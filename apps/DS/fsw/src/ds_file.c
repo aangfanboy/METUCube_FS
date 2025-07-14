@@ -245,13 +245,13 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                         DS_FileSetupWrite(FileIndex, BufPtr);
                         PassedFilter = true;
 
-                        switch (MessageID)
+                        switch (CFE_SB_MsgIdToValue(MessageID))
                         {
-                            case CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID):
+                            case HK_COMBINED_PKT1_MID:
                                 CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
                                 break;
                             default:
-                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "UNKNOWN - Packet with MessageID 0x%04X received by DS, and written to file %d", MessageID, FileIndex);
+                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "UNKNOWN - Packet with Message ID 0x%08lX received by DS, and written to file %d", CFE_SB_MsgIdToValue(MessageID), FileIndex);
                                 break;
                         }
                     }
