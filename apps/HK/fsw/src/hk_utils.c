@@ -86,22 +86,22 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 // last 8 bytes of the copied message represent a double, save it to a variable
                 uint8 tm_CmdCounter;
                 uint8 tm_ErrCounter;
-                double quaternion1;
-                double quaternion2;
-                double quaternion3;
-                double quaternion4;
+                float quaternion1;
+                float quaternion2;
+                float quaternion3;
+                float quaternion4;
                 memcpy(&tm_CmdCounter, SrcPtr, 1);
                 memcpy(&tm_ErrCounter, SrcPtr + 1, 1);
-                memcpy(&quaternion1, SrcPtr + 4, 8);
-                memcpy(&quaternion2, SrcPtr + 12, 8);
-                memcpy(&quaternion3, SrcPtr + 20, 8);
-                memcpy(&quaternion4, SrcPtr + 28, 8);
+                memcpy(&quaternion1, SrcPtr + 4, 4);
+                memcpy(&quaternion2, SrcPtr + 8, 4);
+                memcpy(&quaternion3, SrcPtr + 12, 4);
+                memcpy(&quaternion4, SrcPtr + 16, 4);
 
                 // make a case switch with message id, where options are 0xA1 and 0xA2
                 switch (CFE_SB_MsgIdToValue(MessageID))
                 {
                     case 0xCC0:
-                        OS_printf("CmdCounter: %hhu, ErrCounter: %hhu, Quaternion1: %lf, Quaternion2: %lf, Quaternion3: %lf, Quaternion4: %lf\n",
+                        OS_printf("CmdCounter: %hhu, ErrCounter: %hhu, Quaternion1: %f, Quaternion2: %f, Quaternion3: %f, Quaternion4: %f\n",
                                   tm_CmdCounter, tm_ErrCounter, quaternion1, quaternion2, quaternion3, quaternion4);
                         break;
                     default: 
