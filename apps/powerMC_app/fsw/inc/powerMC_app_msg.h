@@ -50,6 +50,7 @@ typedef struct
 
     // add for alignment
     uint8             Reserved[2];
+    uint32             Reserved2[1];       /**< \brief Reserved for future use, ensure alignment */
 
 } POWERMC_HkTlm_Power_t;
 
