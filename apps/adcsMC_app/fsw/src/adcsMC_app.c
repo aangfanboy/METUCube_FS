@@ -198,7 +198,7 @@ CFE_Status_t ADCSMC_appResetHkData(void)
 CFE_Status_t ADCSMC_appPrepareHkPacket(void)
 {
 
-    ADCSMC_HkTlm_Adcs_t *HkPacketPayload = &ADCSMC_AppData.HkPacket.Payload;
+    ADCSMC_HkTlm_Adcs_t *HkPacketPayload = &ADCSMC_AppData.HkPacket.Adcs;
 
     HkPacketPayload->CmdCounter = ADCSMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = ADCSMC_AppData.ErrCounter;
