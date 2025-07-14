@@ -185,7 +185,7 @@ CFE_Status_t ADCSMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, ADCSMC_Config
 
 CFE_Status_t ADCSMC_appResetHkData(void)
 {
-    ADCSMC_AppData.CmdCounter = 0;
+    ADCSMC_AppData.CmdCounter = 5;
     ADCSMC_AppData.ErrCounter = 10;
     ADCSMC_AppData.quaternion1 = 0.01;
     ADCSMC_AppData.quaternion2 = 0.02;

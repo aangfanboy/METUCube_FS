@@ -428,39 +428,24 @@ void HK_SendCombinedHkPacket(CFE_SB_MsgId_t WhichMidToSend)
                     CFE_SB_TransmitMsg(&OutBuffer->Msg, true);
 
                     // last byte of the copied message represents a uint8, save it to a variable
-                    double oneDouble;
-                    double oneDouble2;
-                    double oneDouble3;
-                    uint8 number1;
-                    double q11;
-                    double q12;
-                    double q13;
-                    double q14;
-                    double q21;
-                    double q22;
-                    double q23;
-                    double q24;
-                    uint8 number2;
-                    memcpy(&oneDouble, ((uint8 *)OutBuffer) + 16, 8);
-                    memcpy(&oneDouble2, ((uint8 *)OutBuffer) + 24, 8);
-                    memcpy(&oneDouble3, ((uint8 *)OutBuffer) + 32, 8);
-                    memcpy(&number1, ((uint8 *)OutBuffer) + 40, 1);
-                    memcpy(&q11, ((uint8 *)OutBuffer) + 41, 8);
-                    memcpy(&q12, ((uint8 *)OutBuffer) + 49, 8);
-                    memcpy(&q13, ((uint8 *)OutBuffer) + 57, 8);
-                    memcpy(&q14, ((uint8 *)OutBuffer) + 65, 8);
-                    memcpy(&q21, ((uint8 *)OutBuffer) + 73, 8);
-                    memcpy(&q22, ((uint8 *)OutBuffer) + 81, 8);
-                    memcpy(&q23, ((uint8 *)OutBuffer) + 89, 8);
-                    memcpy(&q24, ((uint8 *)OutBuffer) + 97, 8);
-                    memcpy(&number2, ((uint8 *)OutBuffer) + 105, 1);
+                    uint8 number1 = 0;
+                    uint8 number2 = 0;
+                    float oneDouble = 0.0f;
+                    float oneDouble2 = 0.0f;
+                    float oneDouble3 = 0.0f;
+                    float oneDouble4 = 0.0f;
+
+                    memccpy(&number1, ((uint8 *)OutBuffer) + 36, sizeof(uint8));
+                    memccpy(&number2, ((uint8 *)OutBuffer) + 37, sizeof(uint8));
+                    memcpy(&oneDouble, ((uint8 *)OutBuffer) + 40, sizeof(float));
+                    memcpy(&oneDouble2, ((uint8 *)OutBuffer) + 44, sizeof(float));
+                    memcpy(&oneDouble3, ((uint8 *)OutBuffer) + 48, sizeof(float));
+                    memcpy(&oneDouble4, ((uint8 *)OutBuffer) + 52, sizeof(float));
 
                     // print all numbers to the console
-                    OS_printf("One double is %f, second double is %f, third double is %f, uint8 is %d\n", oneDouble, oneDouble2, oneDouble3, number1);
-                    OS_printf("First quaternion is %f, %f, %f, %f\n", q11, q12, q13, q14);
-                    OS_printf("Second quaternion is %f, %f, %f, %f, uint8 is %d\n", q21, q22, q23, q24, number2);
-                    OS_printf("Sent to mid: %d\n", CFE_SB_MsgIdToValue(ThisEntrysOutMid));
-                    OS_printf("\n-------------------------------------------------------------------\n");
+                    OS_printf("One double is %f, second double is %f, third double is %f, fourth double is %f\n",
+                              oneDouble, oneDouble2, oneDouble3, oneDouble4);
+                    OS_printf("Number1 is %d, number2 is %d\n", number1, number2);
 
                     HK_AppData.CombinedPacketsSent++;
                 }
