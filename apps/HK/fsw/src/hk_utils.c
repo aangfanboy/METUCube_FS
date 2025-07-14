@@ -427,10 +427,7 @@ void HK_SendCombinedHkPacket(CFE_SB_MsgId_t WhichMidToSend)
                     CFE_SB_TimeStampMsg(&OutBuffer->Msg);
                     CFE_SB_TransmitMsg(&OutBuffer->Msg, true);
 
-                    CFE_EVS_SendEvent(HK_COMBINED_PACKET_SENT_EID, CFE_EVS_EventType_DEBUG,
-                                      "Combined HK Packet 0x%08lX sent with %d bytes",
-                                      (unsigned long)CFE_SB_MsgIdToValue(ThisEntrysOutMid),
-                                      (int)CFE_SB_GetTotalMsgLength(&OutBuffer->Msg));
+                    CFE_EVS_SendEvent(HK_COMBINED_PACKET_SENT_EID, CFE_EVS_EventType_DEBUG, "Combined HK Packet sent");
 
                     HK_AppData.CombinedPacketsSent++;
                 }
