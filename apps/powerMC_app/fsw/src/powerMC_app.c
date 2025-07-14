@@ -197,6 +197,9 @@ CFE_Status_t POWERMC_appPrepareHkPacket(void)
     POWERMC_AppData.HkPacket.Power.ErrCounter = 10;
     POWERMC_AppData.HkPacket.Power.CurrentVoltage = (uint32)1;
     POWERMC_AppData.HkPacket.Power.CurrentTemperature = (uint32)1;
+    POWERMC_AppData.HkPacket.Power.Reserved[0] = 0;
+    POWERMC_AppData.HkPacket.Power.Reserved[1] = 0;
+    POWERMC_AppData.HkPacket.Power.Reserved2[0] = 0;
 
     return CFE_SUCCESS;
 }
