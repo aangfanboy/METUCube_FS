@@ -19,7 +19,7 @@ CFE_Status_t POWERMC_APP_SEND_HK_TO_SB()
     }
 
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader));
-    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(POWERMC_AppData.HkPacket), true);
+    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), true);
 
     if (status != CFE_SUCCESS)
     {
