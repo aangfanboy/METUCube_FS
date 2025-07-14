@@ -48,6 +48,8 @@ typedef struct
     uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
     uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
 
+    CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
+
 } POWERMC_HkTlm_Power_t;
 
 /**
