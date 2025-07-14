@@ -108,6 +108,9 @@ CFE_Status_t POWERMC_appInit(void)
 
     CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "POWERMC: Table content: %d, %d, %d, %d\n", POWERMC_Config_TablePtr->MinorVersion, POWERMC_Config_TablePtr->Revision, POWERMC_Config_TablePtr->someRandomPowerConfig, POWERMC_Config_TablePtr->someRandomTemperatureConfig);
 
+    // TODO DELETE THIS
+    POWERMC_appResetHkData();
+
     return CFE_SUCCESS;
 }
 
@@ -180,9 +183,9 @@ CFE_Status_t POWERMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, POWERMC_Conf
 CFE_Status_t POWERMC_appResetHkData(void)
 {
     POWERMC_AppData.CmdCounter = 0;
-    POWERMC_AppData.ErrCounter = 20;
-    POWERMC_AppData.CurrentVoltage = 300;
-    POWERMC_AppData.CurrentTemperature = 120;
+    POWERMC_AppData.ErrCounter = 10;
+    POWERMC_AppData.CurrentVoltage = 230;
+    POWERMC_AppData.CurrentTemperature = 20;
     
     return CFE_SUCCESS;
 }
