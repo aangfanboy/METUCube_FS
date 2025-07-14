@@ -46,7 +46,7 @@ hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
         16,
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
         16,
-        16,
+        12,
     },
     /*   5 */
     {

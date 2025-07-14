@@ -45,12 +45,9 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
+    uint8              Reserved1[2];        /**< \brief Reserved bytes to fill compiler padding */
     uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
     uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
-
-    // add for alignment
-    uint8             Reserved[2];
-    uint32             Reserved2[1];       /**< \brief Reserved for future use, ensure alignment */
 
 } POWERMC_HkTlm_Power_t;
 

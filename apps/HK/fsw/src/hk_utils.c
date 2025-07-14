@@ -90,8 +90,8 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 uint32 tm_CurrentTemperature;
                 memcpy(&tm_CmdCounter, SrcPtr, 1);
                 memcpy(&tm_ErrCounter, SrcPtr + 1, 1);
-                memcpy(&tm_CurrentVoltage, SrcPtr + 2, 4);
-                memcpy(&tm_CurrentTemperature, SrcPtr + 6, 4);
+                memcpy(&tm_CurrentVoltage, SrcPtr + 4, 4);
+                memcpy(&tm_CurrentTemperature, SrcPtr + 8, 4);
 
                 // make a case switch with message id, where options are 0xA1 and 0xA2
                 switch (CFE_SB_MsgIdToValue(MessageID))
