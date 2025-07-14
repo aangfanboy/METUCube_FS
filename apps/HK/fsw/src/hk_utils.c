@@ -97,8 +97,8 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 switch (CFE_SB_MsgIdToValue(MessageID))
                 {
                     case 0xAC0:
-                        OS_printf("HK: Received PowerMC HK packet with CmdCounter: %d, ErrCounter: %d, CurrentVoltage: %d, CurrentTemperature: %d\n",
-                                  tm_CmdCounter, tm_ErrCounter, tm_CurrentVoltage, tm_CurrentTemperature);
+                        OS_printf("HK: Received PowerMC HK packet with CmdCounter: %d, ErrCounter: %d, CurrentVoltage: %u, CurrentTemperature: %u\n",
+                                    tm_CmdCounter, tm_ErrCounter, tm_CurrentVoltage, tm_CurrentTemperature);
                         break;
                     default: 
                         OS_printf("Message ID is not valid, it is %d", (int)CFE_SB_MsgIdToValue(MessageID));
