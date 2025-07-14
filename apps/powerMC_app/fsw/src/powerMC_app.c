@@ -108,9 +108,6 @@ CFE_Status_t POWERMC_appInit(void)
 
     CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "POWERMC: Table content: %d, %d, %d, %d\n", POWERMC_Config_TablePtr->MinorVersion, POWERMC_Config_TablePtr->Revision, POWERMC_Config_TablePtr->someRandomPowerConfig, POWERMC_Config_TablePtr->someRandomTemperatureConfig);
 
-    // TODO DELETE THIS
-    POWERMC_appResetHkData();
-
     return CFE_SUCCESS;
 }
 
@@ -183,9 +180,9 @@ CFE_Status_t POWERMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, POWERMC_Conf
 CFE_Status_t POWERMC_appResetHkData(void)
 {
     POWERMC_AppData.CmdCounter = 0;
-    POWERMC_AppData.ErrCounter = 10;
-    POWERMC_AppData.CurrentVoltage = 230;
-    POWERMC_AppData.CurrentTemperature = 20;
+    POWERMC_AppData.ErrCounter = 0;
+    POWERMC_AppData.CurrentVoltage = 0;
+    POWERMC_AppData.CurrentTemperature = 0;
     
     return CFE_SUCCESS;
 }
@@ -193,10 +190,10 @@ CFE_Status_t POWERMC_appResetHkData(void)
 CFE_Status_t POWERMC_appPrepareHkPacket(void)
 {
 
-    POWERMC_AppData.HkPacket.Power.CmdCounter = POWERMC_AppData.CmdCounter;
-    POWERMC_AppData.HkPacket.Power.ErrCounter = POWERMC_AppData.ErrCounter;
-    POWERMC_AppData.HkPacket.Power.CurrentVoltage = POWERMC_AppData.CurrentVoltage;
-    POWERMC_AppData.HkPacket.Power.CurrentTemperature = POWERMC_AppData.CurrentTemperature;
+    POWERMC_AppData.HkPacket.Power.CmdCounter = 0;
+    POWERMC_AppData.HkPacket.Power.ErrCounter = 10;
+    POWERMC_AppData.HkPacket.Power.CurrentVoltage = 200;
+    POWERMC_AppData.HkPacket.Power.CurrentTemperature = 300;
 
     CFE_MSG_Init(CFE_MSG_PTR(POWERMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(POWERMC_HK_TLM_MID),
                  sizeof(POWERMC_AppData.HkPacket));

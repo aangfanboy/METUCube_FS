@@ -93,12 +93,14 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 memcpy(&tm_CurrentVoltage, SrcPtr + 2, 4);
                 memcpy(&tm_CurrentTemperature, SrcPtr + 6, 4);
 
+                size_t messageSize = CpyTblEntry->NumBytes;
+
                 // make a case switch with message id, where options are 0xA1 and 0xA2
                 switch (CFE_SB_MsgIdToValue(MessageID))
                 {
                     case 0xAC0:
-                        OS_printf("HK: Received PowerMC HK packet with CmdCounter: %d, ErrCounter: %d, CurrentVoltage: %d, CurrentTemperature: %d",
-                            tm_CmdCounter, tm_ErrCounter, tm_CurrentVoltage, tm_CurrentTemperature);
+                        OS_printf("HK: Received PowerMC HK packet with CmdCounter: %d, ErrCounter: %d, CurrentVoltage: %d, CurrentTemperature: %d, Size: %zu\n",
+                            tm_CmdCounter, tm_ErrCounter, tm_CurrentVoltage, tm_CurrentTemperature, messageSize);
                         break;
                     default: 
                         OS_printf("Message ID is not valid, it is %d", (int)CFE_SB_MsgIdToValue(MessageID));
