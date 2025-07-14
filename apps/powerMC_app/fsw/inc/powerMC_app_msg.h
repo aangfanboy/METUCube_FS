@@ -53,7 +53,7 @@ typedef struct __attribute__((packed))
 /**
  *  \brief HK Application housekeeping Packet
  */
-typedef struct __attribute__((packed))
+typedef struct
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
     POWERMC_HkTlm_Power_t Power;
