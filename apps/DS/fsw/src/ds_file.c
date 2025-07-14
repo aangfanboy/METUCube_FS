@@ -39,6 +39,8 @@
 
 #include <stdio.h>
 
+#include "hk_msgids.h"  // For HK_COMBINED_PKT1_MID
+
 #define DS_PKT_SEQUENCE_BASED_FILTER_TYPE 1
 #define DS_PKT_TIME_BASED_FILTER_TYPE     2
 
@@ -243,7 +245,15 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                         DS_FileSetupWrite(FileIndex, BufPtr);
                         PassedFilter = true;
 
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "a packet was written to a file, message ID: %d", CFE_SB_MsgIdToValue(MessageID));
+                        switch (MessageID)
+                        {
+                            case CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID):
+                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
+                                break;
+                            default:
+                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "UNKNOWN - Packet with MessageID 0x%04X received by DS, and written to file %d", MessageID, FileIndex);
+                                break;
+                        }
                     }
                 }
             }
