@@ -45,10 +45,9 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
+    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
     uint32             NumberOfTakenPhotos; /**< \brief Number of photos taken by the payload camera */
     uint32             ActiveCameraN;      /**< \brief Active camera number */
-
-    CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
 } PAYLOADMC_HkTlm_Payload_t;
 
 /**

@@ -56,6 +56,9 @@ CFE_Status_t COMMMC_appInit(void)
 
     COMMMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
+    CFE_MSG_Init(CFE_MSG_PTR(COMMMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(COMMMC_HK_TLM_MID),
+                 sizeof(COMMMC_AppData.HkPacket));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -212,9 +215,6 @@ CFE_Status_t COMMMC_appPrepareHkPacket(void)
     COMMMC_AppData.HkPacket.Comm.CmdCounter = COMMMC_AppData.CmdCounter;
     COMMMC_AppData.HkPacket.Comm.ErrCounter = COMMMC_AppData.ErrCounter;
     COMMMC_AppData.HkPacket.Comm.currentConnectionRate = COMMMC_AppData.currentConnectionRate;
-
-    CFE_MSG_Init(CFE_MSG_PTR(COMMMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(COMMMC_HK_TLM_MID),
-                 sizeof(COMMMC_AppData.HkPacket));
 
     return CFE_SUCCESS;
 }

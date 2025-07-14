@@ -33,52 +33,61 @@
 #include "cfe_tbl_filedef.h"
 
 #include "powerMC_app_msgids.h"
+#include "powerMC_app_msg.h"
+
 #include "commMC_app_msgids.h"
+#include "commMC_app_msg.h"
+
 #include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
+
 #include "adcsMC_app_msgids.h"
+#include "adcsMC_app_msg.h"
+
 #include "adcsttMC_app_msgids.h"
+#include "adcsttMC_app_msg.h"
 
 hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     /*         inputMid        inputOffset     outputMid    outputOffset  numBytes*/
 
     /*   0 */ { 
         CFE_SB_MSGID_WRAP_VALUE(POWERMC_HK_TLM_MID),
-        16,
+        sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        16,
-        12,
+        sizeof(CFE_MSG_TelemetryHeader_t),
+        sizeof(POWERMC_HkTlm_Power_t)
     },
     /*   5 */
     {
         CFE_SB_MSGID_WRAP_VALUE(COMMMC_HK_TLM_MID),
-        16,
+        sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        32,
-        9
+        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t),
+        sizeof(COMMMC_HkTlm_Comm_t)
     },
     /*   6 */
     {
         CFE_SB_MSGID_WRAP_VALUE(ADCSMC_HK_TLM_MID),
-        16,
+        sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        41,
-        32
+        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t),
+        sizeof(ADCSMC_HkTlm_Adcs_t)
     },
     /*   7 */
     {
         CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_HK_TLM_MID),
-        16,
+        sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        73,
-        32
+        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t) + sizeof(ADCSMC_HkTlm_Adcs_t),
+        sizeof(ADCSTTMC_HkTlm_Adcstt_t)
     },
     /*   8 */
     {
         CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_HK_TLM_MID),
-        16,
+        sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        105,
-        1
+        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t) + sizeof(ADCSMC_HkTlm_Adcs_t) + sizeof(ADCSTTMC_HkTlm_Adcstt_t),
+        sizeof(PAYLOADMC_HkTlm_Payload_t)
     },
 
     /*   9 */

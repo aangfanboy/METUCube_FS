@@ -56,6 +56,9 @@ CFE_Status_t ADCSMC_appInit(void)
 
     ADCSMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
+    CFE_MSG_Init(CFE_MSG_PTR(ADCSMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(ADCSMC_HK_TLM_MID),
+                 sizeof(ADCSMC_AppData.HkPacket));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -107,6 +110,9 @@ CFE_Status_t ADCSMC_appInit(void)
     }
 
     CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "ADCSMC: Table content: %d, %d, %d, %d\n", ADCSMC_Config_TablePtr->MinorVersion, ADCSMC_Config_TablePtr->Revision, ADCSMC_Config_TablePtr->someRandomGainConfig, ADCSMC_Config_TablePtr->someRandomTemperatureConfig);
+
+    // TODO REMOVE THIS LATER
+    ADCSMC_appResetHkData();
 
     return CFE_SUCCESS;
 }
@@ -180,7 +186,7 @@ CFE_Status_t ADCSMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, ADCSMC_Config
 CFE_Status_t ADCSMC_appResetHkData(void)
 {
     ADCSMC_AppData.CmdCounter = 0;
-    ADCSMC_AppData.ErrCounter = 0;
+    ADCSMC_AppData.ErrCounter = 10;
     ADCSMC_AppData.quaternion1 = 0.01;
     ADCSMC_AppData.quaternion2 = 0.02;
     ADCSMC_AppData.quaternion3 = 0.03;
@@ -198,9 +204,6 @@ CFE_Status_t ADCSMC_appPrepareHkPacket(void)
     ADCSMC_AppData.HkPacket.Adcs.quaternion2 = ADCSMC_AppData.quaternion2;
     ADCSMC_AppData.HkPacket.Adcs.quaternion3 = ADCSMC_AppData.quaternion3;
     ADCSMC_AppData.HkPacket.Adcs.quaternion4 = ADCSMC_AppData.quaternion4;
-
-    CFE_MSG_Init(CFE_MSG_PTR(ADCSMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(ADCSMC_HK_TLM_MID),
-                 sizeof(ADCSMC_AppData.HkPacket));
 
     return CFE_SUCCESS;
 }

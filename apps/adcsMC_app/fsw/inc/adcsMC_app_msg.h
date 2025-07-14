@@ -45,12 +45,11 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
+    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
     double             quaternion1;         /**< \brief Quaternion component 1 */
     double             quaternion2;         /**< \brief Quaternion component 2 */
     double             quaternion3;         /**< \brief Quaternion component 3 */
     double             quaternion4;         /**< \brief Quaternion component 4 */
-
-    CFE_ES_MemHandle_t MemPoolHandle;       /**< \brief Memory pool handle used to get mempool diags */
 } ADCSMC_HkTlm_Adcs_t;
 
 /**

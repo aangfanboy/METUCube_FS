@@ -56,6 +56,9 @@ CFE_Status_t PAYLOADMC_appInit(void)
 
     PAYLOADMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
+    CFE_MSG_Init(CFE_MSG_PTR(PAYLOADMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_HK_TLM_MID),
+                 sizeof(PAYLOADMC_AppData.HkPacket));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -194,9 +197,6 @@ CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
     PAYLOADMC_AppData.HkPacket.Payload.ErrCounter = PAYLOADMC_AppData.ErrCounter;
     PAYLOADMC_AppData.HkPacket.Payload.ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
     PAYLOADMC_AppData.HkPacket.Payload.NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
-
-    CFE_MSG_Init(CFE_MSG_PTR(PAYLOADMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_HK_TLM_MID),
-                 sizeof(PAYLOADMC_AppData.HkPacket));
 
     return CFE_SUCCESS;
 }

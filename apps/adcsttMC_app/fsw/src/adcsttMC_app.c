@@ -56,6 +56,9 @@ CFE_Status_t ADCSTTMC_appInit(void)
 
     ADCSTTMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
+    CFE_MSG_Init(CFE_MSG_PTR(ADCSTTMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(ADCSTTMC_HK_TLM_MID),
+                 sizeof(ADCSTTMC_AppData.HkPacket));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -198,9 +201,6 @@ CFE_Status_t ADCSTTMC_appPrepareHkPacket(void)
     ADCSTTMC_AppData.HkPacket.Adcstt.quaternion2 = ADCSTTMC_AppData.quaternion2;
     ADCSTTMC_AppData.HkPacket.Adcstt.quaternion3 = ADCSTTMC_AppData.quaternion3;
     ADCSTTMC_AppData.HkPacket.Adcstt.quaternion4 = ADCSTTMC_AppData.quaternion4;
-
-    CFE_MSG_Init(CFE_MSG_PTR(ADCSTTMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(ADCSTTMC_HK_TLM_MID),
-                 sizeof(ADCSTTMC_AppData.HkPacket));
 
     return CFE_SUCCESS;
 }
