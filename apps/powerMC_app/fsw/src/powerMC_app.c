@@ -180,9 +180,9 @@ CFE_Status_t POWERMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, POWERMC_Conf
 CFE_Status_t POWERMC_appResetHkData(void)
 {
     POWERMC_AppData.CmdCounter = 0;
-    POWERMC_AppData.ErrCounter = 0;
-    POWERMC_AppData.CurrentVoltage = 0;
-    POWERMC_AppData.CurrentTemperature = 0;
+    POWERMC_AppData.ErrCounter = 20;
+    POWERMC_AppData.CurrentVoltage = 300;
+    POWERMC_AppData.CurrentTemperature = 120;
     
     return CFE_SUCCESS;
 }
