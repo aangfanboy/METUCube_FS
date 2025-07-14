@@ -41,7 +41,7 @@
 hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     /*         inputMid        inputOffset     outputMid    outputOffset  numBytes*/
 
-    /*   0 */ {
+    /*   0 */ { 
         CFE_SB_MSGID_WRAP_VALUE(POWERMC_HK_TLM_MID),
         16,
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),

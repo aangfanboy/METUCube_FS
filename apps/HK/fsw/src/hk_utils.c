@@ -84,44 +84,24 @@ void HK_ProcessIncomingHkData(const CFE_SB_Buffer_t *BufPtr)
                 SrcPtr  = ((uint8 *)BufPtr) + CpyTblEntry->InputOffset;
 
                 // last 8 bytes of the copied message represent a double, save it to a variable
-                double lastEightBytes;
-                double otherEightBytes;
-                double qqq3;
-                double qqq4;
-                memcpy(&lastEightBytes, SrcPtr, 8);
-                memcpy(&otherEightBytes, SrcPtr + 8, 8);
-                memcpy(&qqq3, SrcPtr + 16, 8);
-                memcpy(&qqq4, SrcPtr + 24, 8);
-
-                uint8 lastOneByte;
-                memcpy(&lastOneByte, SrcPtr + 8, 1);
+                uint8 tm_CmdCounter;
+                uint8 tm_ErrCounter;
+                uint32 tm_CurrentVoltage;
+                uint32 tm_CurrentTemperature;
+                memcpy(&tm_CmdCounter, SrcPtr, 1);
+                memcpy(&tm_ErrCounter, SrcPtr + 1, 1);
+                memcpy(&tm_CurrentVoltage, SrcPtr + 2, 4);
+                memcpy(&tm_CurrentTemperature, SrcPtr + 6, 4);
 
                 // make a case switch with message id, where options are 0xA1 and 0xA2
                 switch (CFE_SB_MsgIdToValue(MessageID))
                 {
-                    case 2209:
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA1, two doubles are %f and %f, copied total of %d bytes, starting at offset %d",
-                                          lastEightBytes, otherEightBytes, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
-                        break;
-                    case 2210:
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA2, one double is %f and one byte is %d, copied total of %d bytes, starting at offset %d",
-                                          lastEightBytes, lastOneByte, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
-                        break;
-                    case 2211:
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA3, Quaternions are %f, %f, %f, %f, copied total of %d bytes, starting at offset %d",
-                                          lastEightBytes, otherEightBytes, qqq3, qqq4, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
-                        break;
-                    case 2212:
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA4, Quaternions are %f, %f, %f, %f, copied total of %d bytes, starting at offset %d",
-                                          lastEightBytes, otherEightBytes, qqq3, qqq4, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
-                        break;
-                    case 2213:
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is 0xA5, one uint8 is %d, copied total of %d bytes, starting at offset %d",
-                                          lastOneByte, CpyTblEntry->NumBytes, CpyTblEntry->InputOffset);
+                    case 0xAC0:
+                        OS_printf("HK: Received PowerMC HK packet with CmdCounter: %d, ErrCounter: %d, CurrentVoltage: %d, CurrentTemperature: %d",
+                            tm_CmdCounter, tm_ErrCounter, tm_CurrentVoltage, tm_CurrentTemperature);
                         break;
                     default: 
-                        CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Message ID is not valid, it is %d",
-                                          (int)CFE_SB_MsgIdToValue(MessageID));
+                        OS_printf("Message ID is not valid, it is %d", (int)CFE_SB_MsgIdToValue(MessageID));
                         break;
                 }
 
