@@ -15,6 +15,9 @@ CFE_Status_t ADCSMC_APP_SEND_HK_TO_SB()
     {
         CFE_EVS_SendEvent(ADCSMC_HK_PREP_ERR_EID, CFE_EVS_EventType_ERROR,
                           "ADCSMC: Error preparing HK packet, status: %d", status);
+
+        ADCSMC_AppData.errCounter++;
+
         return status;
     }
 
@@ -25,6 +28,9 @@ CFE_Status_t ADCSMC_APP_SEND_HK_TO_SB()
     {
         CFE_EVS_SendEvent(ADCSMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
                           "ADCSMC: Error sending HK packet to SB, status: %d", status);
+
+        ADCSMC_AppData.errCounter++;
+        
         return status;
     }
 

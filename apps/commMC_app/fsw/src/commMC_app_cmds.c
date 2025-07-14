@@ -16,6 +16,9 @@ CFE_Status_t COMMMC_APP_SEND_HK_TO_SB()
     {
         CFE_EVS_SendEvent(COMMMC_HK_PREP_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error preparing HK packet, status: %d", status);
+
+        COMMMC_AppData.errCounter++;
+
         return status;
     }
 
@@ -26,6 +29,9 @@ CFE_Status_t COMMMC_APP_SEND_HK_TO_SB()
     {
         CFE_EVS_SendEvent(COMMMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error sending HK packet to SB, status: %d", status);
+
+        COMMMC_AppData.errCounter++;
+
         return status;
     }
 
@@ -90,6 +96,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     if (!file) {
         CFE_EVS_SendEvent(COMMMC_FILE_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error opening file %s", file_path);
+
+        COMMMC_AppData.errCounter++;
+
         return CFE_SEVERITY_ERROR;
     }
 
@@ -98,6 +107,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     if (file_size < 0) {
         CFE_EVS_SendEvent(COMMMC_FILE_SIZE_ERR_EID, CFE_EVS_EventType_ERROR,
                             "COMMMC: Error getting file size for %s", file_path);
+
+        COMMMC_AppData.errCounter++;
+
         fclose(file);
         return CFE_SEVERITY_ERROR;
     }
@@ -112,6 +124,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     if (compute_sha256(file, fileHash) != CFE_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_FILE_HASH_ERR_EID, CFE_EVS_EventType_ERROR,
                             "COMMMC: Error calculating file hash for %s", file_path);
+
+        COMMMC_AppData.errCounter++;
+
         fclose(file);
         return CFE_SEVERITY_ERROR;
     }
@@ -149,6 +164,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     if (status != CFE_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error sending file transfer init packet to ground");
+
+        COMMMC_AppData.errCounter++;
+
         fclose(file);
         return status;
     }
@@ -173,6 +191,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
             } else {
                 CFE_EVS_SendEvent(COMMMC_FILE_READ_ERR_EID, CFE_EVS_EventType_ERROR,
                                     "COMMMC: Error reading file %s", file_path);
+
+                COMMMC_AppData.errCounter++;
+
                 fclose(file);
                 return CFE_SEVERITY_ERROR;
             }
@@ -211,6 +232,8 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         if (status != CFE_SUCCESS) {
             CFE_EVS_SendEvent(COMMMC_FILE_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
                                 "COMMMC: Error sending file transfer packet to ground, counter: %u, status: %d", counter, status);
+
+            COMMMC_AppData.errCounter++;   
         }
 
         counter++;
@@ -245,6 +268,9 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     if (status != CFE_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_FILE_SEND_LAST_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error sending last file transfer packet to ground, counter: %u, status: %d", counter, status);
+
+        COMMMC_AppData.errCounter++;
+
         return status;
     }
 

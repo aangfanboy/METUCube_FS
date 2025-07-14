@@ -477,6 +477,8 @@
  */
 #define HK_NEWCPYTBL_INIT_FAILED_EID 37
 
+#define HK_COMBINED_PACKET_SENT_EID 38
+
 /**\}*/
 
 #endif

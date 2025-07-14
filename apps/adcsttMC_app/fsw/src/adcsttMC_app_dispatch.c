@@ -13,6 +13,8 @@ void ADCSTTMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(ADCSTTMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "ADCSTTMC: Received command packet");
 
+            ADCSTTMC_AppData.CmdCounter++;
+
             break;
 
         case ADCSTTMC_SEND_HK_MID:

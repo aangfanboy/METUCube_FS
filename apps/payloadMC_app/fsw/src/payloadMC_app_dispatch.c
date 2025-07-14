@@ -13,6 +13,8 @@ void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(PAYLOADMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "PAYLOADMC: Received command packet");
 
+            PAYLOADMC_AppData.CmdCounter++;
+            
             break;
 
         case PAYLOADMC_SEND_HK_MID:

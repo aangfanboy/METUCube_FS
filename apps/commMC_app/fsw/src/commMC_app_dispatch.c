@@ -19,6 +19,8 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "COMMMC: Received command packet");
 
+            COMMMC_AppData.CmdCounter++;
+
             CmdPtr = (const COMMMC_APP_ProcessCmd_t *)SBBufPtr;
             
             if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND)

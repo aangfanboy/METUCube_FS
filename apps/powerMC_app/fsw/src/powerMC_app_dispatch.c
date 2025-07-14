@@ -13,6 +13,8 @@ void POWERMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CFE_EVS_SendEvent(POWERMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
                               "POWERMC: Received command packet");
 
+            POWERMC_AppData.CmdCounter++;
+            
             break;
 
         case POWERMC_SEND_HK_MID:

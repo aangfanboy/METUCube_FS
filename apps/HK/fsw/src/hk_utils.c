@@ -427,25 +427,10 @@ void HK_SendCombinedHkPacket(CFE_SB_MsgId_t WhichMidToSend)
                     CFE_SB_TimeStampMsg(&OutBuffer->Msg);
                     CFE_SB_TransmitMsg(&OutBuffer->Msg, true);
 
-                    // last byte of the copied message represents a uint8, save it to a variable
-                    uint8 number1 = 0;
-                    uint8 number2 = 0;
-                    float oneDouble = 0.0f;
-                    float oneDouble2 = 0.0f;
-                    float oneDouble3 = 0.0f;
-                    float oneDouble4 = 0.0f;
-
-                    memcpy(&number1, ((uint8 *)OutBuffer) + 36, sizeof(uint8));
-                    memcpy(&number2, ((uint8 *)OutBuffer) + 37, sizeof(uint8));
-                    memcpy(&oneDouble, ((uint8 *)OutBuffer) + 40, sizeof(float));
-                    memcpy(&oneDouble2, ((uint8 *)OutBuffer) + 44, sizeof(float));
-                    memcpy(&oneDouble3, ((uint8 *)OutBuffer) + 48, sizeof(float));
-                    memcpy(&oneDouble4, ((uint8 *)OutBuffer) + 52, sizeof(float));
-
-                    // print all numbers to the console
-                    OS_printf("One double is %f, second double is %f, third double is %f, fourth double is %f\n",
-                              oneDouble, oneDouble2, oneDouble3, oneDouble4);
-                    OS_printf("Number1 is %d, number2 is %d\n", number1, number2);
+                    CFE_EVS_SendEvent(HK_COMBINED_PACKET_SENT_EID, CFE_EVS_EventType_DEBUG,
+                                      "Combined HK Packet 0x%08lX sent with %d bytes",
+                                      (unsigned long)CFE_SB_MsgIdToValue(ThisEntrysOutMid),
+                                      (int)CFE_SB_GetTotalMsgLength(&OutBuffer->Msg));
 
                     HK_AppData.CombinedPacketsSent++;
                 }
