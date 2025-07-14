@@ -193,7 +193,7 @@ CFE_Status_t POWERMC_appResetHkData(void)
 CFE_Status_t POWERMC_appPrepareHkPacket(void)
 {
     
-    POWERMC_HkTlm_PowerMC_t *HkPacketPayload = &POWERMC_AppData.HkPacket.PowerMC;
+    POWERMC_HkTlm_Power_t *HkPacketPayload = &POWERMC_AppData.HkPacket.Power;
 
     HkPacketPayload->CmdCounter = POWERMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = POWERMC_AppData.ErrCounter;
