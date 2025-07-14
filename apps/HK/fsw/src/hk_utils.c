@@ -435,8 +435,8 @@ void HK_SendCombinedHkPacket(CFE_SB_MsgId_t WhichMidToSend)
                     float oneDouble3 = 0.0f;
                     float oneDouble4 = 0.0f;
 
-                    memccpy(&number1, ((uint8 *)OutBuffer) + 36, sizeof(uint8));
-                    memccpy(&number2, ((uint8 *)OutBuffer) + 37, sizeof(uint8));
+                    memcpy(&number1, ((uint8 *)OutBuffer) + 36, sizeof(uint8));
+                    memcpy(&number2, ((uint8 *)OutBuffer) + 37, sizeof(uint8));
                     memcpy(&oneDouble, ((uint8 *)OutBuffer) + 40, sizeof(float));
                     memcpy(&oneDouble2, ((uint8 *)OutBuffer) + 44, sizeof(float));
                     memcpy(&oneDouble3, ((uint8 *)OutBuffer) + 48, sizeof(float));
