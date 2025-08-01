@@ -89,6 +89,18 @@
  * It is logged when the application processes a command to send a file and completes the operation without errors.
  */
 
+#define COMMMC_SEND_MINIMAL_TM_SUCCESS_EID 106  // Minimal telemetry sent successfully
+/**
+ * @brief Event ID for successful sending of minimal telemetry in the CommMC application
+ * 
+ * Type: Information
+ * 
+ * Cause: NA
+ * 
+ * This event indicates that the CommMC application has successfully sent minimal telemetry data to the ground station.
+ * It is logged when the application processes a command to send minimal telemetry and completes the operation without errors.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Error Event IDs

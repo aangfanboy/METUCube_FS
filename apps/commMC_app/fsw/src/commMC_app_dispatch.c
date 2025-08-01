@@ -30,6 +30,9 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                 {
                     CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_ERR_EID, CFE_EVS_EventType_ERROR,
                                       "COMMMC: Error sending minimal telemetry to ground, status: %d", status);
+                } else {
+                    CFE_EVS_SendEvent(COMMMC_SEND_MINIMAL_TM_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                                      "COMMMC: Successfully sent minimal telemetry to ground");
                 }
             }
             else if (CmdPtr->OutMsgToSend == COMMMC_APP_COMMAND_TASK_ID_SEND_MAX)
