@@ -286,7 +286,6 @@ void DS_FileSetupWrite(int32 FileIndex, const CFE_SB_Buffer_t *BufPtr)
     DS_AppFileStatus_t *FileStatus   = &DS_AppData.FileStatus[FileIndex];
     bool                OpenNewFile  = false;
     size_t              PacketLength = 0;
-    DS_Heartbeat_Packet_t heartbeatPacket;
 
     /*
     ** Create local pointers for array indexed data...
