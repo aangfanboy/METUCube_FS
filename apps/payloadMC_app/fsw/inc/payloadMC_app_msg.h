@@ -48,6 +48,7 @@ typedef struct
     uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
     uint32             NumberOfTakenPhotos; /**< \brief Number of photos taken by the payload camera */
     uint32             ActiveCameraN;      /**< \brief Active camera number */
+    CFE_TIME_SysTime_t currentTime;        /**< \brief Current time */
 } PAYLOADMC_HkTlm_Payload_t;
 
 /**

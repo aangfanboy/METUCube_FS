@@ -71,18 +71,6 @@ DS_DestFileTable_t DS_DestFileTable = {
 
             /* .FileNameType  = */ DS_BY_COUNT,
             /* .EnableState   = */ DS_ENABLED,
-            /* .MaxFileSize   = */ (1024 * 1024 * 2), /* 2 M-bytes */
-            /* .MaxFileAge    = */ (60 * 60 * 24),     /* 24 hours */
-            /* .SequenceCount = */ DS_UNUSED,
-        },
-        /* File Index 07 */
-        {
-            /* .Movename      = */ DS_EMPTY_STRING,
-            /* .Pathname      = */ "/cf/heartbeat",
-            /* .Basename      = */ "hb",
-            /* .Extension     = */ ".hb",
-            /* .FileNameType  = */ DS_BY_COUNT,
-            /* .EnableState   = */ DS_ENABLED,
             /* .MaxFileSize   = */ (1024 * 1024 * 1024), /* 1 G-byte */
             /* .MaxFileAge    = */ (60 * 60 * 24),     /* 24 hours */
             /* .SequenceCount = */ DS_UNUSED,

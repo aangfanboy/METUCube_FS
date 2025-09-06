@@ -87,14 +87,6 @@ DS_FilterTable_t DS_FilterTable = {
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
-     /* Packet Index 015 */
-     {/* .MessageID = */ CFE_SB_MSGID_WRAP_VALUE(DS_PERFORM_HEARTBEAT_MID),
-      /* .Filter    = */
-      {/* File table index, filter type, N, X, O */
-       {HEARTBEAT_DATA_FILE, DS_BY_COUNT, 1, 1, 0},
-       {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
-       {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
-       {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
      /* Packet Index 016 */
      {/* .MessageID = */ CFE_SB_MSGID_RESERVED,
       /* .Filter    = */

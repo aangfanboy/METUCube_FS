@@ -199,6 +199,7 @@ CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
     HkPacketPayload->ErrCounter = PAYLOADMC_AppData.ErrCounter;
     HkPacketPayload->ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
     HkPacketPayload->NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
+    HkPacketPayload->currentTime = CFE_TIME_GetTime();
 
     return CFE_SUCCESS;
 }
