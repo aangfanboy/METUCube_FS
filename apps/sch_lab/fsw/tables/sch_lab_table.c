@@ -147,7 +147,7 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #ifdef HAVE_HK
         {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), CLOCK_RATE_FOR_HK_CYCLE+1, 0, 4, {HK_COMBINED_PKT1_MID}},
         // send current time
-        {CFE_SB_MSGID_WRAP_VALUE(0x18BD), 101, 0, 4, {CFE_TIME_GetTime()}}
+        {CFE_SB_MSGID_WRAP_VALUE(0x18BD), 101, 0, 8, {0, 175, CFE_TIME_GetTime()}}
 #endif
 
     }};
