@@ -252,7 +252,6 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                                 CFE_TIME_SysTime_t now = CFE_TIME_GetTime();
                                 // define a DS_Heartbeat_Packet_t
                                 DS_Heartbeat_Packet_t heartbeatPacket;
-                                heartbeatPacket.TelemetryHeader = CFE_MSG_Init(CFE_SB_MsgId_t, sizeof(DS_Heartbeat_Packet_t));
                                 heartbeatPacket.currentTime = now;
                                 // change the BufPtr with heartbeatPacket
                                 BufPtr = (const CFE_SB_Buffer_t *)&heartbeatPacket;
