@@ -200,7 +200,6 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
     ** Convert packet MessageID to packet filter table index...
     */
     FilterIndex = DS_TableFindMsgID(MessageID);
-    DS_Heartbeat_Packet_t heartbeatPacket;
 
     /*
     ** Ignore packets not listed in the packet filter table...
@@ -251,6 +250,8 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                                 break;
                             case DS_PERFORM_HEARTBEAT_MID:
                                 // define a DS_Heartbeat_Packet_t
+                                DS_Heartbeat_Packet_t heartbeatPacket;
+                                
                                 heartbeatPacket.currentTime = CFE_TIME_GetTime();
                                 heartbeatPacket.TelemetryHeader = CFE_MSG_Init(CFE_SB_MsgId_t, sizeof(DS_Heartbeat_Packet_t));
 
