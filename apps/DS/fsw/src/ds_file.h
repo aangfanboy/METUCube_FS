@@ -327,6 +327,7 @@ bool DS_IsPacketFiltered(CFE_MSG_Message_t *MessagePtr, uint16 FilterType, uint1
 
 typedef struct
 {
+    CFE_MSG_TelemetryHeader_t TelemetryHeader; /**< \brief cFE SB telemetry message header */
     CFE_TIME_SysTime_t       currentTime;     /**< \brief Current time */
 } DS_Heartbeat_Packet_t;
 

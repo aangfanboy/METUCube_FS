@@ -252,6 +252,8 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                             case DS_PERFORM_HEARTBEAT_MID:
                                 // define a DS_Heartbeat_Packet_t
                                 heartbeatPacket.currentTime = CFE_TIME_GetTime();
+                                heartbeatPacket.TelemetryHeader = CFE_MSG_Init(CFE_SB_MsgId_t, sizeof(DS_Heartbeat_Packet_t));
+
                                 // change the BufPtr with heartbeatPacket
                                 BufPtr = (const CFE_SB_Buffer_t *)&heartbeatPacket;
 
@@ -301,12 +303,6 @@ void DS_FileSetupWrite(int32 FileIndex, const CFE_SB_Buffer_t *BufPtr)
     ** Create local pointers for array indexed data...
     */
     CFE_MSG_GetSize(&BufPtr->Msg, &PacketLength);
-    if (PacketLength > 10000)
-    {
-        PacketLength = sizeof(DS_Heartbeat_Packet_t);
-        heartbeatPacket = (DS_Heartbeat_Packet_t *)BufPtr;
-        OS_printf("DS_FileSetupWrite: Seconds %d, Subseconds %d\n", heartbeatPacket.currentTime.Seconds, heartbeatPacket.currentTime.Subseconds);
-    }
 
     OS_printf("DS_FileSetupWrite: Writing packet to file %d, size %zu\n", FileIndex, PacketLength);
 
