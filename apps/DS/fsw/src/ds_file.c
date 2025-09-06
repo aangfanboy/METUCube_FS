@@ -250,9 +250,8 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                                 CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
                                 break;
                             case DS_PERFORM_HEARTBEAT_MID:
-                                auto now = CFE_TIME_GetTime();
                                 // define a DS_Heartbeat_Packet_t
-                                heartbeatPacket.currentTime = now;
+                                heartbeatPacket.currentTime = CFE_TIME_GetTime();
                                 // change the BufPtr with heartbeatPacket
                                 BufPtr = (const CFE_SB_Buffer_t *)&heartbeatPacket;
 
