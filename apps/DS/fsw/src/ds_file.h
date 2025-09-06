@@ -325,5 +325,10 @@ void DS_FileTransmit(DS_AppFileStatus_t *FileStatus);
 bool DS_IsPacketFiltered(CFE_MSG_Message_t *MessagePtr, uint16 FilterType, uint16 Algorithm_N, uint16 Algorithm_X,
                          uint16 Algorithm_O);
 
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader; /**< \brief Telemetry Message Header */
+    CFE_TIME_SysTime_t       currentTime;     /**< \brief Current time */
+} DS_Heartbeat_Packet_t;
 
 #endif
