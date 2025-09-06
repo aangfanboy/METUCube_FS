@@ -242,8 +242,6 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                         /*
                         ** Write unfiltered packets to destination file...
                         */
-                        DS_FileSetupWrite(FileIndex, BufPtr);
-                        PassedFilter = true;
 
                         switch (CFE_SB_MsgIdToValue(MessageID))
                         {
@@ -251,12 +249,15 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                                 CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
                                 break;
                             case DS_PERFORM_HEARTBEAT_MID:
-                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Heartbeat packet received by DS, and written to file %d", FileIndex);
+                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Heartbeat packet received by DS, and written to file %d", FileIndex);                                
                                 break;
                             default:
                                 CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "UNKNOWN - Packet with Message ID 0x%08X received by DS, and written to file %d", CFE_SB_MsgIdToValue(MessageID), FileIndex);
                                 break;
                         }
+
+                        DS_FileSetupWrite(FileIndex, BufPtr);
+                        PassedFilter = true;
                     }
                 }
             }
