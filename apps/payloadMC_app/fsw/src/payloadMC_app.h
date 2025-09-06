@@ -109,5 +109,7 @@ CFE_Status_t PAYLOADMC_appPrepareHkPacket(void);
  * @return CFE_Status_t Returns CFE_SUCCESS on successful preparation, or an error code on failure.
  */
 
+ int32 GetCpuTemp(void);
+
 
 #endif /* _PAYLOADMC_APP_H_ */

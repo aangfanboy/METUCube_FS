@@ -190,6 +190,20 @@ CFE_Status_t PAYLOADMC_appResetHkData(void)
     return CFE_SUCCESS;
 }
 
+int32 GetCpuTemp(void)
+{
+    FILE *fp;
+    int temp_mC = 0;  // milli-Celsius
+
+    fp = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+    if (fp != NULL)
+    {
+        fscanf(fp, "%d", &temp_mC);
+        fclose(fp);
+    }
+    return temp_mC / 1000;  // return °C
+}
+
 CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
 {
 
@@ -199,7 +213,10 @@ CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
     HkPacketPayload->ErrCounter = PAYLOADMC_AppData.ErrCounter;
     HkPacketPayload->ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
     HkPacketPayload->NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
-    //HkPacketPayload->currentTime = CFE_TIME_GetTime();
+    HkPacketPayload->currentTime = CFE_TIME_GetTime();
+    HkPacketPayload->CpuTemperature = GetCpuTemp();
+
+    OS_printf("PAYLOADMC: Current CPU temperature: %d\n", HkPacketPayload->CpuTemperature);
 
     return CFE_SUCCESS;
 }
