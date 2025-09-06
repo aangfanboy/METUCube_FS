@@ -4,6 +4,17 @@
         "payloadmc_app.h": "c",
         "powermc_app_dispatch.h": "c",
         "powermc_config_msgids.h": "c",
-        "cfe_core_api_base_msgids.h": "c"
+        "cfe_core_api_base_msgids.h": "c",
+        "common_types.h": "c",
+        "cfe_tbl_filedef.h": "c",
+        "payloadmc_app_config.h": "c",
+        "adcsmc_app_msgids.h": "c",
+        "payloadmc_app_extern_typedefs.h": "c",
+        "adcsttmc_app_extern_typedefs.h": "c",
+        "commmc_app_extern_typedefs.h": "c",
+        "powermc_app_msgids.h": "c",
+        "payloadmc_app_msgids.h": "c",
+        "adcsmc_app_dispatch.h": "c",
+        "adcsttmc_app.h": "c"
     }
 }
