@@ -200,6 +200,7 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
     ** Convert packet MessageID to packet filter table index...
     */
     FilterIndex = DS_TableFindMsgID(MessageID);
+    DS_Heartbeat_Packet_t heartbeatPacket;
 
     /*
     ** Ignore packets not listed in the packet filter table...
@@ -249,9 +250,8 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                                 CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
                                 break;
                             case DS_PERFORM_HEARTBEAT_MID:
-                                CFE_TIME_SysTime_t now = CFE_TIME_GetTime();
+                                auto now = CFE_TIME_GetTime();
                                 // define a DS_Heartbeat_Packet_t
-                                DS_Heartbeat_Packet_t heartbeatPacket;
                                 heartbeatPacket.currentTime = now;
                                 // change the BufPtr with heartbeatPacket
                                 BufPtr = (const CFE_SB_Buffer_t *)&heartbeatPacket;
