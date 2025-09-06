@@ -81,7 +81,6 @@ DS_DestFileTable_t DS_DestFileTable = {
             /* .Pathname      = */ "/cf/heartbeat",
             /* .Basename      = */ "hb",
             /* .Extension     = */ ".hb",
-
             /* .FileNameType  = */ DS_BY_COUNT,
             /* .EnableState   = */ DS_ENABLED,
             /* .MaxFileSize   = */ (1024 * 1024 * 1024), /* 1 G-byte */

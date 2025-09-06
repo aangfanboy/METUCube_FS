@@ -293,6 +293,7 @@ void DS_FileSetupWrite(int32 FileIndex, const CFE_SB_Buffer_t *BufPtr)
     ** Create local pointers for array indexed data...
     */
     CFE_MSG_GetSize(&BufPtr->Msg, &PacketLength);
+    OS_printf("DS_FileSetupWrite: Writing packet to file %d, size %zu\n", FileIndex, PacketLength);
 
     if (!OS_ObjectIdDefined(FileStatus->FileHandle))
     {
