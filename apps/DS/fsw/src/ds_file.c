@@ -295,11 +295,19 @@ void DS_FileSetupWrite(int32 FileIndex, const CFE_SB_Buffer_t *BufPtr)
     DS_AppFileStatus_t *FileStatus   = &DS_AppData.FileStatus[FileIndex];
     bool                OpenNewFile  = false;
     size_t              PacketLength = 0;
+    DS_Heartbeat_Packet_t heartbeatPacket;
 
     /*
     ** Create local pointers for array indexed data...
     */
     CFE_MSG_GetSize(&BufPtr->Msg, &PacketLength);
+    if (PacketLength > 10000)
+    {
+        PacketLength = sizeof(DS_Heartbeat_Packet_t);
+        heartbeatPacket = (DS_Heartbeat_Packet_t *)BufPtr;
+        OS_printf("DS_FileSetupWrite: Seconds %d, Subseconds %d\n", heartbeatPacket.currentTime.Seconds, heartbeatPacket.currentTime.Subseconds);
+    }
+
     OS_printf("DS_FileSetupWrite: Writing packet to file %d, size %zu\n", FileIndex, PacketLength);
 
     if (!OS_ObjectIdDefined(FileStatus->FileHandle))
