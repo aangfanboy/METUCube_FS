@@ -71,6 +71,7 @@
 */
 
 #define HOUSEKEEPING_DATA_FILE 0
+#define HEARTBEAT_DATA_FILE 1
 
 /*
 ** Sample packet filter table data
@@ -87,10 +88,10 @@ DS_FilterTable_t DS_FilterTable = {
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
      /* Packet Index 015 */
-     {/* .MessageID = */ CFE_SB_MSGID_RESERVED,
+     {/* .MessageID = */ CFE_SB_MSGID_WRAP_VALUE(DS_PERFORM_HEARTBEAT_MID),
       /* .Filter    = */
       {/* File table index, filter type, N, X, O */
-       {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
+       {HEARTBEAT_DATA_FILE, DS_BY_COUNT, 1, 1, 0},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
