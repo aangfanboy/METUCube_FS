@@ -7,6 +7,27 @@
 #include "adcsttMC_app_extern_typedefs.h"
 #include "powerMC_app_extern_typedefs.h"
 
+// System / POSIX includes for serial and TCP
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+// TCP socket headers
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+
+// Default ground endpoint; can be overridden at compile time
+#ifndef COMMMC_APP_GROUND_ENDPOINT
+#define COMMMC_APP_GROUND_ENDPOINT "tcp://127.0.0.1:5000"
+#endif
+
 CFE_Status_t COMMMC_APP_SEND_HK_TO_SB()
 {
     CFE_Status_t status = CFE_SUCCESS;
@@ -45,7 +66,7 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
 {
     CFE_Status_t status = CFE_SUCCESS;
 
-    const char *port = "/dev/ttyUSB0"; // Example port, adjust as necessary
+    const char *port = COMMMC_APP_GROUND_ENDPOINT; // Endpoint can be serial path or tcp://host:port
     AdcsMC_MinimalTelemetry_t adcs_telemetry_data = {
         .quaternion = {1.0, 0.0, 0.0, 0.0},
         .angular_velocity = {0.1, 0.2, 0.3},
@@ -72,6 +93,8 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
     minimal_tm_packet.TelemetryPayload.AdcsttTelemetry = adcstt_telemetry_data;
     minimal_tm_packet.TelemetryPayload.PowerTelemetry = power_telemetry_data;
+    // print the size of minimal_tm_packet with OS_print
+    OS_printf("Size of minimal_tm_packet: %zu bytes\n", sizeof(minimal_tm_packet));
 
     uint32 crc32OfPayload = 0;
     // Calculate the CRC32 of the telemetry payload
@@ -160,7 +183,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     file_transfer_init_packet.TelemetrySecondaryHeader = telemetry_secondary_header;
 
     // Send the file transfer init packet to ground
-    status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_init_packet, sizeof(file_transfer_init_packet));
+    status = COMMMC_APP_SEND_DATA_TO_GROUND(COMMMC_APP_GROUND_ENDPOINT, (const unsigned char *)&file_transfer_init_packet, sizeof(file_transfer_init_packet));
     if (status != CFE_SUCCESS) {
         CFE_EVS_SendEvent(COMMMC_FILE_SEND_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC: Error sending file transfer init packet to ground");
@@ -227,7 +250,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
         memcpy(file_transfer_packet.FileData, buffer, bytes_read); // Copy the read data into the file transfer packet
 
         // Send the file transfer packet to ground
-        status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
+    status = COMMMC_APP_SEND_DATA_TO_GROUND(COMMMC_APP_GROUND_ENDPOINT, (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
 
         if (status != CFE_SUCCESS) {
             CFE_EVS_SendEvent(COMMMC_FILE_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -261,7 +284,7 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path){
     memcpy(file_transfer_packet.FileData, buffer, sizeof(buffer));
 
     // Send the last file transfer packet to ground
-    status = COMMMC_APP_SEND_DATA_TO_GROUND("/dev/ttyUSB0", (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
+    status = COMMMC_APP_SEND_DATA_TO_GROUND(COMMMC_APP_GROUND_ENDPOINT, (const unsigned char *)&file_transfer_packet, sizeof(file_transfer_packet));
 
     fclose(file);
 
@@ -305,26 +328,136 @@ COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDAR
 }
 
 CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length) {
+    // This function supports two endpoint types:
+    // 1) Serial device path like "/dev/ttyUSB0"
+    // 2) TCP endpoint in the form "tcp://<host>:<port>" (e.g., tcp://127.0.0.1:5000)
     CFE_Status_t status = CFE_SUCCESS;
 
-    int fd = open(port, O_WRONLY | O_NOCTTY);
-    if (fd < 0) return 1;
+    if (port && (strncmp(port, "tcp://", 6) == 0 || strncmp(port, "TCP://", 6) == 0))
+    {
+        // Parse host and port
+        const char *addr = port + 6; // skip tcp://
+        const char *colon = strrchr(addr, ':');
+        if (!colon || colon == addr || *(colon + 1) == '\0')
+        {
+            return 1; // invalid endpoint format
+        }
 
-    struct termios tty;
-    tcgetattr(fd, &tty);
+        char host[256];
+        char port_str[16];
+        size_t host_len = (size_t)(colon - addr);
+        if (host_len >= sizeof(host)) host_len = sizeof(host) - 1;
+        memcpy(host, addr, host_len);
+        host[host_len] = '\0';
+        strncpy(port_str, colon + 1, sizeof(port_str) - 1);
+        port_str[sizeof(port_str) - 1] = '\0';
 
-    tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-    tty.c_iflag = 0;
-    tty.c_oflag = 0;
-    tty.c_lflag = 0;
+        // Convert port to number and validate range
+        char *endptr = NULL;
+        long port_num_long = strtol(port_str, &endptr, 10);
+        if (endptr == port_str || *endptr != '\0' || port_num_long <= 0 || port_num_long > 65535)
+        {
+            return 1; // invalid port
+        }
+        uint16_t port_num = (uint16_t)port_num_long;
 
-    tcsetattr(fd, TCSANOW, &tty);
+        // Build IPv4 socket address
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0)
+        {
+            return 1;
+        }
 
-    write(fd, data, length);
+        struct sockaddr_in sa;
+        memset(&sa, 0, sizeof(sa));
+        sa.sin_family = AF_INET;
+        sa.sin_port = htons(port_num);
 
-    close(fd);
+        // Try numeric IPv4 first
+        if (inet_pton(AF_INET, host, &sa.sin_addr) != 1)
+        {
+            // Fallback to DNS resolution (IPv4 only)
+            struct hostent *he = gethostbyname(host);
+            if (!he || he->h_addrtype != AF_INET || he->h_length != 4)
+            {
+                close(sock);
+                return 1;
+            }
+            memcpy(&sa.sin_addr, he->h_addr_list[0], (size_t)he->h_length);
+        }
 
-    return status;
+        if (connect(sock, (struct sockaddr *)&sa, sizeof(sa)) != 0)
+        {
+            close(sock);
+            return 1;
+        }
+
+        // Send all data (handle partial sends)
+        size_t total = 0;
+        while (total < length)
+        {
+            ssize_t n = send(sock, data + total, length - total, 0);
+            if (n < 0)
+            {
+                if (errno == EINTR)
+                    continue;
+                close(sock);
+                return 1;
+            }
+            if (n == 0)
+            {
+                // Connection closed prematurely
+                close(sock);
+                return 1;
+            }
+            total += (size_t)n;
+        }
+
+        close(sock);
+        return status;
+    }
+    else
+    {
+        // Fallback to serial device path
+        int fd = open(port, O_WRONLY | O_NOCTTY);
+        if (fd < 0) return 1;
+
+        struct termios tty;
+        if (tcgetattr(fd, &tty) != 0)
+        {
+            close(fd);
+            return 1;
+        }
+
+        tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+        tty.c_iflag = 0;
+        tty.c_oflag = 0;
+        tty.c_lflag = 0;
+
+        if (tcsetattr(fd, TCSANOW, &tty) != 0)
+        {
+            close(fd);
+            return 1;
+        }
+
+        // Write may be partial on some systems; loop until all data is written
+        size_t total = 0;
+        while (total < length)
+        {
+            ssize_t n = write(fd, data + total, length - total);
+            if (n < 0)
+            {
+                if (errno == EINTR)
+                    continue;
+                close(fd);
+                return 1;
+            }
+            total += (size_t)n;
+        }
+
+        close(fd);
+        return status;
+    }
 }
 
 void COMMMC_APP_LISTENER_TASK(void)
