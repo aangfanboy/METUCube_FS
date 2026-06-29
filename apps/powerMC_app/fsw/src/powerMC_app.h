@@ -41,10 +41,11 @@ typedef struct
 
     CFE_SB_PipeId_t         CmdPipe;    /**< \brief Pipe Id for HK command pipe */
 
-    uint8                   CmdCounter; /**< \brief Number of valid commands received */
-    uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    uint32                  CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
-    uint32                  CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
+    uint8                   CmdCounter;
+    uint8                   ErrCounter;
+    uint8                   EpsMissCount;          /**< \brief Cycles elapsed without an EPS HK response */
+    uint8                   ChannelCurrents[10];   /**< \brief Cached EPS channel currents               */
+    uint16                  BuckVoltages[5];        /**< \brief Cached EPS buck voltages (mV)            */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

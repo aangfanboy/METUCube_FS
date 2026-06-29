@@ -10,11 +10,11 @@ void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
     switch (CFE_SB_MsgIdToValue(MsgId))
     {
         case CANIOMC_CMD_MID:
-            CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                              "CANIOMC: Received command packet");
+            /* SB-encapsulated CAN frame from another app (e.g. PowerMC) — forward to bus */
+            CANIOMC_ProcessSBCanPacket(SBBufPtr);
 
-            CANIOMC_AppData.CmdCounter++;
-            
+            /* Also drain any frames that may have arrived while we were processing */
+            CANIOMC_PollAndPublishCanRx();
             break;
 
         case CANIOMC_SEND_HK_MID:

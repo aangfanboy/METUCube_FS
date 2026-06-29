@@ -30,8 +30,8 @@ void CANIOMC_appMain(void)
         }
         else if (status == CFE_SB_TIME_OUT)
         {
-            // No message received, continue to next iteration
-            // if desired, you can add a table check here
+            /* Poll CAN bus for incoming frames on every SB timeout */
+            CANIOMC_PollAndPublishCanRx();
             continue;
         }
         else
@@ -58,6 +58,9 @@ CFE_Status_t CANIOMC_appInit(void)
 
     CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.HkPacket.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_HK_TLM_MID),
                  sizeof(CANIOMC_AppData.HkPacket));
+
+    CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.EpsTlmPkt.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_EPS_TLM_MID),
+                 sizeof(CANIOMC_AppData.EpsTlmPkt));
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
@@ -99,6 +102,15 @@ CFE_Status_t CANIOMC_appInit(void)
     {
         CFE_EVS_SendEvent(CANIOMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CANIOMC App: Error Subscribing to CMD, RC = 0x%08X\n", status);
+        return status;
+    }
+
+    /* Initialize CAN hardware */
+    status = CANIO_HAL_Init();
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC: CAN HAL init failed, status: 0x%08X", (unsigned int)status);
         return status;
     }
 

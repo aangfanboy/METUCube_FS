@@ -30,4 +30,7 @@
 
 #define POWERMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for PowerMC application, set to 1MB */
 
+/* Number of HK cycles without an EPS response before EpsStale flag is set */
+#define POWERMC_EPS_STALE_THRESHOLD       5
+
 #endif /* POWERMC_CONFIG_H */

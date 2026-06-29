@@ -4,6 +4,8 @@ set(APP_SRC_FILES
   fsw/src/canIOMC_app.c
   fsw/src/canIOMC_app_cmds.c
   fsw/src/canIOMC_app_dispatch.c
+  fsw/src/canIOMC_segmentation.c
+  platform/socketcan/canIOMC_hal_socketcan.c
 )
 
 # Create the app module

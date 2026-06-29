@@ -1,5 +1,6 @@
 #include "powerMC_app.h"
 #include "powerMC_app_dispatch.h"
+#include "canIOMC_app_msgids.h"
 
 void POWERMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -22,6 +23,10 @@ void POWERMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                               "POWERMC: Received HK request");
 
             POWERMC_APP_SEND_HK_TO_SB();
+            break;
+
+        case CANIOMC_EPS_TLM_MID:
+            POWERMC_ProcessEpsTlm(SBBufPtr);
             break;
 
         default:

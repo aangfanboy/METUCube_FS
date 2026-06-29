@@ -8,6 +8,8 @@
 #include "canIOMC_app_config.h"
 #include "canIOMC_app_msgids.h"
 #include "canIOMC_app_msg.h"
+#include "canIOMC_hal.h"
+#include "canIOMC_segmentation.h"
 #include "canIOMC_app_extern_typedefs.h"
 #include "canIOMC_app_events.h"
 #include "canIOMC_app_tbldefs.h"
@@ -37,22 +39,25 @@ typedef struct  // Integrated Housekeeping Telemetry
 
 typedef struct
 {
-    CANIOMC_HkPacket_t    HkPacket; /**< \brief HK Housekeeping Packet */
+    CANIOMC_HkPacket_t       HkPacket;    /**< \brief CANIOMC own HK packet        */
+    CANIOMC_EpsTlmPacket_t   EpsTlmPkt;  /**< \brief EPS data published to SB     */
 
     CFE_SB_PipeId_t         CmdPipe;    /**< \brief Pipe Id for HK command pipe */
 
     uint8                   CmdCounter; /**< \brief Number of valid commands received */
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    uint32                  CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
-    uint32                  CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
+    uint32                  CurrentVoltage;
+    uint32                  CurrentTemperature;
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */
 
-    CFE_TBL_Handle_t            ConfigTableHandle;    /**< \brief Copy Table handle */
-    CANIOMC_ConfigTbl_entry_t * ConfigTablePtr;    /**< \brief Ptr to copy table entry */
+    CFE_TBL_Handle_t            ConfigTableHandle;
+    CANIOMC_ConfigTbl_entry_t * ConfigTablePtr;
 
-    uint8 MemPoolBuffer[CANIOMC_NUM_BYTES_IN_MEM_POOL]; /**< \brief HK mempool buffer */
+    CANIO_ReassemblySlot_t      RxSlots[CANIO_MAX_REASSEMBLY_SLOTS];
+
+    uint8 MemPoolBuffer[CANIOMC_NUM_BYTES_IN_MEM_POOL];
 } CANIOMC_AppData_t;
 
 extern CANIOMC_AppData_t CANIOMC_AppData;

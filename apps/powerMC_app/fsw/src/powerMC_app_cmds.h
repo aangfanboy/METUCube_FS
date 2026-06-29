@@ -13,13 +13,17 @@ CFE_Status_t POWERMC_APP_SEND_HK_TO_SB(void);
  * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
  */
 
- CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void);
+CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void);
+
 /**
- * @brief Sends a CAN request for housekeeping data to the software bus
+ * @brief Update the PowerMC data cache with an EPS telemetry packet from CANIOMC.
  *
- * This function constructs and sends a CAN request message to the software bus, requesting housekeeping data from the CANIOMC application.
- * It initializes the message header, sets the appropriate CAN ID and payload, timestamps the message, and transmits it. Any errors encountered during this process are logged and returned.
- * @return CFE_Status_t Returns CFE_SUCCESS on successful transmission, or an error code if transmission fails.
- */ 
+ * Called by the dispatcher when CANIOMC_EPS_TLM_MID arrives.
+ * Resets EpsMissCount so the stale flag is cleared.
+ *
+ * @param SBBufPtr Pointer to the SB buffer containing a CANIOMC_EpsTlmPacket_t.
+ * @return CFE_SUCCESS always.
+ */
+CFE_Status_t POWERMC_ProcessEpsTlm(const CFE_SB_Buffer_t *SBBufPtr);
 
 #endif /* POWERMC_APP_CMDS_H */

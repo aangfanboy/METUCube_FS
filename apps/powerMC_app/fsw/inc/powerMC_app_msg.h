@@ -43,11 +43,12 @@ typedef struct
 */
 typedef struct
 {
-    uint8              CmdCounter;          /**< \brief Count of valid commands received */
-    uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
-    uint32             CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
-    uint32             CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
+    uint8              CmdCounter;            /**< \brief Count of valid commands received */
+    uint8              ErrCounter;            /**< \brief Count of invalid commands received */
+    uint8              EpsStale;              /**< \brief 1 = no EPS response for EPS_STALE_THRESHOLD cycles */
+    uint8              Reserved[1];
+    uint8              ChannelCurrents[10];   /**< \brief EPS channel current readings        */
+    uint16             BuckVoltages[5];        /**< \brief EPS buck converter voltages (mV)   */
 } POWERMC_HkTlm_Power_t;
 
 /**

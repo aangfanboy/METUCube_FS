@@ -1,4 +1,6 @@
 #include "powerMC_app.h"
+#include "canIOMC_app_msgids.h"
+#include <string.h>
 
 POWERMC_AppData_t         POWERMC_AppData;
 POWERMC_ConfigTbl_entry_t *POWERMC_Config_TablePtr;
@@ -102,6 +104,15 @@ CFE_Status_t POWERMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to EPS telemetry published by CANIOMC when a CAN HK response arrives */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_EPS_TLM_MID), POWERMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(POWERMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "POWERMC App: Error Subscribing to EPS TLM, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = POWERMC_appTableInit(&POWERMC_AppData.ConfigTableHandle, &POWERMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -182,24 +193,33 @@ CFE_Status_t POWERMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, POWERMC_Conf
 
 CFE_Status_t POWERMC_appResetHkData(void)
 {
-    POWERMC_AppData.CmdCounter = 0;
-    POWERMC_AppData.ErrCounter = 0;
-    POWERMC_AppData.CurrentVoltage = 0;
-    POWERMC_AppData.CurrentTemperature = 0;
-    
+    POWERMC_AppData.CmdCounter   = 0;
+    POWERMC_AppData.ErrCounter   = 0;
+    POWERMC_AppData.EpsMissCount = 0;
+    memset(POWERMC_AppData.ChannelCurrents, 0, sizeof(POWERMC_AppData.ChannelCurrents));
+    memset(POWERMC_AppData.BuckVoltages,    0, sizeof(POWERMC_AppData.BuckVoltages));
+
     return CFE_SUCCESS;
 }
 
 CFE_Status_t POWERMC_appPrepareHkPacket(void)
 {
-    POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
-    
     POWERMC_HkTlm_Power_t *HkPacketPayload = &POWERMC_AppData.HkPacket.Power;
 
     HkPacketPayload->CmdCounter = POWERMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = POWERMC_AppData.ErrCounter;
-    HkPacketPayload->CurrentVoltage = POWERMC_AppData.CurrentVoltage;
-    HkPacketPayload->CurrentTemperature = POWERMC_AppData.CurrentTemperature;
+    HkPacketPayload->EpsStale   = (POWERMC_AppData.EpsMissCount >= POWERMC_EPS_STALE_THRESHOLD) ? 1 : 0;
+    memcpy(HkPacketPayload->ChannelCurrents, POWERMC_AppData.ChannelCurrents, sizeof(HkPacketPayload->ChannelCurrents));
+    memcpy(HkPacketPayload->BuckVoltages,    POWERMC_AppData.BuckVoltages,    sizeof(HkPacketPayload->BuckVoltages));
+
+    /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
+    POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
+
+    /* Track consecutive misses; reset happens in POWERMC_ProcessEpsTlm on response */
+    if (POWERMC_AppData.EpsMissCount < 0xFF)
+    {
+        POWERMC_AppData.EpsMissCount++;
+    }
 
     return CFE_SUCCESS;
 }

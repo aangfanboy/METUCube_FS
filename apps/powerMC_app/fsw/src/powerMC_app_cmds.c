@@ -6,6 +6,7 @@
 #include "canIOMC_app_msgids.h"
 
 #include "cfe.h"
+#include <string.h>
 
 
 CFE_Status_t POWERMC_APP_SEND_HK_TO_SB()
@@ -44,32 +45,26 @@ CFE_Status_t POWERMC_APP_SEND_HK_TO_SB()
 
 CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void)
 {
-    CFE_Status_t status = CFE_SUCCESS;
+    CFE_Status_t          status = CFE_SUCCESS;
     CANIOMC_CanPacketSB_t CanHkRequest;
 
-    /* 1. cFS Mesaj Header'ını Başlat (Mesajı CANIOMC_CMD_MID hedefine yolluyoruz) */
-    CFE_MSG_Init(CFE_MSG_PTR(CanHkRequest.MessageHeader), 
-                 CFE_SB_ValueToMsgId(CANIOMC_CMD_MID), 
+    memset(&CanHkRequest, 0, sizeof(CanHkRequest));
+
+    CFE_MSG_Init(CFE_MSG_PTR(CanHkRequest.MessageHeader),
+                 CFE_SB_ValueToMsgId(CANIOMC_CMD_MID),
                  sizeof(CANIOMC_CanPacketSB_t));
 
-    /* 2. 29-bit CAN ID'yi Paketle 
-    ** Priority: 01 (High), Sender: 0x02 (OBC Power), Receiver: 0x03 (EPS), 
-    ** MsgID: 10 (HK Istek Kodu), SeqType: 0, SeqCount: 1 
-    */
-    CanHkRequest.Header.Priority = 0x01;
-    CanHkRequest.Header.SenderID = 0x02;
-    CanHkRequest.Header.ReceiverID = 0x03;
-    CanHkRequest.Header.MessageID = 0x000A; // HK Request Command
-    CanHkRequest.Header.SeqType = 0x00;
-    CanHkRequest.Header.SeqCount = 0x01;
+    /* CAN header fields — SeqType/SeqCount are set by the segmentation engine */
+    CanHkRequest.Header.Priority   = 0x01;    /* High          */
+    CanHkRequest.Header.SenderID   = 0x02;    /* OBC Power     */
+    CanHkRequest.Header.ReceiverID = 0x03;    /* EPS           */
+    CanHkRequest.Header.MessageID  = 0x000A;  /* HK Request    */
 
-    // no payload for this command, just a request
-    CanHkRequest.Payload.RawBytes[0] = 0x00;
+    /* No payload — this is a pure request frame */
+    CanHkRequest.PayloadLen = 0;
 
-    /* 4. Zaman damgası vur */
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(CanHkRequest.MessageHeader));
 
-    /* 5. Software Bus'a Fırlat */
     status = CFE_SB_TransmitMsg(CFE_MSG_PTR(CanHkRequest.MessageHeader), true);
 
     if (status != CFE_SUCCESS)
@@ -83,8 +78,31 @@ CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void)
 
     CFE_EVS_SendEvent(POWERMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
                       "POWERMC: CAN HK Request basariyla CAN_IO'ya iletildi");
-    
+
     POWERMC_AppData.CmdCounter++;
-    
+
     return status;
+}
+
+CFE_Status_t POWERMC_ProcessEpsTlm(const CFE_SB_Buffer_t *SBBufPtr)
+{
+    const CANIOMC_EpsTlmPacket_t *EpsPkt;
+
+    if (SBBufPtr == NULL)
+    {
+        return CFE_SUCCESS;
+    }
+
+    EpsPkt = (const CANIOMC_EpsTlmPacket_t *)SBBufPtr;
+
+    memcpy(POWERMC_AppData.ChannelCurrents, EpsPkt->Eps.ChannelCurrents, sizeof(POWERMC_AppData.ChannelCurrents));
+    memcpy(POWERMC_AppData.BuckVoltages,    EpsPkt->Eps.BuckVoltages,    sizeof(POWERMC_AppData.BuckVoltages));
+    POWERMC_AppData.EpsMissCount       = 0;
+
+    CFE_EVS_SendEvent(POWERMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                      "POWERMC: EPS cache updated (V=%u mV, T=%u m°C)",
+                      (unsigned int)POWERMC_AppData.CurrentVoltage,
+                      (unsigned int)POWERMC_AppData.CurrentTemperature);
+
+    return CFE_SUCCESS;
 }
