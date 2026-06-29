@@ -11,8 +11,14 @@ set(APP_SRC_FILES
 # Create the app module
 add_cfe_app(canIOMC_app ${APP_SRC_FILES})
 
-# This permits direct access to public headers in the fsw/inc directory
-target_include_directories(canIOMC_app PUBLIC fsw/inc)
+# Public headers (fsw/inc) and platform-specific SocketCAN include path
+target_include_directories(canIOMC_app PUBLIC
+  fsw/inc
+  platform/socketcan
+)
+
+# SocketCAN requires POSIX and Linux kernel network headers
+target_compile_definitions(canIOMC_app PRIVATE _GNU_SOURCE)
 
 set(APP_TABLE_FILES
   fsw/tables/canIOMC_app_config_tbl.c
