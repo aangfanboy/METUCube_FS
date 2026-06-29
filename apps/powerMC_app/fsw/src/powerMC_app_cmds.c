@@ -100,9 +100,9 @@ CFE_Status_t POWERMC_ProcessEpsTlm(const CFE_SB_Buffer_t *SBBufPtr)
     POWERMC_AppData.EpsMissCount       = 0;
 
     CFE_EVS_SendEvent(POWERMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
-                      "POWERMC: EPS cache updated (V=%u mV, T=%u m°C)",
-                      (unsigned int)POWERMC_AppData.CurrentVoltage,
-                      (unsigned int)POWERMC_AppData.CurrentTemperature);
+                      "POWERMC: EPS cache updated (Buck0=%u mV, Ch0=%u)",
+                      (unsigned int)POWERMC_AppData.BuckVoltages[0],
+                      (unsigned int)POWERMC_AppData.ChannelCurrents[0]);
 
     return CFE_SUCCESS;
 }

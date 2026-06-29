@@ -21,17 +21,6 @@
 ** Telemetry Data
 */
 
-typedef struct CANIOMC_APP_HkTlm_Power  // Only Power
-{
-    uint8 activeCameraN;
-} CANIOMC_APP_HkTlm_Power_t;
-
-typedef struct  // Integrated Housekeeping Telemetry
-{
-    CFE_MSG_TelemetryHeader_t  TelemetryHeader;
-    CANIOMC_APP_HkTlm_Power_t Power;        
-} CANIOMC_APP_HkTlm_t;
-
 /*************************************************************************/
 /*
 ** Main CANIOMC App Data Structure
@@ -39,15 +28,13 @@ typedef struct  // Integrated Housekeeping Telemetry
 
 typedef struct
 {
-    CANIOMC_HkPacket_t       HkPacket;    /**< \brief CANIOMC own HK packet        */
-    CANIOMC_EpsTlmPacket_t   EpsTlmPkt;  /**< \brief EPS data published to SB     */
+    CANIOMC_HkPacket_t       HkPacket;    /**< \brief CANIOMC own gateway HK packet */
+    CANIOMC_EpsTlmPacket_t   EpsTlmPkt;  /**< \brief EPS data published to SB      */
 
-    CFE_SB_PipeId_t         CmdPipe;    /**< \brief Pipe Id for HK command pipe */
+    CFE_SB_PipeId_t         CmdPipe;
 
-    uint8                   CmdCounter; /**< \brief Number of valid commands received */
-    uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    uint32                  CurrentVoltage;
-    uint32                  CurrentTemperature;
+    uint8                   CmdCounter; /**< \brief CAN TX requests processed */
+    uint8                   ErrCounter; /**< \brief HAL / reassembly errors   */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

@@ -19,17 +19,6 @@
 ** Telemetry Data
 */
 
-typedef struct POWERMC_APP_HkTlm_Power  // Only Power
-{
-    uint8 activeCameraN;
-} POWERMC_APP_HkTlm_Power_t;
-
-typedef struct  // Integrated Housekeeping Telemetry
-{
-    CFE_MSG_TelemetryHeader_t  TelemetryHeader;
-    POWERMC_APP_HkTlm_Power_t Power;        
-} POWERMC_APP_HkTlm_t;
-
 /*************************************************************************/
 /*
 ** Main PowerMC App Data Structure

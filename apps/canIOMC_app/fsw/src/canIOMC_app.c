@@ -196,21 +196,16 @@ CFE_Status_t CANIOMC_appResetHkData(void)
 {
     CANIOMC_AppData.CmdCounter = 0;
     CANIOMC_AppData.ErrCounter = 0;
-    CANIOMC_AppData.CurrentVoltage = 0;
-    CANIOMC_AppData.CurrentTemperature = 0;
-    
+
     return CFE_SUCCESS;
 }
 
 CFE_Status_t CANIOMC_appPrepareHkPacket(void)
 {
-    
     CANIOMC_HkTlm_Power_t *HkPacketPayload = &CANIOMC_AppData.HkPacket.Power;
 
     HkPacketPayload->CmdCounter = CANIOMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = CANIOMC_AppData.ErrCounter;
-    HkPacketPayload->CurrentVoltage = CANIOMC_AppData.CurrentVoltage;
-    HkPacketPayload->CurrentTemperature = CANIOMC_AppData.CurrentTemperature;
 
     return CFE_SUCCESS;
 }
