@@ -7,9 +7,8 @@ CFE_APP, DS,                DS_AppMain,                 DS,                 60, 
 CFE_APP, powerMC_app,       POWERMC_appMain,            POWERMC_APP,        50,   16384, 0x0, 0;
 CFE_APP, commMC_app,        COMMMC_appMain,            COMMMC_APP,         50,   16384, 0x0, 0;
 CFE_APP, adcsMC_app,        ADCSMC_appMain,             ADCSMC_APP,         50,   16384, 0x0, 0;
-CFE_APP, adcsttMC_app,      ADCSTTMC_appMain,           ADCSTTMC_APP,       50,   16384, 0x0, 0;
 CFE_APP, payloadMC_app,     PAYLOADMC_appMain,          PAYLOADMC_APP,      50,   16384, 0x0, 0;
-
+CFE_APP, canIOMC_app,     CANIOMC_appMain,          CANIOMC_APP,      50,   16384, 0x0, 0;
 !
 ! Startup script fields:
 ! 1. Object Type      -- CFE_APP for an Application, or CFE_LIB for a library.

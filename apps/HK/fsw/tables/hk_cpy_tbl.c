@@ -44,9 +44,6 @@
 #include "adcsMC_app_msgids.h"
 #include "adcsMC_app_msg.h"
 
-#include "adcsttMC_app_msgids.h"
-#include "adcsttMC_app_msg.h"
-
 hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     /*         inputMid        inputOffset     outputMid    outputOffset  numBytes*/
 
@@ -75,19 +72,19 @@ hk_copy_table_entry_t HK_CopyTable[HK_COPY_TABLE_ENTRIES] = {
     },
     /*   7 */
     {
-        CFE_SB_MSGID_WRAP_VALUE(ADCSTTMC_HK_TLM_MID),
-        sizeof(CFE_MSG_TelemetryHeader_t),
-        CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t) + sizeof(ADCSMC_HkTlm_Adcs_t),
-        sizeof(ADCSTTMC_HkTlm_Adcstt_t)
-    },
-    /*   8 */
-    {
         CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_HK_TLM_MID),
         sizeof(CFE_MSG_TelemetryHeader_t),
         CFE_SB_MSGID_WRAP_VALUE(HK_COMBINED_PKT1_MID),
-        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t) + sizeof(ADCSMC_HkTlm_Adcs_t) + sizeof(ADCSTTMC_HkTlm_Adcstt_t),
+        sizeof(CFE_MSG_TelemetryHeader_t) + sizeof(POWERMC_HkTlm_Power_t) + sizeof(COMMMC_HkTlm_Comm_t) + sizeof(ADCSMC_HkTlm_Adcs_t),
         sizeof(PAYLOADMC_HkTlm_Payload_t)
+    },
+    /*   8 */
+    {
+        CFE_SB_MSGID_RESERVED,
+        0,
+        CFE_SB_MSGID_RESERVED,
+        0,
+        0,
     },
 
     /*   9 */

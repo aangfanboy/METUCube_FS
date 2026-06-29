@@ -18,7 +18,7 @@ set(APP_TABLE_FILES
 
 add_cfe_tables(HK ${APP_TABLE_FILES})
 
-foreach(EXT_APP powerMC_app payloadMC_app commMC_app adcsMC_app adcsttMC_app)
+foreach(EXT_APP powerMC_app payloadMC_app commMC_app adcsMC_app)
   list (FIND TGTSYS_${SYSVAR}_APPS ${EXT_APP} HAVE_APP)
   if (HAVE_APP GREATER_EQUAL 0)
     include_directories($<TARGET_PROPERTY:${EXT_APP},INTERFACE_INCLUDE_DIRECTORIES>)

@@ -10,11 +10,9 @@
         "payloadmc_app_config.h": "c",
         "adcsmc_app_msgids.h": "c",
         "payloadmc_app_extern_typedefs.h": "c",
-        "adcsttmc_app_extern_typedefs.h": "c",
         "commmc_app_extern_typedefs.h": "c",
         "powermc_app_msgids.h": "c",
         "payloadmc_app_msgids.h": "c",
         "adcsmc_app_dispatch.h": "c",
-        "adcsttmc_app.h": "c"
     }
 }

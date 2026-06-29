@@ -192,6 +192,7 @@ CFE_Status_t POWERMC_appResetHkData(void)
 
 CFE_Status_t POWERMC_appPrepareHkPacket(void)
 {
+    POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
     
     POWERMC_HkTlm_Power_t *HkPacketPayload = &POWERMC_AppData.HkPacket.Power;
 

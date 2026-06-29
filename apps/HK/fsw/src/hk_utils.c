@@ -37,7 +37,6 @@
 #include "commMC_app_msgids.h"
 #include "payloadMC_app_msgids.h"
 #include "adcsMC_app_msgids.h"
-#include "adcsttMC_app_msgids.h"
 
 /*************************************************************************
 ** Function definitions

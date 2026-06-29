@@ -1,11 +1,11 @@
-#ifndef ADCSTTMC_APP_DISPATCH_H
-#define ADCSTTMC_APP_DISPATCH_H
+#ifndef CANIOMC_APP_DISPATCH_H
+#define CANIOMC_APP_DISPATCH_H
 
 #include "cfe.h"
 
-void ADCSTTMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
+void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
 /**
- * @brief Dispatches messages received by the AdcsttMC application task.
+ * @brief Dispatches messages received by the CANIOMC application task.
  * 
  * This function processes incoming messages from the software bus, handling commands and telemetry requests.
  * It identifies the message type and calls the appropriate handler based on the message ID.
@@ -13,4 +13,4 @@ void ADCSTTMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr);
  * @param SBBufPtr Pointer to the software bus buffer containing the received message.
  */
 
-#endif /* ADCSTTMC_APP_DISPATCH_H */
+#endif /* CANIOMC_APP_DISPATCH_H */

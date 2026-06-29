@@ -4,7 +4,6 @@
 #include "commMC_app_msgids.h"
 
 #include "adcsMC_app_extern_typedefs.h"
-#include "adcsttMC_app_extern_typedefs.h"
 #include "powerMC_app_extern_typedefs.h"
 
 // System / POSIX includes for serial and TCP
@@ -75,14 +74,6 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
         .rw_speeds = {1500, 1600, 1700}
     };
 
-    AdcsttMC_MinimalTelemetry_t adcstt_telemetry_data = {
-        .quaternion = {0.7071, 0.0, 0.7071, 0.0},
-        .angular_velocity = {0.05, 0.1, 0.15},
-        .speed_vector = {5.0, -2.0, 0.5},
-        .position_vector = {50.0, 100.0, 150.0},
-        .rw_speeds = {1200, 1300, 1400}
-    };
-
     PowerMC_MinimalTelemetry_t power_telemetry_data = {
         .batteryPercentage = 85,
         .batteryHealth = 95
@@ -91,7 +82,6 @@ CFE_Status_t COMMMC_APP_SEND_MINIMAL_TM_TO_GROUND()
     // Prepare the data to send
     COMMMC_APP_MinimalTelemetryPacket_t minimal_tm_packet;
     minimal_tm_packet.TelemetryPayload.AdcsTelemetry = adcs_telemetry_data;
-    minimal_tm_packet.TelemetryPayload.AdcsttTelemetry = adcstt_telemetry_data;
     minimal_tm_packet.TelemetryPayload.PowerTelemetry = power_telemetry_data;
     // print the size of minimal_tm_packet with OS_print
     OS_printf("Size of minimal_tm_packet: %zu bytes\n", sizeof(minimal_tm_packet));

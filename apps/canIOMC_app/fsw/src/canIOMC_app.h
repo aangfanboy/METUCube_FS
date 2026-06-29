@@ -1,83 +1,81 @@
-#ifndef _ADCSTTMC_APP_H_
-#define _ADCSTTMC_APP_H_
+#ifndef _CANIOMC_APP_H_
+#define _CANIOMC_APP_H_
 
 #include "cfe.h"
 #include "cfe_msg.h"
 #include "cfe_core_api_base_msgids.h"
 
-#include "adcsttMC_app_config.h"
-#include "adcsttMC_app_msgids.h"
-#include "adcsttMC_app_msg.h"
-#include "adcsttMC_app_extern_typedefs.h"
-#include "adcsttMC_app_events.h"
-#include "adcsttMC_app_tbldefs.h"
-#include "adcsttMC_app_dispatch.h"
-#include "adcsttMC_app_cmds.h"
+#include "canIOMC_app_config.h"
+#include "canIOMC_app_msgids.h"
+#include "canIOMC_app_msg.h"
+#include "canIOMC_app_extern_typedefs.h"
+#include "canIOMC_app_events.h"
+#include "canIOMC_app_tbldefs.h"
+#include "canIOMC_app_dispatch.h"
+#include "canIOMC_app_cmds.h"
 
 /*************************************************************************/
 /*
 ** Telemetry Data
 */
 
-typedef struct ADCSTTMC_APP_HkTlm_Adcstt  // Only Adcstt
+typedef struct CANIOMC_APP_HkTlm_Power  // Only Power
 {
     uint8 activeCameraN;
-} ADCSTTMC_APP_HkTlm_Adcstt_t;
+} CANIOMC_APP_HkTlm_Power_t;
 
 typedef struct  // Integrated Housekeeping Telemetry
 {
     CFE_MSG_TelemetryHeader_t  TelemetryHeader;
-    ADCSTTMC_APP_HkTlm_Adcstt_t Adcstt;        
-} ADCSTTMC_APP_HkTlm_t;
+    CANIOMC_APP_HkTlm_Power_t Power;        
+} CANIOMC_APP_HkTlm_t;
 
 /*************************************************************************/
 /*
-** Main PowerMC App Data Structure
+** Main CANIOMC App Data Structure
 */
 
 typedef struct
 {
-    ADCSTTMC_HkPacket_t    HkPacket; /**< \brief HK Housekeeping Packet */
+    CANIOMC_HkPacket_t    HkPacket; /**< \brief HK Housekeeping Packet */
 
     CFE_SB_PipeId_t         CmdPipe;    /**< \brief Pipe Id for HK command pipe */
 
     uint8                   CmdCounter; /**< \brief Number of valid commands received */
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    float                  quaternion1; /**< \brief Quaternion component 1 */
-    float                  quaternion2; /**< \brief Quaternion component 2 */
-    float                  quaternion3; /**< \brief Quaternion component 3 */
-    float                  quaternion4; /**< \brief Quaternion component 4 */
+    uint32                  CurrentVoltage;      /**< \brief Current voltage reading from the power sensors*/
+    uint32                  CurrentTemperature;  /**< \brief Current temperature reading from the power sensors */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */
 
     CFE_TBL_Handle_t            ConfigTableHandle;    /**< \brief Copy Table handle */
-    ADCSTTMC_ConfigTbl_entry_t * ConfigTablePtr;    /**< \brief Ptr to copy table entry */
+    CANIOMC_ConfigTbl_entry_t * ConfigTablePtr;    /**< \brief Ptr to copy table entry */
 
-    uint8 MemPoolBuffer[ADCSTTMC_NUM_BYTES_IN_MEM_POOL]; /**< \brief HK mempool buffer */
-} ADCSTTMC_AppData_t;
+    uint8 MemPoolBuffer[CANIOMC_NUM_BYTES_IN_MEM_POOL]; /**< \brief HK mempool buffer */
+} CANIOMC_AppData_t;
 
-extern ADCSTTMC_AppData_t ADCSTTMC_AppData;
+extern CANIOMC_AppData_t CANIOMC_AppData;
 
-void ADCSTTMC_appMain(void);
+void CANIOMC_appMain(void);
 /**
- * @brief Main function for the AdcsttMC application
+ * @brief Main function for the CANIOMC application
  * 
  * This function initializes the application, processes commands, and handles telemetry.
  * It runs in a loop until the application is terminated, either by an error or entire shutdown.
  */
 
-CFE_Status_t ADCSTTMC_appInit(void);
+CFE_Status_t CANIOMC_appInit(void);
 /**
- * @brief Initializes the AdcsttMC application
+ * @brief Initializes the CANIOMC application
  * 
  * This function sets up the application, registers events, creates software bus pipes, subscribes to messages, and initializes tables.
  * @return CFE_Status_t Returns CFE_SUCCESS on successful initialization, or an error code on failure.
  */
 
-CFE_Status_t ADCSTTMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, ADCSTTMC_ConfigTbl_entry_t **TblPtr);
+CFE_Status_t CANIOMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, CANIOMC_ConfigTbl_entry_t **TblPtr);
 /**
- * @brief Initializes the configuration table for the AdcsttMC application
+ * @brief Initializes the configuration table for the CANIOMC application
  * 
  * This function registers the configuration table, gets its address, and initializes it.
  * @param TblHandlePtr Pointer to the table handle
@@ -85,9 +83,9 @@ CFE_Status_t ADCSTTMC_appTableInit(CFE_TBL_Handle_t *TblHandlePtr, ADCSTTMC_Conf
  * @return CFE_Status_t Returns CFE_SUCCESS on successful initialization, or an error code on failure.
  */
 
-CFE_Status_t ADCSTTMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, ADCSTTMC_ConfigTbl_entry_t **TblPtr);
+CFE_Status_t CANIOMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, CANIOMC_ConfigTbl_entry_t **TblPtr);
 /**
- * @brief Reloads the configuration table for the AdcsttMC application
+ * @brief Reloads the configuration table for the CANIOMC application
  * 
  * This function releases the current table address, reinitializes the table, and gets its address again.
  * @param TblHandlePtr Pointer to the table handle
@@ -95,21 +93,21 @@ CFE_Status_t ADCSTTMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, ADCSTTMC_Co
  * @return CFE_Status_t Returns CFE_SUCCESS on successful reload, or an error code on failure.
  */
 
-CFE_Status_t ADCSTTMC_appResetHkData(void);
+CFE_Status_t CANIOMC_appResetHkData(void);
 /**
- * @brief Resets the housekeeping data for the AdcsttMC application
+ * @brief Resets the housekeeping data for the CANIOMC application
  * 
  * This function resets the command and error counters, active camera number, and number of taken photos to their initial values.
  * @return CFE_Status_t Returns CFE_SUCCESS on successful reset.
  */
 
-CFE_Status_t ADCSTTMC_appPrepareHkPacket(void);
+CFE_Status_t CANIOMC_appPrepareHkPacket(void);
 /**
- * @brief Prepares the housekeeping packet for the AdcsttMC application
+ * @brief Prepares the housekeeping packet for the CANIOMC application
  * 
  * This function populates the housekeeping packet with the current command and error counters, active camera number, and number of taken photos.
  * @return CFE_Status_t Returns CFE_SUCCESS on successful preparation, or an error code on failure.
  */
 
 
-#endif /* _ADCSTTMC_APP_H_ */
+#endif /* _CANIOMC_APP_H_ */
