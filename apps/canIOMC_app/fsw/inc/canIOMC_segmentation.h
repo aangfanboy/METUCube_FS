@@ -26,10 +26,10 @@
 /* ------------------------------------------------------------------ */
 /* SeqType field values (2-bit field in 29-bit CAN ID)                */
 /* ------------------------------------------------------------------ */
-#define CANIO_SEQ_SINGLE  0x00U  /**< Complete payload in one frame  */
-#define CANIO_SEQ_FIRST   0x01U  /**< First frame of multi-frame msg */
-#define CANIO_SEQ_CONT    0x02U  /**< Continuation frame             */
-#define CANIO_SEQ_LAST    0x03U  /**< Last frame — triggers publish  */
+#define CANIO_SEQ_SINGLE  0x03  /**< Complete payload in one frame  */
+#define CANIO_SEQ_FIRST   0x01      /**< First frame of multi-frame msg */
+#define CANIO_SEQ_CONT    0x00  /**< Continuation frame             */
+#define CANIO_SEQ_LAST    0x02  /**< Last frame — triggers publish  */
 
 /* ------------------------------------------------------------------ */
 /* Reassembly engine configuration                                     */
