@@ -29,6 +29,8 @@ int32 CANIO_SendSegmented(const CANIOMC_CAN_Header_t *Hdr,
     /* Determine framing mode upfront */
     bool multiFrame = (Len > CANIO_HAL_MAX_DLC);
 
+    if (Len == 0){return CFE_SUCCESS}
+
     do
     {
         chunkLen = (Len - offset);
@@ -78,7 +80,7 @@ int32 CANIO_SendSegmented(const CANIOMC_CAN_Header_t *Hdr,
         offset   += chunkLen;
         seqCount++;
 
-    } while (offset < Len || Len == 0);
+    } while (offset < Len);
     /* Len==0 case: sends exactly one SINGLE frame with zero payload */
 
     return CFE_SUCCESS;

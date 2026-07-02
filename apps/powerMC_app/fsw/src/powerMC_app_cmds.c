@@ -56,9 +56,9 @@ CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void)
 
     /* CAN header fields — SeqType/SeqCount are set by the segmentation engine */
     CanHkRequest.Header.Priority   = 0x01;    /* High          */
-    CanHkRequest.Header.SenderID   = 0x02;    /* OBC Power     */
-    CanHkRequest.Header.ReceiverID = 0x03;    /* EPS           */
-    CanHkRequest.Header.MessageID  = 0x000A;  /* HK Request    */
+    CanHkRequest.Header.SenderID   = 0x03;    /* OBC Power     */
+    CanHkRequest.Header.ReceiverID = 0x00;    /* EPS           */
+    CanHkRequest.Header.MessageID  = 0x66;  /* HK Request    */
 
     /* No payload — this is a pure request frame */
     CanHkRequest.PayloadLen = 0;
