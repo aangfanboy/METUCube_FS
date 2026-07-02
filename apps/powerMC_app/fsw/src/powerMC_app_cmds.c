@@ -4,6 +4,7 @@
 #include "powerMC_app_msgids.h"
 #include "canIOMC_app_msg.h"
 #include "canIOMC_app_msgids.h"
+#include "canIOMC_app_header_defs.h"
 
 #include "cfe.h"
 #include <string.h>
@@ -55,10 +56,10 @@ CFE_Status_t POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void)
                  sizeof(CANIOMC_CanPacketSB_t));
 
     /* CAN header fields — SeqType/SeqCount are set by the segmentation engine */
-    CanHkRequest.Header.Priority   = 0x01;    /* High          */
-    CanHkRequest.Header.SenderID   = 0x03;    /* OBC Power     */
-    CanHkRequest.Header.ReceiverID = 0x00;    /* EPS           */
-    CanHkRequest.Header.MessageID  = 0x66;  /* HK Request    */
+    CanHkRequest.Header.Priority   = CANIOMC_HKPRIORITY;
+    CanHkRequest.Header.SenderID   = CANIOMC_OBC_ID;    
+    CanHkRequest.Header.ReceiverID = CANIOMC_EPS_ID;    
+    CanHkRequest.Header.MessageID  = CANIOMC_OBCPOWER_HK_MSGID;
 
     /* No payload — this is a pure request frame */
     CanHkRequest.PayloadLen = 0;
