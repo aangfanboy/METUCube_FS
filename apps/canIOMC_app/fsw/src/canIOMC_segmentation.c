@@ -78,7 +78,7 @@ int32 CANIO_SendSegmented(const CANIOMC_CAN_Header_t *Hdr,
         offset   += chunkLen;
         seqCount++;
 
-        if (len == 0)
+        if (Len == 0)
         {
             /* Special case: zero-length payload, send exactly one SINGLE frame */
             break;
