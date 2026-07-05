@@ -90,7 +90,7 @@
 **  3. If the table grows too big, increase SCH_LAB_MAX_SCHEDULE_ENTRIES
 */
 #define CLOCK_RATE_FOR_HK_CYCLE 1001
-#define CANIOMC_HEARTBEAT_RATE 1000 /* 1 Hz at TickRate=100 */
+#define CANIOMC_HEARTBEAT_RATE 100 /* 1 Hz at TickRate=100 */
 
 SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
     .TickRate = 100,
