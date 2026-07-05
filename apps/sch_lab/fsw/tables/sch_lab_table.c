@@ -63,6 +63,10 @@
 #include "powerMC_app_msgids.h"
 #endif
 
+#ifdef HAVE_CANIOMC_APP
+#include "canIOMC_app_msgids.h"
+#endif
+
 #ifdef HAVE_PAYLOADMC_APP
 #include "payloadMC_app_msgids.h"
 #endif
@@ -86,6 +90,7 @@
 **  3. If the table grows too big, increase SCH_LAB_MAX_SCHEDULE_ENTRIES
 */
 #define CLOCK_RATE_FOR_HK_CYCLE 1001
+#define CANIOMC_HEARTBEAT_RATE 1000 /* 1 Hz at TickRate=100 */
 
 SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
     .TickRate = 100,
@@ -126,6 +131,9 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #endif
 #ifdef HAVE_POWERMC_APP
         {CFE_SB_MSGID_WRAP_VALUE(POWERMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+#endif
+#ifdef HAVE_CANIOMC_APP
+        {CFE_SB_MSGID_WRAP_VALUE(CANIOMC_SEND_HEARTBEAT_MID), CANIOMC_HEARTBEAT_RATE, 0},
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP

@@ -24,4 +24,15 @@ CFE_Status_t CANIOMC_ProcessSBCanPacket(const CFE_SB_Buffer_t *SBBufPtr);
  */
 void CANIOMC_PollAndPublishCanRx(void);
 
+/**
+ * @brief Broadcast the OBC heartbeat (MessageID 0x00) to all CAN nodes.
+ *
+ * Triggered by the scheduler via CANIOMC_SEND_HEARTBEAT_MID. Sent directly
+ * through CANIO_SendSegmented() with a zero-length payload (unsegmented,
+ * single frame) — no SB round-trip needed since CANIOMC owns the CAN bus.
+ *
+ * @return CFE_SUCCESS on success, error code on HAL failure.
+ */
+CFE_Status_t CANIOMC_APP_SEND_HEARTBEAT(void);
+
 #endif /* CANIOMC_APP_CMDS_H */

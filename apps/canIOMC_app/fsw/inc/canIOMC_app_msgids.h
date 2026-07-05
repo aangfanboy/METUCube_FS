@@ -16,6 +16,7 @@
 #define CANIOMC_SEND_HK_MID          0xDC1
 #define CANIOMC_CMD_MID              0xDC2
 #define CANIOMC_EPS_TLM_MID          0xDC3  /**< EPS housekeeping data received from CAN bus */
+#define CANIOMC_SEND_HEARTBEAT_MID   0xDC4  /**< Scheduler trigger: broadcast OBC heartbeat over CAN */
 
 #define CANIOMC_SEND_HK_MID_NAME        "CANIOMC_SEND_C"
 

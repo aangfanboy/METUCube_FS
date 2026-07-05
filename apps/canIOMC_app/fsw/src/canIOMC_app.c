@@ -105,6 +105,15 @@ CFE_Status_t CANIOMC_appInit(void)
         return status;
     }
 
+    // Subscribe to scheduler heartbeat trigger
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_SEND_HEARTBEAT_MID), CANIOMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC App: Error Subscribing to Heartbeat trigger, RC = 0x%08X\n", status);
+        return status;
+    }
+
     /* Initialize CAN hardware */
     status = CANIO_HAL_Init();
     if (status != CFE_SUCCESS)

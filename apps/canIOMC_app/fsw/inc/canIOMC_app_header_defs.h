@@ -10,3 +10,6 @@
 #define CANIOMC_HKPRIORITY                 0x03
 
 #define CANIOMC_OBCPOWER_HK_MSGID 0x66
+
+/* OBC -> ALL2REC heartbeat: unsegmented, empty payload, MessageID 0x00 */
+#define CANIOMC_HEARTBEAT_MSGID 0x00

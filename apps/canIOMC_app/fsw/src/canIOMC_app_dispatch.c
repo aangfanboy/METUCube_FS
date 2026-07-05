@@ -24,6 +24,11 @@ void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             CANIOMC_APP_SEND_HK_TO_SB();
             break;
 
+        case CANIOMC_SEND_HEARTBEAT_MID:
+            /* Scheduler trigger: broadcast OBC heartbeat to all CAN nodes */
+            CANIOMC_APP_SEND_HEARTBEAT();
+            break;
+
         default:
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CANIOMC: invalid packet,MID = 0x%x", (unsigned int)CFE_SB_MsgIdToValue(MsgId));

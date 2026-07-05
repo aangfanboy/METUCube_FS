@@ -1,0 +1,17 @@
+[Unit]
+Description=Bring up MCP2518FD CAN interface (can0) at 500k, independent of cFS
+# Wait until networking devices are settled; the mcp251xfd driver creates can0
+# during boot via the device-tree overlay.
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Override defaults here if needed:
+# Environment=CAN_BITRATE=500000
+# Environment=CAN_IFACE=can0
+ExecStart=/usr/local/sbin/can-bringup.sh
+
+[Install]
+WantedBy=multi-user.target

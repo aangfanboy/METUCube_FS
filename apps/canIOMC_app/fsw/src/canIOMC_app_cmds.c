@@ -2,6 +2,7 @@
 #include "canIOMC_app.h"
 #include "canIOMC_app_cmds.h"
 #include "canIOMC_app_msgids.h"
+#include "canIOMC_app_header_defs.h"
 #include "canIOMC_hal.h"
 #include "canIOMC_segmentation.h"
 
@@ -74,6 +75,34 @@ CFE_Status_t CANIOMC_ProcessSBCanPacket(const CFE_SB_Buffer_t *SBBufPtr)
     CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
                       "CANIOMC: TX complete (MsgID=0x%03X, Len=%u)",
                       (unsigned int)Pkt->Header.MessageID, (unsigned int)Pkt->PayloadLen);
+    CANIOMC_AppData.CmdCounter++;
+    return CFE_SUCCESS;
+}
+
+CFE_Status_t CANIOMC_APP_SEND_HEARTBEAT(void)
+{
+    CANIOMC_CAN_Header_t Hdr;
+    int32                status;
+
+    memset(&Hdr, 0, sizeof(Hdr));
+    Hdr.Priority   = CANIOMC_HKPRIORITY;
+    Hdr.SenderID   = CANIOMC_OBC_ID;
+    Hdr.ReceiverID = CANIOMC_ALL2REC_ID;
+    Hdr.MessageID  = CANIOMC_HEARTBEAT_MSGID;
+
+    /* No payload — unsegmented single frame (Len == 0 special case) */
+    status = CANIO_SendSegmented(&Hdr, NULL, 0);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC: Heartbeat send failed, status: 0x%08X", (unsigned int)status);
+        CANIOMC_AppData.ErrCounter++;
+        return status;
+    }
+
+    CFE_EVS_SendEvent(CANIOMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                      "CANIOMC: Heartbeat broadcast to ALL2REC");
+
     CANIOMC_AppData.CmdCounter++;
     return CFE_SUCCESS;
 }
