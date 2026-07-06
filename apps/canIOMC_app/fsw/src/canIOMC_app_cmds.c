@@ -202,6 +202,31 @@ void CANIOMC_PollAndPublishCanRx(void)
             CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
                               "CANIOMC: MPPT heartbeat published");
         }
+        else if (senderID == CANIOMC_PAYLOAD_ID && messageID == CANIOMC_PAYLOAD_HK_MSGID)
+        {
+            CANIOMC_PayloadTlmPayload_t *Payload = &CANIOMC_AppData.PayloadTlmPkt.Payload;
+
+            /* Parse reassembled payload into the typed struct: 20x uint8 readings. */
+            if (reassembledLen >= sizeof(Payload->Readings))
+            {
+                memcpy(Payload->Readings, reassembledBuf, sizeof(Payload->Readings));
+
+                CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.PayloadTlmPkt.TelemetryHeader));
+                CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.PayloadTlmPkt.TelemetryHeader), true);
+
+                CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                                  "CANIOMC: Payload HK published (%u bytes)", (unsigned int)reassembledLen);
+            }
+        }
+        else if (senderID == CANIOMC_PAYLOAD_ID && messageID == CANIOMC_PAYLOAD_HEARTBEAT_MSGID)
+        {
+            /* Payload's own unprompted liveness ping — no payload, just publish the notice */
+            CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.PayloadHeartbeatPkt.TelemetryHeader));
+            CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.PayloadHeartbeatPkt.TelemetryHeader), true);
+
+            CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                              "CANIOMC: Payload heartbeat published");
+        }
         else
         {
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_DEBUG,

@@ -19,3 +19,9 @@
 
 /* MPPT -> OBC heartbeat: MPPT's own liveness ping, unsegmented, empty payload */
 #define CANIOMC_MPPT_HEARTBEAT_MSGID 0x85
+
+/* Payload HK: shared by OBC->Payload request (empty payload) and Payload->OBC response (20x uint8) */
+#define CANIOMC_PAYLOAD_HK_MSGID 0xA6
+
+/* Payload -> OBC heartbeat: Payload's own liveness ping, unsegmented, empty payload */
+#define CANIOMC_PAYLOAD_HEARTBEAT_MSGID 0xA5

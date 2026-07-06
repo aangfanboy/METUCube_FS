@@ -1,4 +1,6 @@
 #include "payloadMC_app.h"
+#include "canIOMC_app_msgids.h"
+#include <string.h>
 
 PAYLOADMC_AppData_t         PAYLOADMC_AppData;
 PAYLOADMC_ConfigTbl_entry_t *PAYLOADMC_Config_TablePtr;
@@ -102,6 +104,24 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to Payload telemetry published by CANIOMC when a CAN HK response arrives */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_PAYLOAD_TLM_MID), PAYLOADMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to Payload TLM, RC = 0x%08X\n", status);
+        return status;
+    }
+
+    /* Subscribe to Payload heartbeat notifications published by CANIOMC */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_PAYLOAD_HEARTBEAT_MID), PAYLOADMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to Payload Heartbeat, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = PAYLOADMC_appTableInit(&PAYLOADMC_AppData.ConfigTableHandle, &PAYLOADMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -186,7 +206,9 @@ CFE_Status_t PAYLOADMC_appResetHkData(void)
     PAYLOADMC_AppData.ErrCounter = 0;
     PAYLOADMC_AppData.ActiveCameraN = 0;
     PAYLOADMC_AppData.NumberOfTakenPhotos = 0;
-    
+    PAYLOADMC_AppData.PayloadMissCount = 0;
+    memset(PAYLOADMC_AppData.Readings, 0, sizeof(PAYLOADMC_AppData.Readings));
+
     return CFE_SUCCESS;
 }
 
@@ -211,12 +233,23 @@ CFE_Status_t PAYLOADMC_appPrepareHkPacket(void)
 
     HkPacketPayload->CmdCounter = PAYLOADMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = PAYLOADMC_AppData.ErrCounter;
+    HkPacketPayload->PayloadStale = (PAYLOADMC_AppData.PayloadMissCount >= PAYLOADMC_PAYLOAD_STALE_THRESHOLD) ? 1 : 0;
     HkPacketPayload->ActiveCameraN = PAYLOADMC_AppData.ActiveCameraN;
     HkPacketPayload->NumberOfTakenPhotos = PAYLOADMC_AppData.NumberOfTakenPhotos;
     HkPacketPayload->currentTime = CFE_TIME_GetTime();
     HkPacketPayload->CpuTemperature = GetCpuTemp();
+    memcpy(HkPacketPayload->Readings, PAYLOADMC_AppData.Readings, sizeof(HkPacketPayload->Readings));
 
     OS_printf("PAYLOADMC: Current CPU temperature: %d\n", HkPacketPayload->CpuTemperature);
+
+    /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
+    PAYLOADMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
+
+    /* Track consecutive misses; reset happens in PAYLOADMC_ProcessPayloadTlm/Heartbeat on response */
+    if (PAYLOADMC_AppData.PayloadMissCount < 0xFF)
+    {
+        PAYLOADMC_AppData.PayloadMissCount++;
+    }
 
     return CFE_SUCCESS;
 }

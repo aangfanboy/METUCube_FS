@@ -45,6 +45,8 @@ typedef struct
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
     uint32                  ActiveCameraN; /**< \brief Active camera number */
     uint32                  NumberOfTakenPhotos;
+    uint8                   PayloadMissCount;                       /**< \brief Cycles elapsed without a Payload HK response */
+    uint8                   Readings[PAYLOADMC_NUM_READINGS];       /**< \brief Cached Payload telemetry readings           */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

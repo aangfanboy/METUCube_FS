@@ -32,6 +32,8 @@ typedef struct
     CANIOMC_EpsTlmPacket_t   EpsTlmPkt;  /**< \brief EPS data published to SB      */
     CANIOMC_MpptTlmPacket_t       MpptTlmPkt;       /**< \brief MPPT HK data published to SB       */
     CANIOMC_MpptHeartbeatPacket_t MpptHeartbeatPkt; /**< \brief MPPT heartbeat notice published to SB */
+    CANIOMC_PayloadTlmPacket_t       PayloadTlmPkt;       /**< \brief Payload HK data published to SB       */
+    CANIOMC_PayloadHeartbeatPacket_t PayloadHeartbeatPkt; /**< \brief Payload heartbeat notice published to SB */
 
     CFE_SB_PipeId_t         CmdPipe;
 

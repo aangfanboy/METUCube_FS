@@ -30,4 +30,7 @@
 
 #define PAYLOADMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for PayloadMC application, set to 1MB */
 
+/* Number of HK cycles without a Payload response before PayloadStale flag is set */
+#define PAYLOADMC_PAYLOAD_STALE_THRESHOLD       5
+
 #endif /* PAYLOADMC_CONFIG_H */

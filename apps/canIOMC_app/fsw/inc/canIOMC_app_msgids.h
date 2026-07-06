@@ -19,6 +19,8 @@
 #define CANIOMC_SEND_HEARTBEAT_MID   0xDC4  /**< Scheduler trigger: broadcast OBC heartbeat over CAN */
 #define CANIOMC_MPPT_TLM_MID         0xDC5  /**< MPPT HK telemetry (18x uint16) received from CAN bus */
 #define CANIOMC_MPPT_HEARTBEAT_MID   0xDC6  /**< MPPT liveness heartbeat received from CAN bus */
+#define CANIOMC_PAYLOAD_TLM_MID       0xDC7  /**< Payload HK telemetry (20x uint8) received from CAN bus */
+#define CANIOMC_PAYLOAD_HEARTBEAT_MID 0xDC8  /**< Payload liveness heartbeat received from CAN bus */
 
 #define CANIOMC_SEND_HK_MID_NAME        "CANIOMC_SEND_C"
 

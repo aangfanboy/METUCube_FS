@@ -137,4 +137,35 @@ typedef struct
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
 } CANIOMC_MpptHeartbeatPacket_t;
 
+/*
+** Payload housekeeping telemetry — published on CANIOMC_PAYLOAD_TLM_MID
+** when CANIOMC fully reassembles a Payload HK response (MessageID = CANIOMC_PAYLOAD_HK_MSGID).
+** PayloadMC subscribes to this packet to update its data cache.
+**
+** Reassembled CAN payload layout (20 bytes, 3 frames): 20x uint8 raw readings.
+*/
+#define CANIOMC_PAYLOAD_NUM_READINGS  20
+
+typedef struct
+{
+    uint8 Readings[CANIOMC_PAYLOAD_NUM_READINGS]; /**< Payload telemetry readings (raw ADC counts) */
+} CANIOMC_PayloadTlmPayload_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t   TelemetryHeader;
+    CANIOMC_PayloadTlmPayload_t Payload;
+} CANIOMC_PayloadTlmPacket_t;
+
+/*
+** Payload heartbeat notification — published on CANIOMC_PAYLOAD_HEARTBEAT_MID
+** when CANIOMC receives Payload's own unprompted liveness ping
+** (MessageID = CANIOMC_PAYLOAD_HEARTBEAT_MSGID). Carries no payload;
+** receipt alone tells PayloadMC the node is alive.
+*/
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+} CANIOMC_PayloadHeartbeatPacket_t;
+
 #endif /* CANIOMC_MSG_H_ */

@@ -38,6 +38,9 @@ typedef struct
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } PAYLOADMC_APP_SendHkCmd_t;
 
+/* Number of uint8 telemetry readings reported by the Payload hardware over CAN */
+#define PAYLOADMC_NUM_READINGS  20
+
 /*
 ** PayloadMC App housekeeping telemetry definition
 */
@@ -45,11 +48,13 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
+    uint8              PayloadStale;        /**< \brief 1 = no Payload response for PAYLOAD_STALE_THRESHOLD cycles */
+    uint8              Reserved[1];        /**< \brief Reserved bytes to fill compiler padding */
     uint32             NumberOfTakenPhotos; /**< \brief Number of photos taken by the payload camera */
     uint32             ActiveCameraN;      /**< \brief Active camera number */
     CFE_TIME_SysTime_t currentTime;        /**< \brief Current time */
     int32              CpuTemperature;      /**< \brief CPU temperature */
+    uint8              Readings[PAYLOADMC_NUM_READINGS]; /**< \brief Payload telemetry readings (raw ADC counts) */
 } PAYLOADMC_HkTlm_Payload_t;
 
 /**

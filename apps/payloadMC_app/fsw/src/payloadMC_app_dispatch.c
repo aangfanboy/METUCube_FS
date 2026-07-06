@@ -1,5 +1,6 @@
 #include "payloadMC_app.h"
 #include "payloadMC_app_dispatch.h"
+#include "canIOMC_app_msgids.h"
 
 void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -22,6 +23,14 @@ void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                               "PAYLOADMC: Received HK request");
 
             PAYLOADMC_APP_SEND_HK_TO_SB();
+            break;
+
+        case CANIOMC_PAYLOAD_TLM_MID:
+            PAYLOADMC_ProcessPayloadTlm(SBBufPtr);
+            break;
+
+        case CANIOMC_PAYLOAD_HEARTBEAT_MID:
+            PAYLOADMC_ProcessPayloadHeartbeat(SBBufPtr);
             break;
 
         default:
