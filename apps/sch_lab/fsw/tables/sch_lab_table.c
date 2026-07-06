@@ -67,6 +67,10 @@
 #include "canIOMC_app_msgids.h"
 #endif
 
+#ifdef HAVE_MPPTMC_APP
+#include "mpptMC_app_msgids.h"
+#endif
+
 #ifdef HAVE_PAYLOADMC_APP
 #include "payloadMC_app_msgids.h"
 #endif
@@ -134,6 +138,9 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
 #endif
 #ifdef HAVE_CANIOMC_APP
         {CFE_SB_MSGID_WRAP_VALUE(CANIOMC_SEND_HEARTBEAT_MID), CANIOMC_HEARTBEAT_RATE, 0},
+#endif
+#ifdef HAVE_MPPTMC_APP
+        {CFE_SB_MSGID_WRAP_VALUE(MPPTMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP

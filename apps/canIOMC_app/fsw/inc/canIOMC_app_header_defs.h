@@ -13,3 +13,9 @@
 
 /* OBC -> ALL2REC heartbeat: unsegmented, empty payload, MessageID 0x00 */
 #define CANIOMC_HEARTBEAT_MSGID 0x00
+
+/* MPPT HK: shared by OBC->MPPT request (empty payload) and MPPT->OBC response (18x uint16) */
+#define CANIOMC_MPPT_HK_MSGID 0x86
+
+/* MPPT -> OBC heartbeat: MPPT's own liveness ping, unsegmented, empty payload */
+#define CANIOMC_MPPT_HEARTBEAT_MSGID 0x85

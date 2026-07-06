@@ -91,6 +91,7 @@ list(APPEND MISSION_GLOBAL_APPLIST commMC_app)
 list(APPEND MISSION_GLOBAL_APPLIST adcsMC_app)
 list(APPEND MISSION_GLOBAL_APPLIST payloadMC_app)
 list(APPEND MISSION_GLOBAL_APPLIST canIOMC_app)
+list(APPEND MISSION_GLOBAL_APPLIST mpptMC_app)
 # The "MISSION_GLOBAL_STATIC_APPLIST" is similar to MISSION_GLOBAL_APPLIST
 # but the apps are statically linked.
 # This list is effectively appended to every TGTx_STATIC_APPLIST in targets.cmake.

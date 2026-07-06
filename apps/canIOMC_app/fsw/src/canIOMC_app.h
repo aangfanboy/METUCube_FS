@@ -30,6 +30,8 @@ typedef struct
 {
     CANIOMC_HkPacket_t       HkPacket;    /**< \brief CANIOMC own gateway HK packet */
     CANIOMC_EpsTlmPacket_t   EpsTlmPkt;  /**< \brief EPS data published to SB      */
+    CANIOMC_MpptTlmPacket_t       MpptTlmPkt;       /**< \brief MPPT HK data published to SB       */
+    CANIOMC_MpptHeartbeatPacket_t MpptHeartbeatPkt; /**< \brief MPPT heartbeat notice published to SB */
 
     CFE_SB_PipeId_t         CmdPipe;
 

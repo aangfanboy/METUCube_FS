@@ -106,4 +106,35 @@ typedef struct
     CANIOMC_EpsTlmPayload_t   Eps;
 } CANIOMC_EpsTlmPacket_t;
 
+/*
+** MPPT housekeeping telemetry — published on CANIOMC_MPPT_TLM_MID
+** when CANIOMC fully reassembles an MPPT HK response (MessageID = CANIOMC_MPPT_HK_MSGID).
+** MpptMC subscribes to this packet to update its data cache.
+**
+** Reassembled CAN payload layout (36 bytes, 5 frames): 18x uint16 raw readings.
+*/
+#define CANIOMC_MPPT_NUM_READINGS  18
+
+typedef struct
+{
+    uint16 Readings[CANIOMC_MPPT_NUM_READINGS]; /**< MPPT telemetry readings (raw ADC counts) */
+} CANIOMC_MpptTlmPayload_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    CANIOMC_MpptTlmPayload_t  Mppt;
+} CANIOMC_MpptTlmPacket_t;
+
+/*
+** MPPT heartbeat notification — published on CANIOMC_MPPT_HEARTBEAT_MID
+** when CANIOMC receives MPPT's own unprompted liveness ping
+** (MessageID = CANIOMC_MPPT_HEARTBEAT_MSGID). Carries no payload;
+** receipt alone tells MpptMC the node is alive.
+*/
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+} CANIOMC_MpptHeartbeatPacket_t;
+
 #endif /* CANIOMC_MSG_H_ */
