@@ -46,4 +46,17 @@ CFE_Status_t PAYLOADMC_ProcessPayloadTlm(const CFE_SB_Buffer_t *SBBufPtr);
  */
 CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr);
 
+/**
+ * @brief Simulated photo-capture handler.
+ *
+ * Triggered when CANIOMC routes an unprompted CAN message (MessageID
+ * 0xA7, CANIOMC_PAYLOAD_TAKEPHOTO_MSGID) to CANIOMC_PAYLOAD_TAKEPHOTO_MID.
+ * For now this just prints a message in place of driving the camera.
+ *
+ * @param Payload    Full reassembled CAN payload that came with the trigger
+ *                   (already de-segmented if the source message was multi-frame).
+ * @param PayloadLen Number of valid bytes in Payload.
+ */
+void PAYLOADMC_takePhoto(const uint8 *Payload, uint8 PayloadLen);
+
 #endif /* PAYLOADMC_APP_CMDS_H */

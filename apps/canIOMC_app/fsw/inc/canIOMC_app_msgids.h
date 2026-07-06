@@ -23,6 +23,7 @@
 #define CANIOMC_PAYLOAD_HEARTBEAT_MID 0xDC8  /**< Payload liveness heartbeat received from CAN bus */
 #define CANIOMC_ADCS_TLM_MID          0xDC9  /**< ADCS HK telemetry (140 bytes) received from CAN bus */
 #define CANIOMC_COMM_TLM_MID          0xDCA  /**< Comm HK telemetry (5x uint16) received from CAN bus */
+#define CANIOMC_PAYLOAD_TAKEPHOTO_MID 0xDCB  /**< Routed trigger: PayloadMC take-photo command */
 
 #define CANIOMC_SEND_HK_MID_NAME        "CANIOMC_SEND_C"
 

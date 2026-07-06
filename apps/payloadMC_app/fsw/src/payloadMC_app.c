@@ -122,6 +122,15 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to the take-photo trigger routed by CANIOMC (CAN MessageID 0xA7) */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_PAYLOAD_TAKEPHOTO_MID), PAYLOADMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to Take Photo trigger, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = PAYLOADMC_appTableInit(&PAYLOADMC_AppData.ConfigTableHandle, &PAYLOADMC_Config_TablePtr);
     if (status != CFE_SUCCESS)

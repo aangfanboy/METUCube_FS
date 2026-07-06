@@ -217,4 +217,19 @@ typedef struct
     CANIOMC_CommTlmPayload_t  Comm;
 } CANIOMC_CommTlmPacket_t;
 
+/*
+** Generic trigger packet used by CANIOMC's CAN->SB router
+** (canIOMC_app_router.c) to forward an unprompted CAN message straight
+** onto another app's SB pipe. Carries the full reassembled CAN payload
+** (already de-segmented if the source message was multi-frame) so every
+** entry added to CANIOMC_MsgRouteTable gets its complete data, not just
+** a bare notification.
+*/
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    uint8                     PayloadLen;
+    uint8                     Payload[CANIOMC_SB_MAX_PAYLOAD];
+} CANIOMC_RouteTriggerPkt_t;
+
 #endif /* CANIOMC_MSG_H_ */

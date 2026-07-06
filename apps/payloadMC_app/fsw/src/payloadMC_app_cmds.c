@@ -121,3 +121,14 @@ CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr)
 
     return CFE_SUCCESS;
 }
+
+void PAYLOADMC_takePhoto(const uint8 *Payload, uint8 PayloadLen)
+{
+    OS_printf("PAYLOADMC: Take photo command received (payload %u bytes) - simulating photo capture...\n",
+             (unsigned int)PayloadLen);
+
+    if (Payload != NULL && PayloadLen > 0)
+    {
+        OS_printf("PAYLOADMC: Take photo payload[0] = 0x%02X\n", Payload[0]);
+    }
+}

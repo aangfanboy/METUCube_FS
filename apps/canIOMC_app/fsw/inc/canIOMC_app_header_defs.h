@@ -31,3 +31,7 @@
 
 /* Comm HK: shared by OBC->Comm request (empty payload) and Comm->OBC response (5x uint16) */
 #define CANIOMC_COMM_HK_MSGID 0xC6
+
+/* Payload "take photo" trigger: arrives to OBC unprompted (no request), routed by
+ * CANIOMC_RouteIncomingCanMsg() straight to PayloadMC's takePhoto handler. */
+#define CANIOMC_PAYLOAD_TAKEPHOTO_MSGID 0xA7

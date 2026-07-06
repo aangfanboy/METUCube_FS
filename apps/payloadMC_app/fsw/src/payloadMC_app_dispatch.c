@@ -1,6 +1,7 @@
 #include "payloadMC_app.h"
 #include "payloadMC_app_dispatch.h"
 #include "canIOMC_app_msgids.h"
+#include "canIOMC_app_msg.h"
 
 void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -32,6 +33,13 @@ void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
         case CANIOMC_PAYLOAD_HEARTBEAT_MID:
             PAYLOADMC_ProcessPayloadHeartbeat(SBBufPtr);
             break;
+
+        case CANIOMC_PAYLOAD_TAKEPHOTO_MID:
+        {
+            const CANIOMC_RouteTriggerPkt_t *TriggerPkt = (const CANIOMC_RouteTriggerPkt_t *)SBBufPtr;
+            PAYLOADMC_takePhoto(TriggerPkt->Payload, TriggerPkt->PayloadLen);
+            break;
+        }
 
         default:
             CFE_EVS_SendEvent(PAYLOADMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,

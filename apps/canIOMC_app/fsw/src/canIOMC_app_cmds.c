@@ -3,6 +3,7 @@
 #include "canIOMC_app_cmds.h"
 #include "canIOMC_app_msgids.h"
 #include "canIOMC_app_header_defs.h"
+#include "canIOMC_app_router.h"
 #include "canIOMC_hal.h"
 #include "canIOMC_segmentation.h"
 
@@ -257,6 +258,13 @@ void CANIOMC_PollAndPublishCanRx(void)
                 CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
                                   "CANIOMC: Comm HK published (%u bytes)", (unsigned int)reassembledLen);
             }
+        }
+        else if (CANIOMC_RouteIncomingCanMsg(messageID, reassembledBuf, reassembledLen))
+        {
+            /* Unprompted message forwarded via the generic CAN->SB route table */
+            CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                              "CANIOMC: Routed msg (Sender=0x%02X, MsgID=0x%03X)",
+                              (unsigned int)senderID, (unsigned int)messageID);
         }
         else
         {
