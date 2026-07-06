@@ -98,6 +98,7 @@ CFE_Status_t POWERMC_ProcessEpsTlm(const CFE_SB_Buffer_t *SBBufPtr)
 
     memcpy(POWERMC_AppData.ChannelCurrents, EpsPkt->Eps.ChannelCurrents, sizeof(POWERMC_AppData.ChannelCurrents));
     memcpy(POWERMC_AppData.BuckVoltages,    EpsPkt->Eps.BuckVoltages,    sizeof(POWERMC_AppData.BuckVoltages));
+    memcpy(POWERMC_AppData.BoolFlags,       EpsPkt->Eps.BoolFlags,       sizeof(POWERMC_AppData.BoolFlags));
     POWERMC_AppData.EpsMissCount       = 0;
 
     CFE_EVS_SendEvent(POWERMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,

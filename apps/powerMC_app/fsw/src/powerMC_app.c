@@ -198,6 +198,7 @@ CFE_Status_t POWERMC_appResetHkData(void)
     POWERMC_AppData.EpsMissCount = 0;
     memset(POWERMC_AppData.ChannelCurrents, 0, sizeof(POWERMC_AppData.ChannelCurrents));
     memset(POWERMC_AppData.BuckVoltages,    0, sizeof(POWERMC_AppData.BuckVoltages));
+    memset(POWERMC_AppData.BoolFlags,       0, sizeof(POWERMC_AppData.BoolFlags));
 
     return CFE_SUCCESS;
 }
@@ -211,6 +212,7 @@ CFE_Status_t POWERMC_appPrepareHkPacket(void)
     HkPacketPayload->EpsStale   = (POWERMC_AppData.EpsMissCount >= POWERMC_EPS_STALE_THRESHOLD) ? 1 : 0;
     memcpy(HkPacketPayload->ChannelCurrents, POWERMC_AppData.ChannelCurrents, sizeof(HkPacketPayload->ChannelCurrents));
     memcpy(HkPacketPayload->BuckVoltages,    POWERMC_AppData.BuckVoltages,    sizeof(HkPacketPayload->BuckVoltages));
+    memcpy(HkPacketPayload->BoolFlags,       POWERMC_AppData.BoolFlags,       sizeof(HkPacketPayload->BoolFlags));
 
     /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
     POWERMC_APP_SEND_HK_CAN_REQUEST_TO_SB();

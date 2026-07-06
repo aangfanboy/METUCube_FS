@@ -84,20 +84,18 @@ typedef struct
 
 /*
 ** EPS housekeeping telemetry — published on CANIOMC_EPS_TLM_MID
-** when CANIOMC fully reassembles an EPS HK response (MessageID = 0x000B).
+** when CANIOMC fully reassembles an EPS HK response (MessageID = CANIOMC_OBCPOWER_HK_MSGID,
+** shared with the OBC's request — same convention as MPPT/Payload/ADCS/Comm).
 ** PowerMC subscribes to this packet to update its data cache.
 **
-** Reassembled CAN payload layout (20 bytes, 3 frames):
-**   Frame 0 (FIRST,  SeqCount=0): Bytes  0- 7 → ChannelCurrents[0..7]
-**   Frame 1 (CONT,   SeqCount=1): Bytes  8- 9 → ChannelCurrents[8..9]
-**                                 Bytes 10-15 → BuckVoltages[0..2]  (3 x uint16)
-**   Frame 2 (LAST,   SeqCount=2): Bytes 16-19 → BuckVoltages[3..4]  (2 x uint16)
-**                                 Bytes 20-23 → padding (ignored)
+** Reassembled CAN payload layout (22 bytes): 10x uint8 channel currents,
+** 5x uint16 buck voltages (mV), then 2x uint8 packed bool flags (10 flags used).
 */
 typedef struct
 {
     uint8  ChannelCurrents[10]; /**< Channel current readings (raw ADC counts or mA) */
     uint16 BuckVoltages[5];     /**< Buck converter output voltages (mV)             */
+    uint8  BoolFlags[2];        /**< 10 packed boolean status flags (bit-packed)     */
 } CANIOMC_EpsTlmPayload_t;
 
 typedef struct

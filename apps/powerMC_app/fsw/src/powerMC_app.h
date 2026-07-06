@@ -35,6 +35,7 @@ typedef struct
     uint8                   EpsMissCount;          /**< \brief Cycles elapsed without an EPS HK response */
     uint8                   ChannelCurrents[10];   /**< \brief Cached EPS channel currents               */
     uint16                  BuckVoltages[5];        /**< \brief Cached EPS buck voltages (mV)            */
+    uint8                   BoolFlags[2];           /**< \brief Cached EPS packed boolean status flags   */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

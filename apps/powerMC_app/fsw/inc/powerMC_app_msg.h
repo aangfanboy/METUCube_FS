@@ -49,6 +49,7 @@ typedef struct
     uint8              Reserved[1];
     uint8              ChannelCurrents[10];   /**< \brief EPS channel current readings        */
     uint16             BuckVoltages[5];        /**< \brief EPS buck converter voltages (mV)   */
+    uint8              BoolFlags[2];           /**< \brief 10 packed EPS boolean status flags */
 } POWERMC_HkTlm_Power_t;
 
 /**

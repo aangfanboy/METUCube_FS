@@ -9,9 +9,6 @@
 #include "cfe.h"
 #include <string.h>
 
-/* CAN MessageID values (10-bit field, defines the message type) */
-#define CANIO_MSGID_EPS_HK_RESPONSE  0x000BU  /**< EPS → OBC: HK response */
-
 /* Node IDs */
 #define CANIO_NODE_EPS               0x03U
 
@@ -159,16 +156,18 @@ void CANIOMC_PollAndPublishCanRx(void)
 
         /* ---- Message is complete — dispatch by (senderID, messageID) ---- */
 
-        if (senderID == CANIO_NODE_EPS && messageID == CANIO_MSGID_EPS_HK_RESPONSE)
+        if (senderID == CANIO_NODE_EPS && messageID == CANIOMC_OBCPOWER_HK_MSGID)
         {
             CANIOMC_EpsTlmPayload_t *Eps = &CANIOMC_AppData.EpsTlmPkt.Eps;
 
             /* Parse reassembled payload into the typed struct.
-             * Layout: 10x uint8 channel currents, then 5x uint16 buck voltages. */
-            if (reassembledLen >= (10 + 5 * sizeof(uint16)))
+             * Layout: 10x uint8 channel currents, 5x uint16 buck voltages,
+             * then 2x uint8 packed bool flags (10 flags used). */
+            if (reassembledLen >= (10 + 5 * sizeof(uint16) + 2))
             {
                 memcpy(Eps->ChannelCurrents, reassembledBuf, 10);
                 memcpy(Eps->BuckVoltages,    reassembledBuf + 10, 5 * sizeof(uint16));
+                memcpy(Eps->BoolFlags,       reassembledBuf + 10 + 5 * sizeof(uint16), 2);
 
                 CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.EpsTlmPkt.TelemetryHeader));
                 CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.EpsTlmPkt.TelemetryHeader), true);
