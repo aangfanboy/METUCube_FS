@@ -30,4 +30,7 @@
 
 #define COMMMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for CommMC application, set to 1MB */
 
+/* Number of HK cycles without a Comm response before CommStale flag is set */
+#define COMMMC_COMM_STALE_THRESHOLD       5
+
 #endif /* COMMMC_CONFIG_H */

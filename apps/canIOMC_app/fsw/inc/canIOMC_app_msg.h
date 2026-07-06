@@ -199,4 +199,24 @@ typedef struct
     CANIOMC_AdcsTlmPayload_t  Adcs;
 } CANIOMC_AdcsTlmPacket_t;
 
+/*
+** Comm housekeeping telemetry — published on CANIOMC_COMM_TLM_MID
+** when CANIOMC fully reassembles a Comm HK response (MessageID = CANIOMC_COMM_HK_MSGID).
+** CommMC subscribes to this packet to update its data cache.
+**
+** Reassembled CAN payload layout (10 bytes, 2 frames): 5x uint16 raw readings.
+*/
+#define CANIOMC_COMM_NUM_READINGS  5
+
+typedef struct
+{
+    uint16 Readings[CANIOMC_COMM_NUM_READINGS]; /**< Comm telemetry readings */
+} CANIOMC_CommTlmPayload_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    CANIOMC_CommTlmPayload_t  Comm;
+} CANIOMC_CommTlmPacket_t;
+
 #endif /* CANIOMC_MSG_H_ */

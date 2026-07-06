@@ -45,6 +45,8 @@ typedef struct
     uint8                   CmdCounter; /**< \brief Number of valid commands received */
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
     uint32                  currentConnectionRate; /**< \brief Current connection quantity */
+    uint8                   CommMissCount;                   /**< \brief Cycles elapsed without a Comm HK response */
+    uint16                  Readings[COMMMC_NUM_READINGS];   /**< \brief Cached Comm telemetry readings           */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

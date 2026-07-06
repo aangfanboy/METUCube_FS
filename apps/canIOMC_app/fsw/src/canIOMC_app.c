@@ -77,6 +77,9 @@ CFE_Status_t CANIOMC_appInit(void)
     CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.AdcsTlmPkt.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_ADCS_TLM_MID),
                  sizeof(CANIOMC_AppData.AdcsTlmPkt));
 
+    CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_COMM_TLM_MID),
+                 sizeof(CANIOMC_AppData.CommTlmPkt));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {

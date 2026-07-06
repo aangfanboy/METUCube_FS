@@ -1,6 +1,7 @@
 #include "commMC_app.h"
 #include "commMC_app_dispatch.h"
 #include "commMC_app_extern_typedefs.h"
+#include "canIOMC_app_msgids.h"
 
 #include "hk_msgids.h"
 
@@ -49,9 +50,13 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 
         case COMMMC_SEND_HK_MID:
             CFE_EVS_SendEvent(COMMMC_MSG_RECEIVED_EID, CFE_EVS_EventType_INFORMATION,
-                              "COMMMC: Received HK request"); 
+                              "COMMMC: Received HK request");
 
             COMMMC_APP_SEND_HK_TO_SB();
+            break;
+
+        case CANIOMC_COMM_TLM_MID:
+            COMMMC_ProcessCommTlm(SBBufPtr);
             break;
 
         default:

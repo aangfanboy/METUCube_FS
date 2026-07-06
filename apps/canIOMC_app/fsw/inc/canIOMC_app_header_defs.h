@@ -28,3 +28,6 @@
 
 /* ADCS HK: shared by OBC->ADCS request (empty payload) and ADCS->OBC response (140 bytes, segmented) */
 #define CANIOMC_ADCS_HK_MSGID 0x26
+
+/* Comm HK: shared by OBC->Comm request (empty payload) and Comm->OBC response (5x uint16) */
+#define CANIOMC_COMM_HK_MSGID 0xC6

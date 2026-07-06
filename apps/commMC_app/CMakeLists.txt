@@ -14,6 +14,7 @@ add_cfe_app(commMC_app ${APP_SRC_FILES})
 
 # This permits direct access to public headers in the fsw/inc directory
 target_include_directories(commMC_app PUBLIC fsw/inc)
+target_include_directories(commMC_app PUBLIC ../canIOMC_app/fsw/inc)
 
 set(APP_TABLE_FILES
   fsw/tables/commMC_app_config_tbl.c

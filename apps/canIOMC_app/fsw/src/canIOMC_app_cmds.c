@@ -243,6 +243,22 @@ void CANIOMC_PollAndPublishCanRx(void)
                                   "CANIOMC: ADCS HK published (%u bytes)", (unsigned int)reassembledLen);
             }
         }
+        else if (senderID == CANIOMC_COMM_ID && messageID == CANIOMC_COMM_HK_MSGID)
+        {
+            CANIOMC_CommTlmPayload_t *Comm = &CANIOMC_AppData.CommTlmPkt.Comm;
+
+            /* Parse reassembled payload into the typed struct: 5x uint16 readings. */
+            if (reassembledLen >= sizeof(Comm->Readings))
+            {
+                memcpy(Comm->Readings, reassembledBuf, sizeof(Comm->Readings));
+
+                CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader));
+                CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader), true);
+
+                CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                                  "CANIOMC: Comm HK published (%u bytes)", (unsigned int)reassembledLen);
+            }
+        }
         else
         {
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_DEBUG,

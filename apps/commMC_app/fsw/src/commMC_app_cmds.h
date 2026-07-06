@@ -88,10 +88,31 @@ CFE_Status_t COMMMC_APP_SEND_FILE_TO_GROUND(const char *file_path);
 COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDARY_HEADER(uint32 crc32OfPayload);
 /**
  * @brief Creates a telemetry secondary header for the CommMC application
- * 
+ *
  * This function constructs a telemetry secondary header packet for the CommMC application.
  * @param crc32OfPayload The CRC32 checksum of the payload to be included in the secondary header.
  * @return COMMMC_APP_TelemetrySecondaryHeaderPacket_t Returns a telemetry secondary header packet with the specified CRC32 checksum.
  * */
+
+/**
+ * @brief Build and send a CAN HK request to the Comm node via CANIOMC.
+ *
+ * Sends a CANIOMC_CanPacketSB_t to CANIOMC_CMD_MID with an empty payload,
+ * SenderID = OBC, ReceiverID = Comm, MessageID = CANIOMC_COMM_HK_MSGID.
+ * Fire-and-forget: the response (if any) arrives later on CANIOMC_COMM_TLM_MID.
+ *
+ * @return CFE_SUCCESS on success, error code on failure.
+ */
+CFE_Status_t COMMMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void);
+
+/**
+ * @brief Process a Comm HK telemetry packet forwarded by CANIOMC.
+ *
+ * Updates the cached Comm readings and resets the stale-miss counter.
+ *
+ * @param SBBufPtr Pointer to the raw SB buffer containing a CANIOMC_CommTlmPacket_t.
+ * @return CFE_SUCCESS on success.
+ */
+CFE_Status_t COMMMC_ProcessCommTlm(const CFE_SB_Buffer_t *SBBufPtr);
 
 #endif /* COMMMC_APP_CMDS_H */

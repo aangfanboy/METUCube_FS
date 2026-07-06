@@ -2,6 +2,9 @@
 #include "commMC_app.h"
 #include "commMC_app_cmds.h"
 #include "commMC_app_msgids.h"
+#include "canIOMC_app_msg.h"
+#include "canIOMC_app_msgids.h"
+#include "canIOMC_app_header_defs.h"
 
 #include "adcsMC_app_extern_typedefs.h"
 #include "powerMC_app_extern_typedefs.h"
@@ -315,6 +318,68 @@ COMMMC_APP_TelemetrySecondaryHeaderPacket_t COMMMC_APP_CREATE_TELEMETRY_SECONDAR
     telemetry_secondary_header.crc32 = crc32OfPayload;
 
     return telemetry_secondary_header;
+}
+
+CFE_Status_t COMMMC_APP_SEND_HK_CAN_REQUEST_TO_SB(void)
+{
+    CFE_Status_t          status = CFE_SUCCESS;
+    CANIOMC_CanPacketSB_t CanHkRequest;
+
+    memset(&CanHkRequest, 0, sizeof(CanHkRequest));
+
+    CFE_MSG_Init(CFE_MSG_PTR(CanHkRequest.MessageHeader),
+                 CFE_SB_ValueToMsgId(CANIOMC_CMD_MID),
+                 sizeof(CANIOMC_CanPacketSB_t));
+
+    /* CAN header fields — SeqType/SeqCount are set by the segmentation engine */
+    CanHkRequest.Header.Priority   = CANIOMC_HKPRIORITY;
+    CanHkRequest.Header.SenderID   = CANIOMC_OBC_ID;
+    CanHkRequest.Header.ReceiverID = CANIOMC_COMM_ID;
+    CanHkRequest.Header.MessageID  = CANIOMC_COMM_HK_MSGID;
+
+    /* No payload — this is a pure request frame */
+    CanHkRequest.PayloadLen = 0;
+
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(CanHkRequest.MessageHeader));
+
+    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(CanHkRequest.MessageHeader), true);
+
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(COMMMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC: CAN HK Request could not be sent to SB, status: 0x%08X", (unsigned int)status);
+
+        COMMMC_AppData.ErrCounter++;
+        return status;
+    }
+
+    CFE_EVS_SendEvent(COMMMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                      "COMMMC: CAN HK Request forwarded to CAN_IO successfully");
+
+    COMMMC_AppData.CmdCounter++;
+
+    return status;
+}
+
+CFE_Status_t COMMMC_ProcessCommTlm(const CFE_SB_Buffer_t *SBBufPtr)
+{
+    const CANIOMC_CommTlmPacket_t *CommPkt;
+
+    if (SBBufPtr == NULL)
+    {
+        return CFE_SUCCESS;
+    }
+
+    CommPkt = (const CANIOMC_CommTlmPacket_t *)SBBufPtr;
+
+    memcpy(COMMMC_AppData.Readings, CommPkt->Comm.Readings, sizeof(COMMMC_AppData.Readings));
+    COMMMC_AppData.CommMissCount = 0;
+
+    CFE_EVS_SendEvent(COMMMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                      "COMMMC: Comm cache updated (Reading0=%u)",
+                      (unsigned int)COMMMC_AppData.Readings[0]);
+
+    return CFE_SUCCESS;
 }
 
 CFE_Status_t COMMMC_APP_SEND_DATA_TO_GROUND(const char *port, const unsigned char *data, size_t length) {

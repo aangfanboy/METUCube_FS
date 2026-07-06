@@ -1,4 +1,6 @@
 #include "commMC_app.h"
+#include "canIOMC_app_msgids.h"
+#include <string.h>
 
 COMMMC_AppData_t         COMMMC_AppData;
 COMMMC_ConfigTbl_entry_t *COMMMC_Config_TablePtr;
@@ -99,6 +101,15 @@ CFE_Status_t COMMMC_appInit(void)
     {
         CFE_EVS_SendEvent(COMMMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "COMMMC App: Error Subscribing to CMD, RC = 0x%08X\n", status);
+        return status;
+    }
+
+    /* Subscribe to Comm telemetry published by CANIOMC when a CAN HK response arrives */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_COMM_TLM_MID), COMMMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(COMMMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC App: Error Subscribing to Comm TLM, RC = 0x%08X\n", status);
         return status;
     }
 
@@ -205,8 +216,10 @@ CFE_Status_t COMMMC_appResetHkData(void)
     COMMMC_AppData.CmdCounter = 0;
     COMMMC_AppData.ErrCounter = 0;
     COMMMC_AppData.currentConnectionRate = 0;
-    
-    return CFE_SUCCESS; 
+    COMMMC_AppData.CommMissCount = 0;
+    memset(COMMMC_AppData.Readings, 0, sizeof(COMMMC_AppData.Readings));
+
+    return CFE_SUCCESS;
 }
 
 CFE_Status_t COMMMC_appPrepareHkPacket(void)
@@ -216,7 +229,18 @@ CFE_Status_t COMMMC_appPrepareHkPacket(void)
 
     HkPacketPayload->CmdCounter = COMMMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = COMMMC_AppData.ErrCounter;
+    HkPacketPayload->CommStale  = (COMMMC_AppData.CommMissCount >= COMMMC_COMM_STALE_THRESHOLD) ? 1 : 0;
     HkPacketPayload->currentConnectionRate = COMMMC_AppData.currentConnectionRate;
+    memcpy(HkPacketPayload->Readings, COMMMC_AppData.Readings, sizeof(HkPacketPayload->Readings));
+
+    /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
+    COMMMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
+
+    /* Track consecutive misses; reset happens in COMMMC_ProcessCommTlm on response */
+    if (COMMMC_AppData.CommMissCount < 0xFF)
+    {
+        COMMMC_AppData.CommMissCount++;
+    }
 
     return CFE_SUCCESS;
 }

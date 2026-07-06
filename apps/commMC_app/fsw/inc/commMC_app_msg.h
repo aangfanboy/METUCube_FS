@@ -40,6 +40,9 @@ typedef struct
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
 } COMMMC_APP_SendHkCmd_t;
 
+/* Number of uint16 telemetry readings reported by the Comm hardware over CAN */
+#define COMMMC_NUM_READINGS  5
+
 /*
 ** CommMC App housekeeping telemetry definition
 */
@@ -47,8 +50,10 @@ typedef struct
 {
     uint8              CmdCounter;          /**< \brief Count of valid commands received */
     uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
+    uint8              CommStale;           /**< \brief 1 = no Comm response for COMM_STALE_THRESHOLD cycles */
+    uint8              Reserved[1];        /**< \brief Reserved bytes to fill compiler padding */
     uint32             currentConnectionRate; /**< \brief Current connection rate in Hz */
+    uint16             Readings[COMMMC_NUM_READINGS]; /**< \brief Comm telemetry readings (raw ADC counts) */
 } COMMMC_HkTlm_Comm_t;
 
 /**
