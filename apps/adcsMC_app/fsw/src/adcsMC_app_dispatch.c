@@ -1,5 +1,6 @@
 #include "adcsMC_app.h"
 #include "adcsMC_app_dispatch.h"
+#include "canIOMC_app_msgids.h"
 
 void ADCSMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -22,6 +23,10 @@ void ADCSMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
                               "ADCSMC: Received HK request");
 
             ADCSMC_APP_SEND_HK_TO_SB();
+            break;
+
+        case CANIOMC_ADCS_TLM_MID:
+            ADCSMC_ProcessAdcsTlm(SBBufPtr);
             break;
 
         default:

@@ -25,3 +25,6 @@
 
 /* Payload -> OBC heartbeat: Payload's own liveness ping, unsegmented, empty payload */
 #define CANIOMC_PAYLOAD_HEARTBEAT_MSGID 0xA5
+
+/* ADCS HK: shared by OBC->ADCS request (empty payload) and ADCS->OBC response (140 bytes, segmented) */
+#define CANIOMC_ADCS_HK_MSGID 0x26

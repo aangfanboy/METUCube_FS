@@ -227,6 +227,22 @@ void CANIOMC_PollAndPublishCanRx(void)
             CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
                               "CANIOMC: Payload heartbeat published");
         }
+        else if (senderID == CANIOMC_ADCS_ID && messageID == CANIOMC_ADCS_HK_MSGID)
+        {
+            CANIOMC_AdcsTlmPayload_t *Adcs = &CANIOMC_AppData.AdcsTlmPkt.Adcs;
+
+            /* Parse reassembled payload into the typed struct: 140 bytes, packed floats + trailing uint16s. */
+            if (reassembledLen >= sizeof(*Adcs))
+            {
+                memcpy(Adcs, reassembledBuf, sizeof(*Adcs));
+
+                CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.AdcsTlmPkt.TelemetryHeader));
+                CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.AdcsTlmPkt.TelemetryHeader), true);
+
+                CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                                  "CANIOMC: ADCS HK published (%u bytes)", (unsigned int)reassembledLen);
+            }
+        }
         else
         {
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_DEBUG,

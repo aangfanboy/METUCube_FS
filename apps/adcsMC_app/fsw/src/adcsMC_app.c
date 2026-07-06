@@ -1,4 +1,6 @@
 #include "adcsMC_app.h"
+#include "canIOMC_app_msgids.h"
+#include <string.h>
 
 ADCSMC_AppData_t         ADCSMC_AppData;
 ADCSMC_ConfigTbl_entry_t *ADCSMC_Config_TablePtr;
@@ -102,6 +104,15 @@ CFE_Status_t ADCSMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to ADCS telemetry published by CANIOMC when a CAN HK response arrives */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_ADCS_TLM_MID), ADCSMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(ADCSMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "ADCSMC App: Error Subscribing to ADCS TLM, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = ADCSMC_appTableInit(&ADCSMC_AppData.ConfigTableHandle, &ADCSMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -185,13 +196,23 @@ CFE_Status_t ADCSMC_appTableReload(CFE_TBL_Handle_t *TblHandlePtr, ADCSMC_Config
 
 CFE_Status_t ADCSMC_appResetHkData(void)
 {
-    ADCSMC_AppData.CmdCounter = 5;
-    ADCSMC_AppData.ErrCounter = 10;
-    ADCSMC_AppData.quaternion1 = 0.01;
-    ADCSMC_AppData.quaternion2 = 0.02;
-    ADCSMC_AppData.quaternion3 = 0.03;
-    ADCSMC_AppData.quaternion4 = 0.97;
-    
+    ADCSMC_AppData.CmdCounter    = 0;
+    ADCSMC_AppData.ErrCounter    = 0;
+    ADCSMC_AppData.AdcsMissCount = 0;
+
+    memset(ADCSMC_AppData.QuaternionEst,   0, sizeof(ADCSMC_AppData.QuaternionEst));
+    memset(ADCSMC_AppData.AngularVelEst,   0, sizeof(ADCSMC_AppData.AngularVelEst));
+    memset(ADCSMC_AppData.BiasEst,         0, sizeof(ADCSMC_AppData.BiasEst));
+    memset(ADCSMC_AppData.PosEst,          0, sizeof(ADCSMC_AppData.PosEst));
+    memset(ADCSMC_AppData.VelEst,          0, sizeof(ADCSMC_AppData.VelEst));
+    memset(ADCSMC_AppData.PqEst,           0, sizeof(ADCSMC_AppData.PqEst));
+    memset(ADCSMC_AppData.PbEst,           0, sizeof(ADCSMC_AppData.PbEst));
+    memset(ADCSMC_AppData.SunUnitVector1,  0, sizeof(ADCSMC_AppData.SunUnitVector1));
+    memset(ADCSMC_AppData.SunUnitVector2,  0, sizeof(ADCSMC_AppData.SunUnitVector2));
+    memset(ADCSMC_AppData.MagUnitVector1,  0, sizeof(ADCSMC_AppData.MagUnitVector1));
+    memset(ADCSMC_AppData.MagUnitVector2,  0, sizeof(ADCSMC_AppData.MagUnitVector2));
+    memset(ADCSMC_AppData.SunSensorTemp,   0, sizeof(ADCSMC_AppData.SunSensorTemp));
+
     return CFE_SUCCESS;
 }
 
@@ -202,10 +223,29 @@ CFE_Status_t ADCSMC_appPrepareHkPacket(void)
 
     HkPacketPayload->CmdCounter = ADCSMC_AppData.CmdCounter;
     HkPacketPayload->ErrCounter = ADCSMC_AppData.ErrCounter;
-    HkPacketPayload->quaternion1 = ADCSMC_AppData.quaternion1;
-    HkPacketPayload->quaternion2 = ADCSMC_AppData.quaternion2;
-    HkPacketPayload->quaternion3 = ADCSMC_AppData.quaternion3; 
-    HkPacketPayload->quaternion4 = ADCSMC_AppData.quaternion4;
+    HkPacketPayload->AdcsStale  = (ADCSMC_AppData.AdcsMissCount >= ADCSMC_ADCS_STALE_THRESHOLD) ? 1 : 0;
+
+    memcpy(HkPacketPayload->QuaternionEst,  ADCSMC_AppData.QuaternionEst,  sizeof(HkPacketPayload->QuaternionEst));
+    memcpy(HkPacketPayload->AngularVelEst,  ADCSMC_AppData.AngularVelEst,  sizeof(HkPacketPayload->AngularVelEst));
+    memcpy(HkPacketPayload->BiasEst,        ADCSMC_AppData.BiasEst,        sizeof(HkPacketPayload->BiasEst));
+    memcpy(HkPacketPayload->PosEst,         ADCSMC_AppData.PosEst,         sizeof(HkPacketPayload->PosEst));
+    memcpy(HkPacketPayload->VelEst,         ADCSMC_AppData.VelEst,         sizeof(HkPacketPayload->VelEst));
+    memcpy(HkPacketPayload->PqEst,          ADCSMC_AppData.PqEst,          sizeof(HkPacketPayload->PqEst));
+    memcpy(HkPacketPayload->PbEst,          ADCSMC_AppData.PbEst,          sizeof(HkPacketPayload->PbEst));
+    memcpy(HkPacketPayload->SunUnitVector1, ADCSMC_AppData.SunUnitVector1, sizeof(HkPacketPayload->SunUnitVector1));
+    memcpy(HkPacketPayload->SunUnitVector2, ADCSMC_AppData.SunUnitVector2, sizeof(HkPacketPayload->SunUnitVector2));
+    memcpy(HkPacketPayload->MagUnitVector1, ADCSMC_AppData.MagUnitVector1, sizeof(HkPacketPayload->MagUnitVector1));
+    memcpy(HkPacketPayload->MagUnitVector2, ADCSMC_AppData.MagUnitVector2, sizeof(HkPacketPayload->MagUnitVector2));
+    memcpy(HkPacketPayload->SunSensorTemp,  ADCSMC_AppData.SunSensorTemp,  sizeof(HkPacketPayload->SunSensorTemp));
+
+    /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
+    ADCSMC_APP_SEND_HK_CAN_REQUEST_TO_SB();
+
+    /* Track consecutive misses; reset happens in ADCSMC_ProcessAdcsTlm on response */
+    if (ADCSMC_AppData.AdcsMissCount < 0xFF)
+    {
+        ADCSMC_AppData.AdcsMissCount++;
+    }
 
     return CFE_SUCCESS;
 }

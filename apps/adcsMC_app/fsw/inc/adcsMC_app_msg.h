@@ -40,16 +40,28 @@ typedef struct
 
 /*
 ** AdcsMC App housekeeping telemetry definition
+**
+** Field layout mirrors CANIOMC_AdcsTlmPayload_t (canIOMC_app_msg.h): single-precision
+** floats throughout except the trailing 2x uint16 sun sensor temperatures.
 */
 typedef struct
 {
-    uint8              CmdCounter;          /**< \brief Count of valid commands received */
-    uint8              ErrCounter;          /**< \brief Count of invalid commands received */
-    uint8              Reserved[2];        /**< \brief Reserved bytes to fill compiler padding */
-    float              quaternion1;         /**< \brief Quaternion component 1 */
-    float              quaternion2;         /**< \brief Quaternion component 2 */
-    float              quaternion3;         /**< \brief Quaternion component 3 */
-    float              quaternion4;         /**< \brief Quaternion component 4 */
+    uint8  CmdCounter;             /**< \brief Count of valid commands received */
+    uint8  ErrCounter;             /**< \brief Count of invalid commands received */
+    uint8  AdcsStale;              /**< \brief 1 = no ADCS response for ADCS_STALE_THRESHOLD cycles */
+    uint8  Reserved[1];           /**< \brief Reserved bytes to fill compiler padding */
+    float  QuaternionEst[4];      /**< \brief Attitude quaternion estimate             */
+    float  AngularVelEst[3];      /**< \brief Angular velocity estimate                */
+    float  BiasEst[3];            /**< \brief Gyro bias estimate                       */
+    float  PosEst[3];             /**< \brief Position estimate                        */
+    float  VelEst[3];             /**< \brief Velocity estimate                        */
+    float  PqEst[3];              /**< \brief Process noise covariance (q) estimate    */
+    float  PbEst[3];              /**< \brief Process noise covariance (bias) estimate */
+    float  SunUnitVector1[3];     /**< \brief Sun unit vector, sensor 1                */
+    float  SunUnitVector2[3];     /**< \brief Sun unit vector, sensor 2                */
+    float  MagUnitVector1[3];     /**< \brief Magnetometer unit vector, sensor 1       */
+    float  MagUnitVector2[3];     /**< \brief Magnetometer unit vector, sensor 2       */
+    uint16 SunSensorTemp[2];      /**< \brief Sun sensor temperatures                  */
 } ADCSMC_HkTlm_Adcs_t;
 
 /**

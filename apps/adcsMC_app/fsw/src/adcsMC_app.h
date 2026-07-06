@@ -43,10 +43,21 @@ typedef struct
 
     uint8                   CmdCounter; /**< \brief Number of valid commands received */
     uint8                   ErrCounter; /**< \brief Number of invalid commands received */
-    float                   quaternion1; /**< \brief Quaternion component 1 */
-    float                   quaternion2; /**< \brief Quaternion component 2 */
-    float                   quaternion3; /**< \brief Quaternion component 3 */
-    float                   quaternion4; /**< \brief Quaternion component 4 */
+    uint8                   AdcsMissCount; /**< \brief Cycles elapsed without an ADCS HK response */
+
+    /* Cached ADCS telemetry — mirrors CANIOMC_AdcsTlmPayload_t field-for-field */
+    float                   QuaternionEst[4];
+    float                   AngularVelEst[3];
+    float                   BiasEst[3];
+    float                   PosEst[3];
+    float                   VelEst[3];
+    float                   PqEst[3];
+    float                   PbEst[3];
+    float                   SunUnitVector1[3];
+    float                   SunUnitVector2[3];
+    float                   MagUnitVector1[3];
+    float                   MagUnitVector2[3];
+    uint16                  SunSensorTemp[2];
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

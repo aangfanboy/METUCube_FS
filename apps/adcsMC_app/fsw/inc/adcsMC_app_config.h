@@ -30,4 +30,7 @@
 
 #define ADCSMC_NUM_BYTES_IN_MEM_POOL     (1024 * 1024) /**< \brief Number of bytes in the memory pool for AdcsMC application, set to 1MB */
 
+/* Number of HK cycles without an ADCS response before AdcsStale flag is set */
+#define ADCSMC_ADCS_STALE_THRESHOLD       5
+
 #endif /* ADCSMC_CONFIG_H */

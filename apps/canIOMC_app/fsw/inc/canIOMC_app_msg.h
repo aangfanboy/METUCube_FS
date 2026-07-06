@@ -59,7 +59,7 @@ typedef struct
 } CANIOMC_HkPacket_t;
 
 /** Maximum payload an app can send through SB to CANIOMC for transmission */
-#define CANIOMC_SB_MAX_PAYLOAD  64
+#define CANIOMC_SB_MAX_PAYLOAD  144
 
 typedef struct {
     uint8  Priority;   /**< \brief 2 bits (00=Critical, 01=High, 10=Medium, 11=Low) */
@@ -167,5 +167,36 @@ typedef struct
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
 } CANIOMC_PayloadHeartbeatPacket_t;
+
+/*
+** ADCS housekeeping telemetry — published on CANIOMC_ADCS_TLM_MID
+** when CANIOMC fully reassembles an ADCS HK response (MessageID = CANIOMC_ADCS_HK_MSGID).
+** AdcsMC subscribes to this packet to update its data cache.
+**
+** Reassembled CAN payload layout (140 bytes, 18 frames): all fields packed
+** back-to-back with no gaps, single-precision (4-byte) floats throughout
+** except the trailing 2x uint16 sun sensor temperatures.
+*/
+typedef struct
+{
+    float  QuaternionEst[4];     /**< Attitude quaternion estimate                 */
+    float  AngularVelEst[3];     /**< Angular velocity estimate                    */
+    float  BiasEst[3];           /**< Gyro bias estimate                           */
+    float  PosEst[3];            /**< Position estimate                            */
+    float  VelEst[3];            /**< Velocity estimate                            */
+    float  PqEst[3];             /**< Process noise covariance (q) estimate        */
+    float  PbEst[3];             /**< Process noise covariance (bias) estimate     */
+    float  SunUnitVector1[3];    /**< Sun unit vector, sensor 1                    */
+    float  SunUnitVector2[3];    /**< Sun unit vector, sensor 2                    */
+    float  MagUnitVector1[3];    /**< Magnetometer unit vector, sensor 1           */
+    float  MagUnitVector2[3];    /**< Magnetometer unit vector, sensor 2           */
+    uint16 SunSensorTemp[2];     /**< Sun sensor temperatures                      */
+} CANIOMC_AdcsTlmPayload_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    CANIOMC_AdcsTlmPayload_t  Adcs;
+} CANIOMC_AdcsTlmPacket_t;
 
 #endif /* CANIOMC_MSG_H_ */
