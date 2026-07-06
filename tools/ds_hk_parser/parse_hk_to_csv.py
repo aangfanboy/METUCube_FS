@@ -41,9 +41,11 @@ request. That branch never fired, so Power/EPS fields stayed at their
 zero-initialized value forever regardless of real CAN traffic. Also added
 the real EPS payload's trailing 2 bytes of packed boolean flags (10 flags),
 which the code previously discarded entirely. This script's PowerHk struct
-now includes BoolFlags[2] to match -- but the exact bit order/meaning of
-the 10 flags inside those 2 bytes is NOT confirmed, so they are exposed
-as two raw bytes (Power_BoolFlags_0/1), not individually decoded booleans.
+now includes BoolFlags[2] to match, and flatten() bit-unpacks them into 16
+individual True/False columns (Power_BoolFlag_0..15, LSB-first, byte 0
+first) -- only the first 10 are meaningful per spec, the rest are unused.
+The exact bit order/meaning was never confirmed against real hardware
+documentation, so treat the bit-to-flag mapping as a best guess.
 """
 
 import argparse
@@ -168,11 +170,25 @@ SUBSYSTEMS = [
 
 
 def flatten(name, hk_struct):
-    """Turn one decoded subsystem struct into an ordered list of (column, value) pairs."""
+    """Turn one decoded subsystem struct into an ordered list of (column, value) pairs.
+
+    Special case: a "BoolFlags" byte array is bit-unpacked into individual
+    True/False columns instead of raw byte values (LSB-first within each
+    byte, byte 0 first). For Power/EPS this yields 16 bits total (2 bytes);
+    only the first 10 (BoolFlag_0..9) are meaningful per spec, the rest are
+    reserved/unused -- and the bit order itself is an assumption (the exact
+    bit-to-flag mapping was never confirmed against real hardware docs).
+    """
     row = []
     for field_name, field_type in hk_struct._fields_:
         value = getattr(hk_struct, field_name)
-        if hasattr(value, "__len__"):
+        if field_name == "BoolFlags":
+            bit = 0
+            for byte_val in value:
+                for b in range(8):
+                    row.append((f"{name}_BoolFlag_{bit}", bool((byte_val >> b) & 1)))
+                    bit += 1
+        elif hasattr(value, "__len__"):
             for i, v in enumerate(value):
                 row.append((f"{name}_{field_name}_{i}", v))
         else:
