@@ -41,6 +41,7 @@ typedef struct
 
     uint8                   CmdCounter; /**< \brief CAN TX requests processed */
     uint8                   ErrCounter; /**< \brief HAL / reassembly errors   */
+    bool                    IsImaging;  /**< \brief Cached PayloadMC imaging-mode broadcast */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

@@ -17,6 +17,7 @@ target_include_directories(canIOMC_app PUBLIC
   fsw/inc
   platform/socketcan
 )
+target_include_directories(canIOMC_app PUBLIC ../payloadMC_app/fsw/inc)
 
 # SocketCAN requires POSIX and Linux kernel network headers
 target_compile_definitions(canIOMC_app PRIVATE _GNU_SOURCE)

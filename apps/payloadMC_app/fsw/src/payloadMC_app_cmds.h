@@ -47,16 +47,37 @@ CFE_Status_t PAYLOADMC_ProcessPayloadTlm(const CFE_SB_Buffer_t *SBBufPtr);
 CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr);
 
 /**
- * @brief Simulated photo-capture handler.
+ * @brief Camera take-control/init handler.
  *
  * Triggered when CANIOMC routes an unprompted CAN message (MessageID
  * 0xA7, CANIOMC_PAYLOAD_TAKEPHOTO_MSGID) to CANIOMC_PAYLOAD_TAKEPHOTO_MID.
- * For now this just prints a message in place of driving the camera.
+ * Runs the GVCP take-control/init register sequence on camera 0 only
+ * (PAYLOADMC_GVCP_HAL_InitCamera) -- it does NOT capture a photo. On
+ * success, broadcasts IsImaging=true to every subsystem app.
  *
+ * @param SenderID   CAN node ID that sent the trigger message.
  * @param Payload    Full reassembled CAN payload that came with the trigger
  *                   (already de-segmented if the source message was multi-frame).
  * @param PayloadLen Number of valid bytes in Payload.
  */
-void PAYLOADMC_takePhoto(const uint8 *Payload, uint8 PayloadLen);
+void PAYLOADMC_takePhoto(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen);
+
+/**
+ * @brief Broadcast PayloadMC's imaging-mode state to every subsystem app.
+ *
+ * Updates PAYLOADMC_AppData.IsImaging and publishes a
+ * PAYLOADMC_ImagingModePkt_t on PAYLOADMC_IMAGING_MODE_MID.
+ *
+ * @param IsImaging New imaging-mode state.
+ */
+void PAYLOADMC_BroadcastImagingMode(bool IsImaging);
+
+/**
+ * @brief Scheduler-triggered GVCP heartbeat.
+ *
+ * Sends a GVCP ReadReg heartbeat to camera 0 only while
+ * PAYLOADMC_AppData.IsImaging is true; a no-op otherwise.
+ */
+void PAYLOADMC_SendGvcpHeartbeatIfImaging(void);
 
 #endif /* PAYLOADMC_APP_CMDS_H */

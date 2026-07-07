@@ -59,6 +59,8 @@ typedef struct
     float                   MagUnitVector2[3];
     uint16                  SunSensorTemp[2];
 
+    bool                    IsImaging;     /**< \brief Cached PayloadMC imaging-mode broadcast */
+
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */
 

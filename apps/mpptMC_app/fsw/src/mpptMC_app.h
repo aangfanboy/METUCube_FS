@@ -34,6 +34,7 @@ typedef struct
     uint8                   ErrCounter;
     uint8                   MpptMissCount;                     /**< \brief Cycles elapsed without an MPPT HK response */
     uint16                  Readings[MPPTMC_NUM_READINGS];     /**< \brief Cached MPPT telemetry readings            */
+    bool                    IsImaging;                         /**< \brief Cached PayloadMC imaging-mode broadcast   */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

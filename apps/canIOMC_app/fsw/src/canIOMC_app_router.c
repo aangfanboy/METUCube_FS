@@ -18,7 +18,7 @@ static const CANIOMC_MsgRouteEntry_t CANIOMC_MsgRouteTable[] = {
 
 #define CANIOMC_MSG_ROUTE_TABLE_SIZE (sizeof(CANIOMC_MsgRouteTable) / sizeof(CANIOMC_MsgRouteTable[0]))
 
-bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, const uint8 *Payload, uint8 PayloadLen)
+bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
 {
     uint32 i;
 
@@ -35,6 +35,7 @@ bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, const uint8 *Payload, uint
                 PayloadLen = CANIOMC_SB_MAX_PAYLOAD;
             }
 
+            TriggerPkt.SenderID   = SenderID;
             TriggerPkt.PayloadLen = PayloadLen;
             if (Payload != NULL && PayloadLen > 0)
             {

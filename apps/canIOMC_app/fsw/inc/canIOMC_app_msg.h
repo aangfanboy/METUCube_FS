@@ -228,6 +228,7 @@ typedef struct
 typedef struct
 {
     CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    uint8                     SenderID;
     uint8                     PayloadLen;
     uint8                     Payload[CANIOMC_SB_MAX_PAYLOAD];
 } CANIOMC_RouteTriggerPkt_t;

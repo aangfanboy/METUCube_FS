@@ -1,6 +1,8 @@
 #include "mpptMC_app.h"
 #include "mpptMC_app_dispatch.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
 
 void MPPTMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -32,6 +34,13 @@ void MPPTMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
         case CANIOMC_MPPT_HEARTBEAT_MID:
             MPPTMC_ProcessMpptHeartbeat(SBBufPtr);
             break;
+
+        case PAYLOADMC_IMAGING_MODE_MID:
+        {
+            const PAYLOADMC_ImagingModePkt_t *ImagingPkt = (const PAYLOADMC_ImagingModePkt_t *)SBBufPtr;
+            MPPTMC_AppData.IsImaging = ImagingPkt->IsImaging;
+            break;
+        }
 
         default:
             CFE_EVS_SendEvent(MPPTMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,

@@ -1,6 +1,8 @@
 #include "powerMC_app.h"
 #include "powerMC_app_dispatch.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
 
 void POWERMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -28,6 +30,13 @@ void POWERMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
         case CANIOMC_EPS_TLM_MID:
             POWERMC_ProcessEpsTlm(SBBufPtr);
             break;
+
+        case PAYLOADMC_IMAGING_MODE_MID:
+        {
+            const PAYLOADMC_ImagingModePkt_t *ImagingPkt = (const PAYLOADMC_ImagingModePkt_t *)SBBufPtr;
+            POWERMC_AppData.IsImaging = ImagingPkt->IsImaging;
+            break;
+        }
 
         default:
             CFE_EVS_SendEvent(POWERMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,

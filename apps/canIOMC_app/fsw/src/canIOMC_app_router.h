@@ -29,10 +29,11 @@ typedef struct
 
 /**
  * @brief Look up a reassembled CAN MessageID in the route table and, if
- * found, publish a trigger packet carrying the full payload on the
- * mapped SB MID.
+ * found, publish a trigger packet carrying the sender and full payload
+ * on the mapped SB MID.
  *
  * @param CanMessageID The 10-bit CAN MessageID that was just reassembled.
+ * @param SenderID     The CAN node ID that sent the message.
  * @param Payload      Pointer to the fully reassembled payload bytes
  *                     (already de-segmented if the source was multi-frame).
  * @param PayloadLen   Number of valid bytes in Payload (0..CANIOMC_SB_MAX_PAYLOAD).
@@ -40,6 +41,6 @@ typedef struct
  *         the MessageID isn't in the table (caller should fall back to
  *         its own "unhandled message" logging).
  */
-bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, const uint8 *Payload, uint8 PayloadLen);
+bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, uint8 SenderID, const uint8 *Payload, uint8 PayloadLen);
 
 #endif /* CANIOMC_APP_ROUTER_H */

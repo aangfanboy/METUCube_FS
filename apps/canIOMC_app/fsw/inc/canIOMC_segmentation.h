@@ -85,14 +85,18 @@ int32 CANIO_SendSegmented(const CANIOMC_CAN_Header_t *Hdr,
  *
  * On completion (CANIO_SEQ_SINGLE or CANIO_SEQ_LAST) the reassembled
  * payload is written into OutBuf/OutLen and the identifying fields are
- * written into OutSenderID / OutMessageID so the caller can dispatch.
+ * written into OutSenderID / OutReceiverID / OutMessageID so the caller
+ * can dispatch (and verify the frame was actually addressed to it —
+ * CAN is a shared bus, so every node's HAL sees every frame, including
+ * ones addressed to other nodes).
  *
- * @param Slots        Pointer to the slot table (CANIO_MAX_REASSEMBLY_SLOTS entries).
- * @param Frame        The received CAN frame.
- * @param OutBuf       Caller-supplied buffer (>= CANIO_REASSEMBLY_BUF_SIZE bytes).
- * @param OutLen       Set to total reassembled byte count on completion.
- * @param OutSenderID  Set to the sender node ID on completion.
- * @param OutMessageID Set to the 10-bit message ID on completion.
+ * @param Slots         Pointer to the slot table (CANIO_MAX_REASSEMBLY_SLOTS entries).
+ * @param Frame         The received CAN frame.
+ * @param OutBuf        Caller-supplied buffer (>= CANIO_REASSEMBLY_BUF_SIZE bytes).
+ * @param OutLen        Set to total reassembled byte count on completion.
+ * @param OutSenderID   Set to the sender node ID on completion.
+ * @param OutReceiverID Set to the addressed receiver node ID on completion.
+ * @param OutMessageID  Set to the 10-bit message ID on completion.
  *
  * @return CFE_SUCCESS              — message is complete, OutBuf is valid.
  *         CANIO_REASSEMBLY_PENDING — more frames expected.
@@ -103,6 +107,7 @@ int32 CANIO_FeedFrame(CANIO_ReassemblySlot_t *Slots,
                       uint8  *OutBuf,
                       uint8  *OutLen,
                       uint8  *OutSenderID,
+                      uint8  *OutReceiverID,
                       uint16 *OutMessageID);
 
 #endif /* CANIOMC_SEGMENTATION_H */

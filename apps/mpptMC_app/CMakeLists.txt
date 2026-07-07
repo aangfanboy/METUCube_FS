@@ -12,6 +12,7 @@ add_cfe_app(mpptMC_app ${APP_SRC_FILES})
 # This permits direct access to public headers in the fsw/inc directory
 target_include_directories(mpptMC_app PUBLIC fsw/inc)
 target_include_directories(mpptMC_app PUBLIC ../canIOMC_app/fsw/inc)
+target_include_directories(mpptMC_app PUBLIC ../payloadMC_app/fsw/inc)
 
 set(APP_TABLE_FILES
   fsw/tables/mpptMC_app_config_tbl.c

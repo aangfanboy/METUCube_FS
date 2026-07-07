@@ -159,6 +159,7 @@ int32 CANIO_FeedFrame(CANIO_ReassemblySlot_t *Slots,
                       uint8  *OutBuf,
                       uint8  *OutLen,
                       uint8  *OutSenderID,
+                      uint8  *OutReceiverID,
                       uint16 *OutMessageID)
 {
     uint8  seqType   = (uint8)CANIO_UNPACK_SEQTYPE(Frame->CanId);
@@ -175,9 +176,10 @@ int32 CANIO_FeedFrame(CANIO_ReassemblySlot_t *Slots,
         case CANIO_SEQ_SINGLE:
         /* ---------------------------------------------------------- */
             memcpy(OutBuf, Frame->Data, Frame->Len);
-            *OutLen      = Frame->Len;
-            *OutSenderID = senderID;
-            *OutMessageID= messageID;
+            *OutLen        = Frame->Len;
+            *OutSenderID   = senderID;
+            *OutReceiverID = receiverID;
+            *OutMessageID  = messageID;
             return CFE_SUCCESS;
 
         /* ---------------------------------------------------------- */
@@ -232,9 +234,10 @@ int32 CANIO_FeedFrame(CANIO_ReassemblySlot_t *Slots,
             }
 
             memcpy(OutBuf, Slot->Buf, Slot->Len);
-            *OutLen       = Slot->Len;
-            *OutSenderID  = senderID;
-            *OutMessageID = messageID;
+            *OutLen        = Slot->Len;
+            *OutSenderID   = senderID;
+            *OutReceiverID = receiverID;
+            *OutMessageID  = messageID;
 
             FreeSlot(Slot);
             return CFE_SUCCESS;

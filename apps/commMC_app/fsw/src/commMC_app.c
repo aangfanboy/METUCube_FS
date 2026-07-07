@@ -1,5 +1,6 @@
 #include "commMC_app.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
 #include <string.h>
 
 COMMMC_AppData_t         COMMMC_AppData;
@@ -113,6 +114,15 @@ CFE_Status_t COMMMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to PayloadMC's imaging-mode broadcast */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), COMMMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(COMMMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = COMMMC_appTableInit(&COMMMC_AppData.ConfigTableHandle, &COMMMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -218,6 +228,7 @@ CFE_Status_t COMMMC_appResetHkData(void)
     COMMMC_AppData.currentConnectionRate = 0;
     COMMMC_AppData.CommMissCount = 0;
     memset(COMMMC_AppData.Readings, 0, sizeof(COMMMC_AppData.Readings));
+    COMMMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
 }

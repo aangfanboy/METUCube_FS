@@ -47,6 +47,7 @@ typedef struct
     uint32                  NumberOfTakenPhotos;
     uint8                   PayloadMissCount;                       /**< \brief Cycles elapsed without a Payload HK response */
     uint8                   Readings[PAYLOADMC_NUM_READINGS];       /**< \brief Cached Payload telemetry readings           */
+    bool                    IsImaging;                              /**< \brief true while an imaging sequence (camera init/streaming) is active */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

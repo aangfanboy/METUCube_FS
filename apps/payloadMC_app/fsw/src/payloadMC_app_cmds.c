@@ -2,6 +2,8 @@
 #include "payloadMC_app.h"
 #include "payloadMC_app_cmds.h"
 #include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
+#include "payloadMC_gvcp_hal.h"
 #include "canIOMC_app_msg.h"
 #include "canIOMC_app_msgids.h"
 #include "canIOMC_app_header_defs.h"
@@ -122,13 +124,64 @@ CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr)
     return CFE_SUCCESS;
 }
 
-void PAYLOADMC_takePhoto(const uint8 *Payload, uint8 PayloadLen)
+void PAYLOADMC_takePhoto(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
 {
-    OS_printf("PAYLOADMC: Take photo command received (payload %u bytes) - simulating photo capture...\n",
-             (unsigned int)PayloadLen);
+    int32 status;
+
+    OS_printf("PAYLOADMC: Take photo trigger received (Sender=0x%02X, payload %u bytes) - "
+             "initializing camera 0...\n", (unsigned int)SenderID, (unsigned int)PayloadLen);
 
     if (Payload != NULL && PayloadLen > 0)
     {
         OS_printf("PAYLOADMC: Take photo payload[0] = 0x%02X\n", Payload[0]);
+    }
+
+    status = PAYLOADMC_GVCP_HAL_InitCamera();
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: GVCP camera init failed, status: 0x%08X", (unsigned int)status);
+        PAYLOADMC_AppData.ErrCounter++;
+        return;
+    }
+
+    CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                      "PAYLOADMC: Camera 0 initialized, entering imaging mode");
+
+    PAYLOADMC_BroadcastImagingMode(true);
+}
+
+void PAYLOADMC_BroadcastImagingMode(bool IsImaging)
+{
+    PAYLOADMC_ImagingModePkt_t Pkt;
+
+    PAYLOADMC_AppData.IsImaging = IsImaging;
+
+    memset(&Pkt, 0, sizeof(Pkt));
+    Pkt.IsImaging = IsImaging;
+
+    CFE_MSG_Init(CFE_MSG_PTR(Pkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), sizeof(Pkt));
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(Pkt.TelemetryHeader));
+    CFE_SB_TransmitMsg(CFE_MSG_PTR(Pkt.TelemetryHeader), true);
+
+    CFE_EVS_SendEvent(PAYLOADMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                      "PAYLOADMC: Broadcast IsImaging=%d to all subsystem apps", (int)IsImaging);
+}
+
+void PAYLOADMC_SendGvcpHeartbeatIfImaging(void)
+{
+    int32 status;
+
+    if (!PAYLOADMC_AppData.IsImaging)
+    {
+        return;
+    }
+
+    status = PAYLOADMC_GVCP_HAL_Heartbeat();
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: GVCP heartbeat failed, status: 0x%08X", (unsigned int)status);
+        PAYLOADMC_AppData.ErrCounter++;
     }
 }

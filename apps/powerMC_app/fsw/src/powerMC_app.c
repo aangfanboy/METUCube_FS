@@ -1,5 +1,6 @@
 #include "powerMC_app.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
 #include <string.h>
 
 POWERMC_AppData_t         POWERMC_AppData;
@@ -113,6 +114,15 @@ CFE_Status_t POWERMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to PayloadMC's imaging-mode broadcast */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), POWERMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(POWERMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "POWERMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = POWERMC_appTableInit(&POWERMC_AppData.ConfigTableHandle, &POWERMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -199,6 +209,7 @@ CFE_Status_t POWERMC_appResetHkData(void)
     memset(POWERMC_AppData.ChannelCurrents, 0, sizeof(POWERMC_AppData.ChannelCurrents));
     memset(POWERMC_AppData.BuckVoltages,    0, sizeof(POWERMC_AppData.BuckVoltages));
     memset(POWERMC_AppData.BoolFlags,       0, sizeof(POWERMC_AppData.BoolFlags));
+    POWERMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
 }

@@ -4,6 +4,7 @@ set(APP_SRC_FILES
   fsw/src/payloadMC_app.c
   fsw/src/payloadMC_app_cmds.c
   fsw/src/payloadMC_app_dispatch.c
+  platform/gvcp_udp/payloadMC_gvcp_hal_udp.c
 )
 
 # Create the app module

@@ -114,6 +114,7 @@ void CANIOMC_PollAndPublishCanRx(void)
     uint8          reassembledBuf[CANIO_REASSEMBLY_BUF_SIZE];
     uint8          reassembledLen  = 0;
     uint8          senderID        = 0;
+    uint8          receiverID      = 0;
     uint16         messageID       = 0;
 
     /* Drain all frames waiting in the socket receive buffer */
@@ -140,6 +141,7 @@ void CANIOMC_PollAndPublishCanRx(void)
                                     reassembledBuf,
                                     &reassembledLen,
                                     &senderID,
+                                    &receiverID,
                                     &messageID);
 
         if (segStatus == CANIO_REASSEMBLY_PENDING)
@@ -152,6 +154,16 @@ void CANIOMC_PollAndPublishCanRx(void)
             CFE_EVS_SendEvent(CANIOMC_RCV_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CANIOMC: Reassembly error: 0x%08X", (unsigned int)segStatus);
             CANIOMC_AppData.ErrCounter++;
+            continue;
+        }
+
+        /* CAN is a shared bus — our HAL sees every frame, including ones addressed
+         * to other nodes. Only process frames actually meant for us. */
+        if (receiverID != CANIOMC_OBC_ID && receiverID != CANIOMC_ALL2REC_ID)
+        {
+            CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,
+                              "CANIOMC: Ignoring msg not addressed to us (Sender=0x%02X, Receiver=0x%02X, MsgID=0x%03X)",
+                              (unsigned int)senderID, (unsigned int)receiverID, (unsigned int)messageID);
             continue;
         }
 
@@ -259,7 +271,7 @@ void CANIOMC_PollAndPublishCanRx(void)
                                   "CANIOMC: Comm HK published (%u bytes)", (unsigned int)reassembledLen);
             }
         }
-        else if (CANIOMC_RouteIncomingCanMsg(messageID, reassembledBuf, reassembledLen))
+        else if (CANIOMC_RouteIncomingCanMsg(messageID, senderID, reassembledBuf, reassembledLen))
         {
             /* Unprompted message forwarded via the generic CAN->SB route table */
             CFE_EVS_SendEvent(CANIOMC_MSG_RECEIVED_EID, CFE_EVS_EventType_DEBUG,

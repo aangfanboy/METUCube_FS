@@ -1,5 +1,6 @@
 #include "payloadMC_app.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_gvcp_hal.h"
 #include <string.h>
 
 PAYLOADMC_AppData_t         PAYLOADMC_AppData;
@@ -131,6 +132,25 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to the scheduler-driven GVCP heartbeat trigger */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_SEND_GVCP_HEARTBEAT_MID), PAYLOADMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to GVCP Heartbeat trigger, RC = 0x%08X\n", status);
+        return status;
+    }
+
+    /* Open the GVCP control socket toward camera 0 (Init only -- the actual
+     * take-control register sequence runs when the 0xA7 CAN trigger arrives) */
+    status = PAYLOADMC_GVCP_HAL_Init();
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Initializing GVCP HAL, error 0x%08X", (unsigned int)status);
+        return status;
+    }
+
     // register to table(s)
     status = PAYLOADMC_appTableInit(&PAYLOADMC_AppData.ConfigTableHandle, &PAYLOADMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -217,6 +237,7 @@ CFE_Status_t PAYLOADMC_appResetHkData(void)
     PAYLOADMC_AppData.NumberOfTakenPhotos = 0;
     PAYLOADMC_AppData.PayloadMissCount = 0;
     memset(PAYLOADMC_AppData.Readings, 0, sizeof(PAYLOADMC_AppData.Readings));
+    PAYLOADMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
 }

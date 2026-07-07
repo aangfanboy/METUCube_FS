@@ -67,4 +67,15 @@ typedef struct
     PAYLOADMC_HkTlm_Payload_t Payload;
 } PAYLOADMC_HkPacket_t;
 
+/*
+** Broadcast whenever PayloadMC's imaging-mode state changes (published on
+** PAYLOADMC_IMAGING_MODE_MID). Every subsystem app subscribes and caches
+** IsImaging locally -- pure internal state flag, not part of any app's HK.
+*/
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    bool                      IsImaging;
+} PAYLOADMC_ImagingModePkt_t;
+
 #endif /* PAYLOADMC_MSG_H_ */

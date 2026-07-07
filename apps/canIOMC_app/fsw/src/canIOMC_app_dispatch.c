@@ -1,5 +1,7 @@
 #include "canIOMC_app.h"
 #include "canIOMC_app_dispatch.h"
+#include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
 
 void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
 {
@@ -28,6 +30,13 @@ void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             /* Scheduler trigger: broadcast OBC heartbeat to all CAN nodes */
             CANIOMC_APP_SEND_HEARTBEAT();
             break;
+
+        case PAYLOADMC_IMAGING_MODE_MID:
+        {
+            const PAYLOADMC_ImagingModePkt_t *ImagingPkt = (const PAYLOADMC_ImagingModePkt_t *)SBBufPtr;
+            CANIOMC_AppData.IsImaging = ImagingPkt->IsImaging;
+            break;
+        }
 
         default:
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,

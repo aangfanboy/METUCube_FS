@@ -1,5 +1,6 @@
 #include "mpptMC_app.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
 #include <string.h>
 
 MPPTMC_AppData_t         MPPTMC_AppData;
@@ -122,6 +123,15 @@ CFE_Status_t MPPTMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to PayloadMC's imaging-mode broadcast */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), MPPTMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(MPPTMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "MPPTMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = MPPTMC_appTableInit(&MPPTMC_AppData.ConfigTableHandle, &MPPTMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -206,6 +216,7 @@ CFE_Status_t MPPTMC_appResetHkData(void)
     MPPTMC_AppData.ErrCounter    = 0;
     MPPTMC_AppData.MpptMissCount = 0;
     memset(MPPTMC_AppData.Readings, 0, sizeof(MPPTMC_AppData.Readings));
+    MPPTMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
 }

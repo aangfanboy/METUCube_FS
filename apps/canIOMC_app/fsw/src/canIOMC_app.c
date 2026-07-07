@@ -1,4 +1,5 @@
 #include "canIOMC_app.h"
+#include "payloadMC_app_msgids.h"
 
 CANIOMC_AppData_t         CANIOMC_AppData;
 CANIOMC_ConfigTbl_entry_t *CANIOMC_Config_TablePtr;
@@ -132,6 +133,15 @@ CFE_Status_t CANIOMC_appInit(void)
         return status;
     }
 
+    // Subscribe to PayloadMC's imaging-mode broadcast
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), CANIOMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
+        return status;
+    }
+
     /* Initialize CAN hardware */
     status = CANIO_HAL_Init();
     if (status != CFE_SUCCESS)
@@ -223,6 +233,7 @@ CFE_Status_t CANIOMC_appResetHkData(void)
 {
     CANIOMC_AppData.CmdCounter = 0;
     CANIOMC_AppData.ErrCounter = 0;
+    CANIOMC_AppData.IsImaging  = false;
 
     return CFE_SUCCESS;
 }

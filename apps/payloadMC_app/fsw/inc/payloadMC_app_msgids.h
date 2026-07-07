@@ -12,9 +12,11 @@
 #define PAYLOADMC_MSGIDS_H
 
 /* Message IDs for PayloadMC Application */
-#define PAYLOADMC_HK_TLM_MID           0xEC0
-#define PAYLOADMC_SEND_HK_MID          0xEC1
-#define PAYLOADMC_CMD_MID              0xEC2
+#define PAYLOADMC_HK_TLM_MID              0xEC0
+#define PAYLOADMC_SEND_HK_MID             0xEC1
+#define PAYLOADMC_CMD_MID                 0xEC2
+#define PAYLOADMC_IMAGING_MODE_MID        0xEC3  /**< Broadcast: PayloadMC's isImaging state changed, all subsystem apps subscribe */
+#define PAYLOADMC_SEND_GVCP_HEARTBEAT_MID 0xEC4  /**< Scheduler trigger: send a GVCP heartbeat if currently imaging */
 
 #define PAYLOADMC_SEND_HK_MID_NAME        "PAYLOADMC_SEND_C"
 

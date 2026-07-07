@@ -1,5 +1,6 @@
 #include "adcsMC_app.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
 #include <string.h>
 
 ADCSMC_AppData_t         ADCSMC_AppData;
@@ -113,6 +114,15 @@ CFE_Status_t ADCSMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to PayloadMC's imaging-mode broadcast */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), ADCSMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(ADCSMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "ADCSMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
+        return status;
+    }
+
     // register to table(s)
     status = ADCSMC_appTableInit(&ADCSMC_AppData.ConfigTableHandle, &ADCSMC_Config_TablePtr);
     if (status != CFE_SUCCESS)
@@ -212,6 +222,7 @@ CFE_Status_t ADCSMC_appResetHkData(void)
     memset(ADCSMC_AppData.MagUnitVector1,  0, sizeof(ADCSMC_AppData.MagUnitVector1));
     memset(ADCSMC_AppData.MagUnitVector2,  0, sizeof(ADCSMC_AppData.MagUnitVector2));
     memset(ADCSMC_AppData.SunSensorTemp,   0, sizeof(ADCSMC_AppData.SunSensorTemp));
+    ADCSMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
 }

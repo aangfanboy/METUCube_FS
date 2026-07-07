@@ -2,6 +2,8 @@
 #include "commMC_app_dispatch.h"
 #include "commMC_app_extern_typedefs.h"
 #include "canIOMC_app_msgids.h"
+#include "payloadMC_app_msgids.h"
+#include "payloadMC_app_msg.h"
 
 #include "hk_msgids.h"
 
@@ -58,6 +60,13 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
         case CANIOMC_COMM_TLM_MID:
             COMMMC_ProcessCommTlm(SBBufPtr);
             break;
+
+        case PAYLOADMC_IMAGING_MODE_MID:
+        {
+            const PAYLOADMC_ImagingModePkt_t *ImagingPkt = (const PAYLOADMC_ImagingModePkt_t *)SBBufPtr;
+            COMMMC_AppData.IsImaging = ImagingPkt->IsImaging;
+            break;
+        }
 
         default:
             CFE_EVS_SendEvent(COMMMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
