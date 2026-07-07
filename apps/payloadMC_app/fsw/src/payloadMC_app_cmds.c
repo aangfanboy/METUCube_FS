@@ -148,7 +148,44 @@ void PAYLOADMC_takePhoto(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
     CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
                       "PAYLOADMC: Camera 0 initialized, entering imaging mode");
 
+    PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(SenderID);
     PAYLOADMC_BroadcastImagingMode(true);
+}
+
+CFE_Status_t PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(uint8 ReceiverID)
+{
+    CFE_Status_t          status = CFE_SUCCESS;
+    CANIOMC_CanPacketSB_t AckPkt;
+
+    memset(&AckPkt, 0, sizeof(AckPkt));
+
+    CFE_MSG_Init(CFE_MSG_PTR(AckPkt.MessageHeader), CFE_SB_ValueToMsgId(CANIOMC_CMD_MID), sizeof(CANIOMC_CanPacketSB_t));
+
+    /* CAN header fields — SeqType/SeqCount are set by the segmentation engine */
+    AckPkt.Header.Priority   = CANIOMC_HKPRIORITY;
+    AckPkt.Header.SenderID   = CANIOMC_OBC_ID;
+    AckPkt.Header.ReceiverID = ReceiverID;
+    AckPkt.Header.MessageID  = CANIOMC_PAYLOAD_INIT_COMPLETE_MSGID;
+
+    /* No payload — this is a pure ack frame */
+    AckPkt.PayloadLen = 0;
+
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(AckPkt.MessageHeader));
+
+    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(AckPkt.MessageHeader), true);
+
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Init complete ack could not be sent to SB, status: 0x%08X", (unsigned int)status);
+        PAYLOADMC_AppData.ErrCounter++;
+        return status;
+    }
+
+    CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                      "PAYLOADMC: Init complete ack sent to node 0x%02X", (unsigned int)ReceiverID);
+
+    return status;
 }
 
 void PAYLOADMC_BroadcastImagingMode(bool IsImaging)

@@ -63,6 +63,18 @@ CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr);
 void PAYLOADMC_takePhoto(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen);
 
 /**
+ * @brief Send a CAN ack to whoever triggered the take-photo/init sequence.
+ *
+ * Sends a CANIOMC_CanPacketSB_t to CANIOMC_CMD_MID with an empty payload,
+ * SenderID = OBC, ReceiverID = the original 0xA7 sender, MessageID =
+ * CANIOMC_PAYLOAD_INIT_COMPLETE_MSGID. Fire-and-forget, no response expected.
+ *
+ * @param ReceiverID CAN node ID that originally sent the 0xA7 trigger.
+ * @return CFE_SUCCESS on success, error code on failure.
+ */
+CFE_Status_t PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(uint8 ReceiverID);
+
+/**
  * @brief Broadcast PayloadMC's imaging-mode state to every subsystem app.
  *
  * Updates PAYLOADMC_AppData.IsImaging and publishes a

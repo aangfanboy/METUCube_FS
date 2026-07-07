@@ -35,3 +35,7 @@
 /* Payload "take photo" trigger: arrives to OBC unprompted (no request), routed by
  * CANIOMC_RouteIncomingCanMsg() straight to PayloadMC's takePhoto handler. */
 #define CANIOMC_PAYLOAD_TAKEPHOTO_MSGID 0xA7
+
+/* OBC -> original 0xA7 sender ack: camera init succeeded, OBC is now in imaging
+ * mode. Unicast (ReceiverID = whoever sent 0xA7), unsegmented, empty payload. */
+#define CANIOMC_PAYLOAD_INIT_COMPLETE_MSGID 0xA8
