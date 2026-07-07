@@ -14,6 +14,7 @@
 #include "payloadMC_app_config.h"
 
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -50,7 +51,7 @@ static int                GvcpSocket     = -1;
 static uint16             GvcpReqCounter = 1;
 static struct sockaddr_in GvcpCamAddr;
 
-static int32 GVCP_WriteReg(uint32 addr, uint32 value)
+static int32 GVCP_WriteReg(const char *label, uint32 addr, uint32 value)
 {
     uint8          pkt[16];
     GVCP_Header_t *h = (GVCP_Header_t *)pkt;
@@ -70,18 +71,38 @@ static int32 GVCP_WriteReg(uint32 addr, uint32 value)
 
     if (sendto(GvcpSocket, (char *)pkt, sizeof(pkt), 0, (struct sockaddr *)&GvcpCamAddr, sizeof(GvcpCamAddr)) < 0)
     {
+        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (sendto: %s)\n",
+                 label, (unsigned int)addr, (unsigned int)value, strerror(errno));
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
     n = recvfrom(GvcpSocket, (char *)ack, sizeof(ack), 0, (struct sockaddr *)&from, &fromLen);
     GvcpReqCounter++;
 
-    if (n < 8)
+    if (n < 0)
     {
+        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (recvfrom: %s -- no ack from camera)\n",
+                 label, (unsigned int)addr, (unsigned int)value, strerror(errno));
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
-    return (ntohs(*(uint16 *)ack) == 0) ? CFE_SUCCESS : CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    if (n < 8)
+    {
+        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (short ack, %d bytes)\n",
+                 label, (unsigned int)addr, (unsigned int)value, n);
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
+    if (ntohs(*(uint16 *)ack) != 0)
+    {
+        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (camera status 0x%04X)\n",
+                 label, (unsigned int)addr, (unsigned int)value, (unsigned int)ntohs(*(uint16 *)ack));
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
+    OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X OK (%d byte ack)\n",
+             label, (unsigned int)addr, (unsigned int)value, n);
+    return CFE_SUCCESS;
 }
 
 int32 PAYLOADMC_GVCP_HAL_Init(void)
@@ -113,49 +134,58 @@ int32 PAYLOADMC_GVCP_HAL_InitCamera(void)
     inet_pton(AF_INET, PAYLOADMC_OBC_IP, &obcIp);
     obcIp = ntohl(obcIp);
 
+    OS_printf("PAYLOADMC GVCP: InitCamera starting -- CAM_IP=%s GVCP_PORT=%d OBC_IP=%s STREAM_PORT=%d\n",
+             PAYLOADMC_CAM0_IP, PAYLOADMC_GVCP_PORT, PAYLOADMC_OBC_IP, PAYLOADMC_STREAM_PORT);
+
     /*
     ** IMPORTANT (per reference capture): only take control, set the stream
     ** destination, packet size, and enable auto-exposure/auto-gain. Do NOT
     ** write PixelFormat/AcquisitionMode/ExposureTime/Gain/TestPattern —
     ** doing so put the sensor into an all-white state during bring-up.
     */
-    status = GVCP_WriteReg(GVCP_REG_CCP, GVCP_CCP_TAKE_CONTROL);
+    status = GVCP_WriteReg("CCP take control", GVCP_REG_CCP, GVCP_CCP_TAKE_CONTROL);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg(GVCP_REG_SCPS0, GVCP_SCPS0_1500);
+    status = GVCP_WriteReg("SCPS0 packet size", GVCP_REG_SCPS0, GVCP_SCPS0_1500);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg(GVCP_REG_SCDA0, obcIp);
+    status = GVCP_WriteReg("SCDA0 stream dest", GVCP_REG_SCDA0, obcIp);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg(GVCP_REG_SCP0, PAYLOADMC_STREAM_PORT);
+    status = GVCP_WriteReg("SCP0 stream port", GVCP_REG_SCP0, PAYLOADMC_STREAM_PORT);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg(GVCP_REG_EXPOSURE_AUTO, GVCP_AUTO_CONTINUOUS);
+    status = GVCP_WriteReg("Exposure auto ON", GVCP_REG_EXPOSURE_AUTO, GVCP_AUTO_CONTINUOUS);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg(GVCP_REG_GAIN_AUTO, GVCP_AUTO_CONTINUOUS);
+    status = GVCP_WriteReg("Gain auto ON", GVCP_REG_GAIN_AUTO, GVCP_AUTO_CONTINUOUS);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    return GVCP_WriteReg(GVCP_REG_ACQ_START, GVCP_ACQ_START_FIRE);
+    status = GVCP_WriteReg("Acquisition start", GVCP_REG_ACQ_START, GVCP_ACQ_START_FIRE);
+    if (status == CFE_SUCCESS)
+    {
+        OS_printf("PAYLOADMC GVCP: InitCamera sequence complete, all 7 steps OK\n");
+    }
+
+    return status;
 }
 
 int32 PAYLOADMC_GVCP_HAL_Heartbeat(void)

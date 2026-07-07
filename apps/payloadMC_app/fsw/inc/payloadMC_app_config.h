@@ -35,7 +35,7 @@
 
 /* GVCP imaging camera network config -- up to 4 cameras on the payload's Eth
  * switch, only camera 0 is wired up for now. */
-#define PAYLOADMC_CAM0_IP        "192.168.1.11" /**< \brief Camera 0 IP address */
+#define PAYLOADMC_CAM0_IP        "192.168.1.11" /**< \brief Camera 0 IP address (static, set via MVS) */
 #define PAYLOADMC_OBC_IP         "192.168.1.50" /**< \brief OBC IP address (GVSP stream destination) */
 #define PAYLOADMC_GVCP_PORT      3956           /**< \brief GVCP control port (fixed by GigE Vision spec) */
 #define PAYLOADMC_STREAM_PORT    50001          /**< \brief GVSP stream destination port on the OBC */
