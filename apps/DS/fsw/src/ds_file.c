@@ -241,16 +241,31 @@ void DS_FileStorePacket(CFE_SB_MsgId_t MessageID, const CFE_SB_Buffer_t *BufPtr)
                     {
                         /*
                         ** Write unfiltered packets to destination file...
+                        **
+                        ** Use OS_printf (not CFE_EVS_SendEvent) for this dump --
+                        ** EVS per-app event rate limiting squelches repeated
+                        ** events, which was hiding real DS_CREATE_FILE_ERR_EID /
+                        ** DS_WRITE_FILE_ERR_EID errors behind a flood of these.
                         */
-
-                        switch (CFE_SB_MsgIdToValue(MessageID))
                         {
-                            case HK_COMBINED_PKT1_MID:
-                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "Combined housekeeping received by DS, and written to file %d", FileIndex);
-                                break;
-                            default:
-                                CFE_EVS_SendEvent(1, CFE_EVS_EventType_INFORMATION, "UNKNOWN - Packet with Message ID 0x%08X received by DS, and written to file %d", CFE_SB_MsgIdToValue(MessageID), FileIndex);
-                                break;
+                            size_t      PktSize = 0;
+                            const uint8 *RawBytes = (const uint8 *)BufPtr;
+                            char        HexBuf[3 * 24 + 1];
+                            size_t      DumpLen;
+                            size_t      b;
+
+                            CFE_MSG_GetSize((CFE_MSG_Message_t *)BufPtr, &PktSize);
+
+                            DumpLen = (PktSize < 24) ? PktSize : 24;
+                            for (b = 0; b < DumpLen; b++)
+                            {
+                                snprintf(&HexBuf[b * 3], 4, "%02X ", RawBytes[b]);
+                            }
+                            HexBuf[DumpLen * 3] = '\0';
+
+                            OS_printf("DS_FileStorePacket: MID=0x%08X size=%u dest=%d first%u=[ %s]\n",
+                                      (unsigned int)CFE_SB_MsgIdToValue(MessageID), (unsigned int)PktSize,
+                                      (int)FileIndex, (unsigned int)DumpLen, HexBuf);
                         }
 
                         DS_FileSetupWrite(FileIndex, BufPtr);
