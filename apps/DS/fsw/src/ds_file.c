@@ -379,6 +379,11 @@ void DS_FileWriteData(int32 FileIndex, const void *FileData, uint32 DataLength)
     ** Let cFE manage the file I/O...
     */
     Result = OS_write(FileStatus->FileHandle, FileData, DataLength);
+
+    OS_printf("DS_FileWriteData: OS_write(handle=0x%08X, len=%u) = %d, FileSize before=%u\n",
+              (unsigned int)FileStatus->FileHandle, (unsigned int)DataLength, (int)Result,
+              (unsigned int)FileStatus->FileSize);
+
     if (Result == DataLength)
     {
         /*
@@ -522,6 +527,9 @@ void DS_FileCreateDest(uint32 FileIndex)
         */
         Result = OS_OpenCreate(&LocalFileHandle, FileStatus->FileName, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
                                OS_READ_WRITE);
+
+        OS_printf("DS_FileCreateDest: OS_OpenCreate('%s') = %d, handle=0x%08X\n", FileStatus->FileName, (int)Result,
+                  (unsigned int)LocalFileHandle);
 
         if (Result != OS_SUCCESS)
         {
