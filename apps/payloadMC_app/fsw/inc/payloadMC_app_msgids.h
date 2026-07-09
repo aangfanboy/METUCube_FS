@@ -17,6 +17,7 @@
 #define PAYLOADMC_CMD_MID                 0xEC2
 #define PAYLOADMC_IMAGING_MODE_MID        0xEC3  /**< Broadcast: PayloadMC's isImaging state changed, all subsystem apps subscribe */
 #define PAYLOADMC_SEND_GVCP_HEARTBEAT_MID 0xEC4  /**< Scheduler trigger: send a GVCP heartbeat if currently imaging */
+#define PAYLOADMC_PHOTO_CHUNK_MID         0xEC5  /**< One chunk of a captured GVSP frame, archived to file by DS */
 
 #define PAYLOADMC_SEND_HK_MID_NAME        "PAYLOADMC_SEND_C"
 

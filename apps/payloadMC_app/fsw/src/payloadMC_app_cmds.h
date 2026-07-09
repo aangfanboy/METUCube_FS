@@ -92,4 +92,22 @@ void PAYLOADMC_BroadcastImagingMode(bool IsImaging);
  */
 void PAYLOADMC_SendGvcpHeartbeatIfImaging(void);
 
+/**
+ * @brief Capture the current GVSP frame and archive it via DS.
+ *
+ * Triggered when CANIOMC routes an unprompted CAN message (MessageID
+ * 0xA9, CANIOMC_PAYLOAD_CAPTURE_FRAME_MSGID) to
+ * CANIOMC_PAYLOAD_CAPTURE_FRAME_MID. Calls PAYLOADMC_GVCP_HAL_CaptureFrame()
+ * to grab whichever frame camera 0 is currently streaming (no trigger
+ * request is sent to the camera -- it has been streaming continuously
+ * since PAYLOADMC_takePhoto()'s init), then splits the resulting PGM
+ * buffer into PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD-sized chunks and publishes
+ * them in order on PAYLOADMC_PHOTO_CHUNK_MID for DS to archive.
+ *
+ * @param SenderID   CAN node ID that sent the trigger message.
+ * @param Payload    Reassembled CAN payload that came with the trigger (unused).
+ * @param PayloadLen Number of valid bytes in Payload (unused).
+ */
+void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen);
+
 #endif /* PAYLOADMC_APP_CMDS_H */

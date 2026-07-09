@@ -39,3 +39,8 @@
 /* OBC -> original 0xA7 sender ack: camera init succeeded, OBC is now in imaging
  * mode. Unicast (ReceiverID = whoever sent 0xA7), unsegmented, empty payload. */
 #define CANIOMC_PAYLOAD_INIT_COMPLETE_MSGID 0xA8
+
+/* Payload "capture frame" trigger: arrives to OBC unprompted (no request), routed by
+ * CANIOMC_RouteIncomingCanMsg() straight to PayloadMC's captureFrame handler. Grabs
+ * whichever GVSP frame is currently streaming from camera 0 and archives it via DS. */
+#define CANIOMC_PAYLOAD_CAPTURE_FRAME_MSGID 0xA9

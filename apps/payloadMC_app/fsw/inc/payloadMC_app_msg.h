@@ -78,4 +78,22 @@ typedef struct
     bool                      IsImaging;
 } PAYLOADMC_ImagingModePkt_t;
 
+/*
+** One chunk of a captured GVSP frame (see PAYLOADMC_captureFrame /
+** PAYLOADMC_GVCP_HAL_CaptureFrame). Published repeatedly, in order, on
+** PAYLOADMC_PHOTO_CHUNK_MID; DS's filter table archives every packet on
+** that MID into the same destination file, so consecutive chunks land
+** back-to-back in the .ds dump (still framed by CCSDS/DS headers -- see
+** tools/gvcp-bringup/extract_photo_from_ds.py to turn that into a clean
+** viewable .pgm).
+*/
+#define PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD  8192
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    uint16                    ChunkLen;
+    uint8                     ChunkData[PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD];
+} PAYLOADMC_PhotoChunkPkt_t;
+
 #endif /* PAYLOADMC_MSG_H_ */

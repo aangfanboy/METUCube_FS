@@ -13,12 +13,24 @@
 #include "payloadMC_gvcp_hal.h"
 #include "payloadMC_app_config.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+
+/* ---- GVSP (streaming) frame header format bits (see gvsp_capture.c reference) ---- */
+#define GVSP_FMT_LEADER   0x01u
+#define GVSP_FMT_TRAILER  0x02u
+#define GVSP_FMT_PAYLOAD  0x03u
+
+#define GVSP_MAX_UDP_PKT       2048u
+#define GVSP_RECV_IDLE_LIMIT   20     /* consecutive receive timeouts before giving up */
+#define GVSP_RECV_TIMEOUT_SEC  1
+#define GVSP_MAX_FRAME_BYTES   (64u * 1024u * 1024u) /* sanity cap on LEADER-reported size */
 
 /* ---- GVCP registers / values (MV-CB120-10GM-S GVCP register map) ---- */
 #define GVCP_REG_CCP            0x00000A00u
@@ -221,4 +233,159 @@ void PAYLOADMC_GVCP_HAL_Deinit(void)
         close(GvcpSocket);
         GvcpSocket = -1;
     }
+}
+
+int32 PAYLOADMC_GVCP_HAL_CaptureFrame(uint8 **OutBuf, uint32 *OutLen)
+{
+    int            streamSocket;
+    struct sockaddr_in bindAddr;
+    struct timeval tv = {GVSP_RECV_TIMEOUT_SEC, 0};
+    uint8          udpBuf[GVSP_MAX_UDP_PKT];
+    uint8         *frame    = NULL;
+    uint32         frameCap = 0;
+    uint32         frameLen = 0;
+    uint32         width    = 0;
+    uint32         height   = 0;
+    int            haveLeader = 0;
+    int            curBlock   = -1;
+    int            idle       = 0;
+
+    *OutBuf = NULL;
+    *OutLen = 0;
+
+    streamSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (streamSocket < 0)
+    {
+        OS_printf("PAYLOADMC GVSP: socket() failed: %s\n", strerror(errno));
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
+    setsockopt(streamSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+
+    memset(&bindAddr, 0, sizeof(bindAddr));
+    bindAddr.sin_family      = AF_INET;
+    bindAddr.sin_port        = htons(PAYLOADMC_STREAM_PORT);
+    bindAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (bind(streamSocket, (struct sockaddr *)&bindAddr, sizeof(bindAddr)) < 0)
+    {
+        OS_printf("PAYLOADMC GVSP: bind() to port %d failed: %s\n", PAYLOADMC_STREAM_PORT, strerror(errno));
+        close(streamSocket);
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
+    OS_printf("PAYLOADMC GVSP: waiting for one complete frame on port %d...\n", PAYLOADMC_STREAM_PORT);
+
+    while (idle < GVSP_RECV_IDLE_LIMIT)
+    {
+        struct sockaddr_in from;
+        socklen_t fromLen = sizeof(from);
+        int n = recvfrom(streamSocket, (char *)udpBuf, sizeof(udpBuf), 0, (struct sockaddr *)&from, &fromLen);
+
+        if (n < 0)
+        {
+            idle++;
+            continue;
+        }
+        if (n < 8)
+        {
+            continue;
+        }
+        idle = 0;
+
+        uint16 block  = ((uint16)udpBuf[2] << 8) | udpBuf[3];
+        uint8  format = udpBuf[4] & 0x0Fu;
+
+        if (format == GVSP_FMT_LEADER)
+        {
+            if (n >= 8 + 36)
+            {
+                width  = ((uint32)udpBuf[8 + 16] << 24) | ((uint32)udpBuf[8 + 17] << 16) |
+                         ((uint32)udpBuf[8 + 18] << 8)  |  (uint32)udpBuf[8 + 19];
+                height = ((uint32)udpBuf[8 + 20] << 24) | ((uint32)udpBuf[8 + 21] << 16) |
+                         ((uint32)udpBuf[8 + 22] << 8)  |  (uint32)udpBuf[8 + 23];
+
+                uint32 need = width * height;
+                if (need == 0 || need > GVSP_MAX_FRAME_BYTES)
+                {
+                    OS_printf("PAYLOADMC GVSP: LEADER reported implausible size %ux%u, ignoring\n",
+                             (unsigned int)width, (unsigned int)height);
+                    haveLeader = 0;
+                    continue;
+                }
+
+                if (need > frameCap)
+                {
+                    free(frame);
+                    frame = (uint8 *)malloc(need);
+                    if (frame == NULL)
+                    {
+                        OS_printf("PAYLOADMC GVSP: malloc(%u) failed\n", (unsigned int)need);
+                        close(streamSocket);
+                        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+                    }
+                    frameCap = need;
+                }
+                frameLen   = 0;
+                curBlock   = block;
+                haveLeader = 1;
+                OS_printf("PAYLOADMC GVSP: LEADER block=%u %ux%u\n",
+                         (unsigned int)block, (unsigned int)width, (unsigned int)height);
+            }
+        }
+        else if (format == GVSP_FMT_PAYLOAD && haveLeader && block == (uint16)curBlock)
+        {
+            uint32 dlen = (uint32)(n - 8);
+            if (frameLen + dlen <= frameCap)
+            {
+                memcpy(frame + frameLen, udpBuf + 8, dlen);
+                frameLen += dlen;
+            }
+        }
+        else if (format == GVSP_FMT_TRAILER && haveLeader && block == (uint16)curBlock)
+        {
+            if (frameLen >= width * height && width > 0 && height > 0)
+            {
+                char   pgmHeader[64];
+                uint32 headerLen;
+                uint8 *outBuf;
+
+                snprintf(pgmHeader, sizeof(pgmHeader), "P5\n%u %u\n255\n", (unsigned int)width, (unsigned int)height);
+                headerLen = (uint32)strlen(pgmHeader);
+
+                outBuf = (uint8 *)malloc(headerLen + width * height);
+                if (outBuf == NULL)
+                {
+                    OS_printf("PAYLOADMC GVSP: malloc for PGM output failed\n");
+                    free(frame);
+                    close(streamSocket);
+                    return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+                }
+
+                memcpy(outBuf, pgmHeader, headerLen);
+                memcpy(outBuf + headerLen, frame, width * height);
+
+                free(frame);
+                close(streamSocket);
+
+                *OutBuf = outBuf;
+                *OutLen = headerLen + width * height;
+
+                OS_printf("PAYLOADMC GVSP: frame captured, %u bytes (%u header + %ux%u pixels)\n",
+                         (unsigned int)*OutLen, (unsigned int)headerLen, (unsigned int)width, (unsigned int)height);
+                return CFE_SUCCESS;
+            }
+            else
+            {
+                OS_printf("PAYLOADMC GVSP: incomplete frame at TRAILER (%u of %u bytes), discarding\n",
+                         (unsigned int)frameLen, (unsigned int)(width * height));
+                haveLeader = 0;
+            }
+        }
+    }
+
+    OS_printf("PAYLOADMC GVSP: timed out waiting for a complete frame\n");
+    free(frame);
+    close(streamSocket);
+    return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
 }

@@ -45,6 +45,13 @@ void PAYLOADMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             PAYLOADMC_SendGvcpHeartbeatIfImaging();
             break;
 
+        case CANIOMC_PAYLOAD_CAPTURE_FRAME_MID:
+        {
+            const CANIOMC_RouteTriggerPkt_t *TriggerPkt = (const CANIOMC_RouteTriggerPkt_t *)SBBufPtr;
+            PAYLOADMC_captureFrame(TriggerPkt->SenderID, TriggerPkt->Payload, TriggerPkt->PayloadLen);
+            break;
+        }
+
         default:
             CFE_EVS_SendEvent(PAYLOADMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
                               "PAYLOADMC: invalid packet,MID = 0x%x", (unsigned int)CFE_SB_MsgIdToValue(MsgId));

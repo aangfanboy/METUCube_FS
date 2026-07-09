@@ -141,6 +141,15 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
+    /* Subscribe to the capture-frame trigger routed by CANIOMC (CAN MessageID 0xA9) */
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_PAYLOAD_CAPTURE_FRAME_MID), PAYLOADMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC App: Error Subscribing to Capture Frame trigger, RC = 0x%08X\n", status);
+        return status;
+    }
+
     /* Open the GVCP control socket toward camera 0 (Init only -- the actual
      * take-control register sequence runs when the 0xA7 CAN trigger arrives) */
     status = PAYLOADMC_GVCP_HAL_Init();

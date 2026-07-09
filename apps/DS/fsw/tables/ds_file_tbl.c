@@ -75,17 +75,20 @@ DS_DestFileTable_t DS_DestFileTable = {
             /* .MaxFileAge    = */ (60 * 60 * 24),     /* 24 hours */
             /* .SequenceCount = */ DS_UNUSED,
         },
-        /* File Index 08 */
+        /* File Index 08 -- PHOTO_DATA_FILE (see ds_filter_tbl.c). Raw DS dump:
+         * consecutive PAYLOADMC_PHOTO_CHUNK_MID packets, still CCSDS/DS-framed.
+         * Run tools/gvcp-bringup/extract_photo_from_ds.py on this file to get
+         * a clean, viewable .pgm. */
         {
             /* .Movename      = */ DS_EMPTY_STRING,
-            /* .Pathname      = */ DS_EMPTY_STRING,
-            /* .Basename      = */ DS_EMPTY_STRING,
-            /* .Extension     = */ DS_EMPTY_STRING,
+            /* .Pathname      = */ "/cf/photos",
+            /* .Basename      = */ "photo",
+            /* .Extension     = */ ".ds",
 
-            /* .FileNameType  = */ DS_UNUSED,
-            /* .EnableState   = */ DS_UNUSED,
-            /* .MaxFileSize   = */ DS_UNUSED,
-            /* .MaxFileAge    = */ DS_UNUSED,
+            /* .FileNameType  = */ DS_BY_COUNT,
+            /* .EnableState   = */ DS_ENABLED,
+            /* .MaxFileSize   = */ (256 * 1024 * 1024), /* 256 M-byte, generous for one image */
+            /* .MaxFileAge    = */ (60 * 60 * 24),      /* 24 hours */
             /* .SequenceCount = */ DS_UNUSED,
         },
         /* File Index 09 */

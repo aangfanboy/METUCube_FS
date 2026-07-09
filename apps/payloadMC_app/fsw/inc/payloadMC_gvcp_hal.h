@@ -44,4 +44,22 @@ int32 PAYLOADMC_GVCP_HAL_Heartbeat(void);
  */
 void PAYLOADMC_GVCP_HAL_Deinit(void);
 
+/**
+ * @brief Capture one complete GVSP frame from camera 0's stream as a P5
+ * PGM image (Mono8).
+ *
+ * Binds a fresh UDP socket to PAYLOADMC_STREAM_PORT, waits for the next
+ * complete LEADER..PAYLOAD..TRAILER sequence to arrive (the camera must
+ * already be streaming, i.e. PAYLOADMC_GVCP_HAL_InitCamera() succeeded
+ * earlier), and hands back a malloc()'d buffer containing a full
+ * "P5\nW H\n255\n" + raw pixel bytes PGM file image. No warm-up/frame-skip
+ * is done here -- by the time this is called the camera has typically
+ * been streaming (and auto-exposure settled) for a while already.
+ *
+ * @param OutBuf Set to a malloc()'d buffer on success. Caller must free() it.
+ * @param OutLen Set to the number of valid bytes in *OutBuf on success.
+ * @return CFE_SUCCESS on success, error code on failure/timeout.
+ */
+int32 PAYLOADMC_GVCP_HAL_CaptureFrame(uint8 **OutBuf, uint32 *OutLen);
+
 #endif /* PAYLOADMC_GVCP_HAL_H */

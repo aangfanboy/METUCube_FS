@@ -14,6 +14,8 @@
 static const CANIOMC_MsgRouteEntry_t CANIOMC_MsgRouteTable[] = {
     /* Payload "take photo" trigger, arrives unprompted on 0xA7 */
     {CANIOMC_PAYLOAD_TAKEPHOTO_MSGID, CFE_SB_MSGID_WRAP_VALUE(CANIOMC_PAYLOAD_TAKEPHOTO_MID)},
+    /* Payload "capture frame" trigger, arrives unprompted on 0xA9 */
+    {CANIOMC_PAYLOAD_CAPTURE_FRAME_MSGID, CFE_SB_MSGID_WRAP_VALUE(CANIOMC_PAYLOAD_CAPTURE_FRAME_MID)},
 };
 
 #define CANIOMC_MSG_ROUTE_TABLE_SIZE (sizeof(CANIOMC_MsgRouteTable) / sizeof(CANIOMC_MsgRouteTable[0]))

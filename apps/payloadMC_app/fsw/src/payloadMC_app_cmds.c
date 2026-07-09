@@ -10,6 +10,7 @@
 
 #include "cfe.h"
 #include <string.h>
+#include <stdlib.h>
 
 
 CFE_Status_t PAYLOADMC_APP_SEND_HK_TO_SB()
@@ -221,4 +222,67 @@ void PAYLOADMC_SendGvcpHeartbeatIfImaging(void)
                           "PAYLOADMC: GVCP heartbeat failed, status: 0x%08X", (unsigned int)status);
         PAYLOADMC_AppData.ErrCounter++;
     }
+}
+
+void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
+{
+    int32                     status;
+    uint8                    *frameBuf = NULL;
+    uint32                    frameLen = 0;
+    uint32                    offset;
+    uint32                    chunkCount = 0;
+    PAYLOADMC_PhotoChunkPkt_t ChunkPkt;
+
+    (void)Payload;
+    (void)PayloadLen;
+
+    OS_printf("PAYLOADMC: Capture frame trigger received (Sender=0x%02X)\n", (unsigned int)SenderID);
+
+    if (!PAYLOADMC_AppData.IsImaging)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Capture frame requested but not in imaging mode (camera never initialized)");
+        PAYLOADMC_AppData.ErrCounter++;
+        return;
+    }
+
+    status = PAYLOADMC_GVCP_HAL_CaptureFrame(&frameBuf, &frameLen);
+    if (status != CFE_SUCCESS || frameBuf == NULL)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Frame capture failed, status: 0x%08X", (unsigned int)status);
+        PAYLOADMC_AppData.ErrCounter++;
+        return;
+    }
+
+    /* Split the PGM buffer into DS-archivable chunks, published in order on
+     * PAYLOADMC_PHOTO_CHUNK_MID. DS's filter table stores every packet on
+     * that MID into the same destination file, so the chunks land back-to-
+     * back on disk (still CCSDS/DS-framed -- see
+     * tools/gvcp-bringup/extract_photo_from_ds.py to get a clean .pgm). */
+    for (offset = 0; offset < frameLen; offset += PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD)
+    {
+        uint32 remaining = frameLen - offset;
+        uint16 thisLen   = (uint16)((remaining < PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD) ? remaining
+                                                                                     : PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD);
+
+        memset(&ChunkPkt, 0, sizeof(ChunkPkt));
+        ChunkPkt.ChunkLen = thisLen;
+        memcpy(ChunkPkt.ChunkData, frameBuf + offset, thisLen);
+
+        CFE_MSG_Init(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_PHOTO_CHUNK_MID),
+                     sizeof(ChunkPkt));
+        CFE_SB_TimeStampMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader));
+        CFE_SB_TransmitMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), true);
+
+        chunkCount++;
+    }
+
+    free(frameBuf);
+
+    CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                      "PAYLOADMC: Captured frame archived (%u bytes, %u chunks)",
+                      (unsigned int)frameLen, (unsigned int)chunkCount);
+
+    PAYLOADMC_AppData.CmdCounter++;
 }

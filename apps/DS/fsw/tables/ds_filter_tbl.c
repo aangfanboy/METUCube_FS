@@ -46,6 +46,7 @@
 #include "ds_msgids.h"
 
 #include "hk_msgids.h"
+#include "payloadMC_app_msgids.h"
 
 /* #include "ci_lab_msgids.h"  */
 /* #include "to_lab_msgids.h"  */
@@ -71,7 +72,7 @@
 */
 
 #define HOUSEKEEPING_DATA_FILE 0
-#define HEARTBEAT_DATA_FILE 1
+#define PHOTO_DATA_FILE 1
 
 /*
 ** Sample packet filter table data
@@ -88,10 +89,10 @@ DS_FilterTable_t DS_FilterTable = {
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
      /* Packet Index 016 */
-     {/* .MessageID = */ CFE_SB_MSGID_RESERVED,
+     {/* .MessageID = */ CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_PHOTO_CHUNK_MID),
       /* .Filter    = */
       {/* File table index, filter type, N, X, O */
-       {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
+       {PHOTO_DATA_FILE, DS_BY_COUNT, 1, 1, 0},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED},
        {DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED, DS_UNUSED}}},
