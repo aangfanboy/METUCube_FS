@@ -195,10 +195,12 @@ void PAYLOADMC_BroadcastImagingMode(bool IsImaging)
 
     PAYLOADMC_AppData.IsImaging = IsImaging;
 
-    memset(&Pkt, 0, sizeof(Pkt));
+    /* CFE_MSG_Init memsets the WHOLE struct (Size bytes), not just the
+     * header -- must run before IsImaging is set, or it gets wiped back
+     * to false right after. */
+    CFE_MSG_Init(CFE_MSG_PTR(Pkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), sizeof(Pkt));
     Pkt.IsImaging = IsImaging;
 
-    CFE_MSG_Init(CFE_MSG_PTR(Pkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_IMAGING_MODE_MID), sizeof(Pkt));
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(Pkt.TelemetryHeader));
     CFE_SB_TransmitMsg(CFE_MSG_PTR(Pkt.TelemetryHeader), true);
 
@@ -277,12 +279,16 @@ void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadL
                                                                                      : PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD);
         uint32 retry;
 
-        memset(&ChunkPkt, 0, sizeof(ChunkPkt));
+        /* CFE_MSG_Init memsets the WHOLE struct (Size bytes), not just the
+         * header -- must run before ChunkLen/ChunkData are populated, or
+         * they get wiped back to zero right after (this was silently
+         * zeroing every chunk's payload while leaving the CCSDS framing
+         * intact, which is why DS files decoded fine but were empty). */
+        CFE_MSG_Init(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_PHOTO_CHUNK_MID),
+                     sizeof(ChunkPkt));
         ChunkPkt.ChunkLen = thisLen;
         memcpy(ChunkPkt.ChunkData, frameBuf + offset, thisLen);
 
-        CFE_MSG_Init(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_PHOTO_CHUNK_MID),
-                     sizeof(ChunkPkt));
         CFE_SB_TimeStampMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader));
 
         status = CFE_SB_TransmitMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), true);

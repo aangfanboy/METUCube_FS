@@ -30,7 +30,12 @@ bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, uint8 SenderID, const uint
         {
             CANIOMC_RouteTriggerPkt_t TriggerPkt;
 
-            memset(&TriggerPkt, 0, sizeof(TriggerPkt));
+            /* CFE_MSG_Init memsets the WHOLE struct (Size bytes from
+             * MsgPtr), not just the header -- it must run before any
+             * payload fields are populated, or they get wiped right back
+             * to zero. */
+            CFE_MSG_Init(CFE_MSG_PTR(TriggerPkt.TelemetryHeader), CANIOMC_MsgRouteTable[i].SbMid,
+                        sizeof(TriggerPkt));
 
             if (PayloadLen > CANIOMC_SB_MAX_PAYLOAD)
             {
@@ -44,8 +49,6 @@ bool CANIOMC_RouteIncomingCanMsg(uint16 CanMessageID, uint8 SenderID, const uint
                 memcpy(TriggerPkt.Payload, Payload, PayloadLen);
             }
 
-            CFE_MSG_Init(CFE_MSG_PTR(TriggerPkt.TelemetryHeader), CANIOMC_MsgRouteTable[i].SbMid,
-                        sizeof(TriggerPkt));
             CFE_SB_TimeStampMsg(CFE_MSG_PTR(TriggerPkt.TelemetryHeader));
             CFE_SB_TransmitMsg(CFE_MSG_PTR(TriggerPkt.TelemetryHeader), true);
 
