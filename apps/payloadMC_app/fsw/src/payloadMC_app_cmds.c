@@ -224,6 +224,15 @@ void PAYLOADMC_SendGvcpHeartbeatIfImaging(void)
     }
 }
 
+/* CFE_PLATFORM_SB_BUF_MEMORY_BYTES is a fixed-size shared pool (512KB by
+ * default) and DS only frees a chunk's buffer once its own task gets a
+ * scheduling turn to drain its pipe. Blasting ~190 back-to-back 8KB sends
+ * with zero pacing reliably exhausts that pool mid-frame (silently, if the
+ * caller doesn't check CFE_SB_TransmitMsg's return). Retry each chunk with
+ * a short delay instead of dropping it. */
+#define PAYLOADMC_PHOTO_CHUNK_MAX_RETRIES 20
+#define PAYLOADMC_PHOTO_CHUNK_RETRY_DELAY_MS 10
+
 void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
 {
     int32                     status;
@@ -231,6 +240,7 @@ void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadL
     uint32                    frameLen = 0;
     uint32                    offset;
     uint32                    chunkCount = 0;
+    uint32                    chunkFailCount = 0;
     PAYLOADMC_PhotoChunkPkt_t ChunkPkt;
 
     (void)Payload;
@@ -265,6 +275,7 @@ void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadL
         uint32 remaining = frameLen - offset;
         uint16 thisLen   = (uint16)((remaining < PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD) ? remaining
                                                                                      : PAYLOADMC_PHOTO_CHUNK_MAX_PAYLOAD);
+        uint32 retry;
 
         memset(&ChunkPkt, 0, sizeof(ChunkPkt));
         ChunkPkt.ChunkLen = thisLen;
@@ -273,16 +284,51 @@ void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadL
         CFE_MSG_Init(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), CFE_SB_ValueToMsgId(PAYLOADMC_PHOTO_CHUNK_MID),
                      sizeof(ChunkPkt));
         CFE_SB_TimeStampMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader));
-        CFE_SB_TransmitMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), true);
 
-        chunkCount++;
+        status = CFE_SB_TransmitMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), true);
+        for (retry = 0; status != CFE_SUCCESS && retry < PAYLOADMC_PHOTO_CHUNK_MAX_RETRIES; retry++)
+        {
+            /* Give DS's task a scheduling turn to drain its pipe and free SB
+             * pool buffers, then retry the SAME chunk -- never skip one. */
+            OS_TaskDelay(PAYLOADMC_PHOTO_CHUNK_RETRY_DELAY_MS);
+            status = CFE_SB_TransmitMsg(CFE_MSG_PTR(ChunkPkt.TelemetryHeader), true);
+        }
+
+        if (status == CFE_SUCCESS)
+        {
+            chunkCount++;
+        }
+        else
+        {
+            chunkFailCount++;
+            CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC: Photo chunk at offset %u dropped after %u retries, status: 0x%08X",
+                              (unsigned int)offset, (unsigned int)PAYLOADMC_PHOTO_CHUNK_MAX_RETRIES,
+                              (unsigned int)status);
+        }
+
+        /* Pace every send, not just failures -- keeps us from re-exhausting
+         * the pool one chunk after a successful retry. */
+        OS_TaskDelay(PAYLOADMC_PHOTO_CHUNK_RETRY_DELAY_MS);
     }
 
     free(frameBuf);
 
-    CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
-                      "PAYLOADMC: Captured frame archived (%u bytes, %u chunks)",
-                      (unsigned int)frameLen, (unsigned int)chunkCount);
+    if (chunkFailCount == 0)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
+                          "PAYLOADMC: Captured frame archived (%u bytes, %u chunks, 0 dropped)",
+                          (unsigned int)frameLen, (unsigned int)chunkCount);
+    }
+    else
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Captured frame PARTIALLY archived (%u bytes, %u/%u chunks sent, "
+                          "%u DROPPED -- file is corrupt/incomplete)",
+                          (unsigned int)frameLen, (unsigned int)chunkCount,
+                          (unsigned int)(chunkCount + chunkFailCount), (unsigned int)chunkFailCount);
+        PAYLOADMC_AppData.ErrCounter++;
+    }
 
     PAYLOADMC_AppData.CmdCounter++;
 }
