@@ -97,50 +97,53 @@ class PowerHk(C.LittleEndianStructure):
     ]
 
 
+class CommIfaceTelemetryHk(C.LittleEndianStructure):
+    """apps/canIOMC_app/fsw/inc/canIOMC_app_msg.h : CANIOMC_CommIfaceTlm_t
+
+    One UHF or S-Band interface telemetry block (identical 58-byte wire
+    layout for both), verified against real hardware traffic.
+    """
+    _fields_ = [
+        ("IfaceState", C.c_uint8),
+        ("RfFilterSelection", C.c_uint8),
+        ("TxFrequency", C.c_uint32),
+        ("RxFrequency", C.c_uint32),
+        ("TxFrames", C.c_uint32),
+        ("TxFramesFailed", C.c_uint32),
+        ("TxFramesDropped", C.c_uint32),
+        ("RxFrames", C.c_uint32),
+        ("RxFramesInvalid", C.c_uint32),
+        ("RxFramesDropped", C.c_uint32),
+        ("LastRxTimestamp", C.c_uint64),
+        ("LastRssi", C.c_float),
+        ("LastValidRxTimestamp", C.c_uint64),
+        ("LastValidRssi", C.c_float),
+    ]
+
+
 class CommTelemetryHk(C.LittleEndianStructure):
     """apps/canIOMC_app/fsw/inc/canIOMC_app_msg.h : CANIOMC_CommTlmPayload_t
 
-    Power rail measurements, then UHF interface state/filter, UHF
-    frequency + link stats, the identical S-Band frequency + link stats
-    block, and finally 14 boolean flags packed into the trailing 2 bytes
-    (see BoolFlags bit order in the C struct's comment).
+    56-byte uptime/boot-count/power/temperature header, followed by two
+    identical 58-byte interface blocks (UHF then S-Band). No boolean flags
+    are present in this message.
     """
     _fields_ = [
-        ("VinVoltage", C.c_uint32),
-        ("VinCurrent", C.c_uint32),
-        ("FpgaCurrent", C.c_uint32),
-        ("Dig3v3Current", C.c_uint32),
-        ("Rf5vCurrent", C.c_uint32),
-        ("Emc1702Power", C.c_uint32),
-        ("EfusesPower", C.c_uint32),
-        ("VbatVoltage", C.c_uint32),
-        ("UhfIfaceState", C.c_uint8),
-        ("UhfFilter", C.c_uint8),
-        ("UhfTxFrequency", C.c_uint32),
-        ("UhfRxFrequency", C.c_uint32),
-        ("UhfTxFrames", C.c_uint32),
-        ("UhfTxFramesFail", C.c_uint32),
-        ("UhfTxFramesDrop", C.c_uint32),
-        ("UhfRxFrames", C.c_uint32),
-        ("UhfRxFramesInval", C.c_uint32),
-        ("UhfRxFramesDrop", C.c_uint32),
-        ("UhfLastRxTimestamp", C.c_uint64),
-        ("UhfLastRssi", C.c_uint32),
-        ("UhfLastValidRxTimestamp", C.c_uint64),
-        ("UhfLastValidRssi", C.c_uint32),
-        ("SbandTxFrequency", C.c_uint32),
-        ("SbandRxFrequency", C.c_uint32),
-        ("SbandTxFrames", C.c_uint32),
-        ("SbandTxFramesFail", C.c_uint32),
-        ("SbandTxFramesDrop", C.c_uint32),
-        ("SbandRxFrames", C.c_uint32),
-        ("SbandRxFramesInval", C.c_uint32),
-        ("SbandRxFramesDrop", C.c_uint32),
-        ("SbandLastRxTimestamp", C.c_uint64),
-        ("SbandLastRssi", C.c_uint32),
-        ("SbandLastValidRxTimestamp", C.c_uint64),
-        ("SbandLastValidRssi", C.c_uint32),
-        ("BoolFlags", C.c_uint8 * 2),
+        ("UptimeMs", C.c_uint64),
+        ("BootCount", C.c_uint32),
+        ("VinVoltage", C.c_float),
+        ("VinCurrent", C.c_float),
+        ("FpgaCurrent", C.c_float),
+        ("Dig3v3Current", C.c_float),
+        ("Rf5vCurrent", C.c_float),
+        ("Emc1702Power", C.c_float),
+        ("EfusesPower", C.c_float),
+        ("VbatVoltage", C.c_float),
+        ("PcbTemperature", C.c_float),
+        ("UhfPaTemperature", C.c_float),
+        ("SbandPaTemperature", C.c_float),
+        ("Uhf", CommIfaceTelemetryHk),
+        ("Sband", CommIfaceTelemetryHk),
     ]
 
 

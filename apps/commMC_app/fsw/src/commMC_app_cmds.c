@@ -376,9 +376,9 @@ CFE_Status_t COMMMC_ProcessCommTlm(const CFE_SB_Buffer_t *SBBufPtr)
     COMMMC_AppData.CommMissCount = 0;
 
     CFE_EVS_SendEvent(COMMMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
-                      "COMMMC: Comm cache updated (VBAT=%u, UhfTxFrames=%u)",
-                      (unsigned int)COMMMC_AppData.Telemetry.VbatVoltage,
-                      (unsigned int)COMMMC_AppData.Telemetry.UhfTxFrames);
+                      "COMMMC: Comm cache updated (BootCount=%u, UhfTxFrames=%u)",
+                      (unsigned int)COMMMC_AppData.Telemetry.BootCount,
+                      (unsigned int)COMMMC_AppData.Telemetry.Uhf.TxFrames);
 
     return CFE_SUCCESS;
 }

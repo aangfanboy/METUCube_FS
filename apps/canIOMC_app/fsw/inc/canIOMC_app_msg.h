@@ -59,7 +59,7 @@ typedef struct
 } CANIOMC_HkPacket_t;
 
 /** Maximum payload an app can send through SB to CANIOMC for transmission */
-#define CANIOMC_SB_MAX_PAYLOAD  160
+#define CANIOMC_SB_MAX_PAYLOAD  176
 
 typedef struct {
     uint8  Priority;   /**< \brief 2 bits (00=Critical, 01=High, 10=Medium, 11=Low) */
@@ -202,71 +202,63 @@ typedef struct
 ** when CANIOMC fully reassembles a Comm HK response (MessageID = CANIOMC_COMM_HK_MSGID).
 ** CommMC subscribes to this packet to update its data cache.
 **
-** Reassembled CAN payload layout (148 bytes, tightly packed, no gaps):
-** power rail measurements, then UHF interface state/filter, UHF frequency +
-** link stats, then the identical S-Band frequency + link stats block,
-** and finally all 14 boolean status flags packed into the trailing 2 bytes.
-** Field order mirrors the order values are produced by the Comm subsystem's
-** own telemetry writer, with every bool moved to the tail.
+** Reassembled CAN payload layout (172 bytes, tightly packed, no gaps) --
+** verified against real hardware traffic, NOT derived from source-code
+** inspection:
+**   offset  0 (56 bytes): uptime/boot-count header + 11 power/temp floats
+**   offset 56 (58 bytes): UHF interface telemetry block
+**   offset 114 (58 bytes): S-Band interface telemetry block (identical
+**                          layout to the UHF block)
+** No boolean flags are present in this message at all.
 **
-** NOTE: this C struct may contain compiler-inserted padding (e.g. between
-** the two trailing uint8 fields and the next uint32) that the wire format
-** does NOT have -- CANIOMC_COMM_TLM_WIRE_SIZE is the true wire byte count,
-** and canIOMC_app_cmds.c parses the raw CAN payload into this struct
+** NOTE: this C struct may contain compiler-inserted padding (e.g. before
+** each interface block's first uint32, and before each uint64) that the
+** wire format does NOT have -- CANIOMC_COMM_TLM_WIRE_SIZE /
+** CANIOMC_COMM_IFACE_WIRE_SIZE are the true wire byte counts, and
+** canIOMC_app_cmds.c parses the raw CAN payload into this struct
 ** field-by-field (not via a single bulk memcpy) to avoid that mismatch.
 ** Every other copy of this struct (CommMC's cache, HK packet, etc.) is a
 ** plain struct-to-struct memcpy since both sides use this same type.
 */
-#define CANIOMC_COMM_TLM_WIRE_SIZE  148
+#define CANIOMC_COMM_IFACE_WIRE_SIZE  58   /**< bytes per UHF/S-Band interface block on the wire */
+#define CANIOMC_COMM_TLM_WIRE_SIZE   172   /**< total: 56-byte header + 2x 58-byte interface blocks */
 
 typedef struct
 {
-    uint32 VinVoltage;              /**< VIN rail voltage                       */
-    uint32 VinCurrent;              /**< VIN rail current                       */
-    uint32 FpgaCurrent;             /**< FPGA rail current                      */
-    uint32 Dig3v3Current;           /**< DIG_3V3 rail current                   */
-    uint32 Rf5vCurrent;             /**< RF_5V rail current                     */
-    uint32 Emc1702Power;            /**< EMC1702 sensor power reading           */
-    uint32 EfusesPower;             /**< eFuses power reading                   */
-    uint32 VbatVoltage;             /**< Battery voltage                        */
+    uint8  IfaceState;           /**< Interface state (iface_ctrl state machine) */
+    uint8  RfFilterSelection;    /**< RF filter selection                        */
+    uint32 TxFrequency;          /**< TX frequency [Hz]                          */
+    uint32 RxFrequency;          /**< RX frequency [Hz]                          */
+    uint32 TxFrames;             /**< TX frame count                             */
+    uint32 TxFramesFailed;       /**< TX frames failed                           */
+    uint32 TxFramesDropped;      /**< TX frames dropped                          */
+    uint32 RxFrames;             /**< RX frame count                             */
+    uint32 RxFramesInvalid;      /**< RX invalid frames                          */
+    uint32 RxFramesDropped;      /**< RX frames dropped                          */
+    uint64 LastRxTimestamp;      /**< Last RX timestamp [ms uptime]              */
+    float  LastRssi;             /**< Last RSSI [dBm]                            */
+    uint64 LastValidRxTimestamp; /**< Last valid RX timestamp [ms uptime]        */
+    float  LastValidRssi;        /**< Last valid RSSI [dBm]                      */
+} CANIOMC_CommIfaceTlm_t;
 
-    uint8  UhfIfaceState;           /**< UHF interface state                    */
-    uint8  UhfFilter;               /**< UHF radio filter setting               */
+typedef struct
+{
+    uint64 UptimeMs;             /**< Uptime, ms since boot       */
+    uint32 BootCount;            /**< Boot count                  */
+    float  VinVoltage;           /**< VIN voltage [V]             */
+    float  VinCurrent;           /**< VIN current [A]             */
+    float  FpgaCurrent;          /**< FPGA current [A]            */
+    float  Dig3v3Current;        /**< DIG_3V3 current [A]         */
+    float  Rf5vCurrent;          /**< RF_5V current [A]           */
+    float  Emc1702Power;         /**< EMC1702 power [W]           */
+    float  EfusesPower;          /**< eFuses power [W]            */
+    float  VbatVoltage;          /**< V_BAT voltage [V]           */
+    float  PcbTemperature;       /**< PCB temperature [C]         */
+    float  UhfPaTemperature;     /**< UHF PA temperature [C]      */
+    float  SbandPaTemperature;   /**< S-Band PA temperature [C]   */
 
-    uint32 UhfTxFrequency;          /**< UHF TX frequency                       */
-    uint32 UhfRxFrequency;          /**< UHF RX frequency                       */
-    uint32 UhfTxFrames;             /**< UHF TX frame count                     */
-    uint32 UhfTxFramesFail;         /**< UHF TX frame failures                  */
-    uint32 UhfTxFramesDrop;         /**< UHF TX frames dropped                  */
-    uint32 UhfRxFrames;             /**< UHF RX frame count                     */
-    uint32 UhfRxFramesInval;        /**< UHF RX invalid frames                  */
-    uint32 UhfRxFramesDrop;         /**< UHF RX frames dropped                  */
-    uint64 UhfLastRxTimestamp;      /**< UHF last RX timestamp                  */
-    uint32 UhfLastRssi;             /**< UHF last RSSI                          */
-    uint64 UhfLastValidRxTimestamp; /**< UHF last valid RX timestamp            */
-    uint32 UhfLastValidRssi;        /**< UHF last valid RSSI                    */
-
-    uint32 SbandTxFrequency;          /**< S-Band TX frequency                  */
-    uint32 SbandRxFrequency;          /**< S-Band RX frequency                  */
-    uint32 SbandTxFrames;             /**< S-Band TX frame count                */
-    uint32 SbandTxFramesFail;         /**< S-Band TX frame failures             */
-    uint32 SbandTxFramesDrop;         /**< S-Band TX frames dropped             */
-    uint32 SbandRxFrames;             /**< S-Band RX frame count                */
-    uint32 SbandRxFramesInval;        /**< S-Band RX invalid frames             */
-    uint32 SbandRxFramesDrop;         /**< S-Band RX frames dropped             */
-    uint64 SbandLastRxTimestamp;      /**< S-Band last RX timestamp             */
-    uint32 SbandLastRssi;             /**< S-Band last RSSI                     */
-    uint64 SbandLastValidRxTimestamp; /**< S-Band last valid RX timestamp       */
-    uint32 SbandLastValidRssi;        /**< S-Band last valid RSSI               */
-
-    /* 14 boolean flags packed LSB-first, byte 0 first:
-     *  0: RF_5V_Enabled      1: FPGA_5V_Enabled    2: CAN1_Enabled
-     *  3: CAN1_LPWR_Enabled  4: CAN2_Enabled        5: CAN2_LPWR_Enabled
-     *  6: UHF_Enabled        7: SBAND_Enabled       8: Rail5V_PGood
-     *  9: RailFPGA_PGood    10: RailUHF_PGood      11: RailSBAND_PGood
-     * 12: UhfRadioEnabled   13: UhfRadioDirection
-     */
-    uint8  BoolFlags[2];
+    CANIOMC_CommIfaceTlm_t Uhf;   /**< UHF interface telemetry     */
+    CANIOMC_CommIfaceTlm_t Sband; /**< S-Band interface telemetry  */
 } CANIOMC_CommTlmPayload_t;
 
 typedef struct
