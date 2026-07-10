@@ -97,6 +97,21 @@
 #define CANIOMC_HEARTBEAT_RATE 100 /* 1 Hz at TickRate=100 */
 #define PAYLOADMC_GVCP_HEARTBEAT_RATE 100 /* 1 Hz at TickRate=100; no-op unless PayloadMC is imaging */
 
+/* Each subsystem's SEND_HK trigger fires its own CAN HK request. Staggering
+ * them by 1 tick (~10ms) each keeps them from all hitting the CAN bus in
+ * the same tick -- back-to-back requests were causing arbitration
+ * contention that dropped the FIRST segment of a board's segmented
+ * response (seen on the bus analyzer as CONT+LAST with no FIRST) whenever
+ * the real scheduled HK cycle ran, even though a single manual trigger
+ * (no contention) always worked. HK_SEND_COMBINED_PKT_MID stays 1 tick
+ * after the last subsystem so it aggregates once everyone's had a turn. */
+#define POWERMC_HK_RATE    (CLOCK_RATE_FOR_HK_CYCLE + 0)
+#define MPPTMC_HK_RATE     (CLOCK_RATE_FOR_HK_CYCLE + 1)
+#define ADCSMC_HK_RATE     (CLOCK_RATE_FOR_HK_CYCLE + 2)
+#define PAYLOADMC_HK_RATE  (CLOCK_RATE_FOR_HK_CYCLE + 3)
+#define COMMMC_HK_RATE     (CLOCK_RATE_FOR_HK_CYCLE + 4)
+#define HK_COMBINED_RATE   (CLOCK_RATE_FOR_HK_CYCLE + 5)
+
 SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
     .TickRate = 100,
     .Config   = {
@@ -135,28 +150,28 @@ SCH_LAB_ScheduleTable_t SCH_LAB_ScheduleTable = {
         {CFE_SB_MSGID_WRAP_VALUE(LC_SAMPLE_AP_MID), 500, 0, 8, {0, 175, 1}},
 #endif
 #ifdef HAVE_POWERMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(POWERMC_SEND_HK_MID), POWERMC_HK_RATE, 0},
 #endif
 #ifdef HAVE_CANIOMC_APP
         {CFE_SB_MSGID_WRAP_VALUE(CANIOMC_SEND_HEARTBEAT_MID), CANIOMC_HEARTBEAT_RATE, 0},
 #endif
 #ifdef HAVE_MPPTMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(MPPTMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(MPPTMC_SEND_HK_MID), MPPTMC_HK_RATE, 0},
 #endif
 
 #ifdef HAVE_PAYLOADMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_SEND_HK_MID), PAYLOADMC_HK_RATE, 0},
         {CFE_SB_MSGID_WRAP_VALUE(PAYLOADMC_SEND_GVCP_HEARTBEAT_MID), PAYLOADMC_GVCP_HEARTBEAT_RATE, 0},
 #endif
 #ifdef HAVE_ADCSMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(ADCSMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(ADCSMC_SEND_HK_MID), ADCSMC_HK_RATE, 0},
 #endif
 #ifdef HAVE_COMMMC_APP
-        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_SEND_HK_MID), CLOCK_RATE_FOR_HK_CYCLE, 0},
+        {CFE_SB_MSGID_WRAP_VALUE(COMMMC_SEND_HK_MID), COMMMC_HK_RATE, 0},
         {CFE_SB_MSGID_WRAP_VALUE(COMMMC_CMD_MID), 1201, 0, 8, {0, 175, COMMMC_APP_COMMAND_TASK_ID_SEND_MINIMAL_TM_TO_GROUND}},
 #endif
 #ifdef HAVE_HK
-        {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), CLOCK_RATE_FOR_HK_CYCLE+1, 0, 4, {HK_COMBINED_PKT1_MID}},
+        {CFE_SB_MSGID_WRAP_VALUE(HK_SEND_COMBINED_PKT_MID), HK_COMBINED_RATE, 0, 4, {HK_COMBINED_PKT1_MID}},
 #endif
 
     }};
