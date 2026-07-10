@@ -127,7 +127,7 @@ int32 PAYLOADMC_GVCP_HAL_Init(uint8 CamIndex)
      * InitCamera's WriteReg exchanges and the periodic heartbeat). Kept
      * short because the heartbeat loop is sequential across all 4 cameras
      * -- a slow/unresponsive one blocks the others for up to this long. */
-    struct timeval tv = {0, 500000}; /* 500ms */
+    struct timeval tv = {0, 200000}; /* 200ms */
 
     if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
     {
