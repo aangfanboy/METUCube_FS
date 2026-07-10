@@ -123,7 +123,11 @@ static int32 GVCP_WriteReg(uint8 CamIndex, const char *label, uint32 addr, uint3
 
 int32 PAYLOADMC_GVCP_HAL_Init(uint8 CamIndex)
 {
-    struct timeval tv = {1, 0};
+    /* GVCP ack timeout for this camera's control socket (used for both
+     * InitCamera's WriteReg exchanges and the periodic heartbeat). Kept
+     * short because the heartbeat loop is sequential across all 4 cameras
+     * -- a slow/unresponsive one blocks the others for up to this long. */
+    struct timeval tv = {0, 500000}; /* 500ms */
 
     if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
     {
