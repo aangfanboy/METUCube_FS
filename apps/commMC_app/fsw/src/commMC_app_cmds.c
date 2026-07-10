@@ -372,12 +372,13 @@ CFE_Status_t COMMMC_ProcessCommTlm(const CFE_SB_Buffer_t *SBBufPtr)
 
     CommPkt = (const CANIOMC_CommTlmPacket_t *)SBBufPtr;
 
-    memcpy(COMMMC_AppData.Readings, CommPkt->Comm.Readings, sizeof(COMMMC_AppData.Readings));
+    memcpy(&COMMMC_AppData.Telemetry, &CommPkt->Comm, sizeof(COMMMC_AppData.Telemetry));
     COMMMC_AppData.CommMissCount = 0;
 
     CFE_EVS_SendEvent(COMMMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
-                      "COMMMC: Comm cache updated (Reading0=%u)",
-                      (unsigned int)COMMMC_AppData.Readings[0]);
+                      "COMMMC: Comm cache updated (VBAT=%u, UhfTxFrames=%u)",
+                      (unsigned int)COMMMC_AppData.Telemetry.VbatVoltage,
+                      (unsigned int)COMMMC_AppData.Telemetry.UhfTxFrames);
 
     return CFE_SUCCESS;
 }

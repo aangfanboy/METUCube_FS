@@ -97,6 +97,53 @@ class PowerHk(C.LittleEndianStructure):
     ]
 
 
+class CommTelemetryHk(C.LittleEndianStructure):
+    """apps/canIOMC_app/fsw/inc/canIOMC_app_msg.h : CANIOMC_CommTlmPayload_t
+
+    Power rail measurements, then UHF interface state/filter, UHF
+    frequency + link stats, the identical S-Band frequency + link stats
+    block, and finally 14 boolean flags packed into the trailing 2 bytes
+    (see BoolFlags bit order in the C struct's comment).
+    """
+    _fields_ = [
+        ("VinVoltage", C.c_uint32),
+        ("VinCurrent", C.c_uint32),
+        ("FpgaCurrent", C.c_uint32),
+        ("Dig3v3Current", C.c_uint32),
+        ("Rf5vCurrent", C.c_uint32),
+        ("Emc1702Power", C.c_uint32),
+        ("EfusesPower", C.c_uint32),
+        ("VbatVoltage", C.c_uint32),
+        ("UhfIfaceState", C.c_uint8),
+        ("UhfFilter", C.c_uint8),
+        ("UhfTxFrequency", C.c_uint32),
+        ("UhfRxFrequency", C.c_uint32),
+        ("UhfTxFrames", C.c_uint32),
+        ("UhfTxFramesFail", C.c_uint32),
+        ("UhfTxFramesDrop", C.c_uint32),
+        ("UhfRxFrames", C.c_uint32),
+        ("UhfRxFramesInval", C.c_uint32),
+        ("UhfRxFramesDrop", C.c_uint32),
+        ("UhfLastRxTimestamp", C.c_uint64),
+        ("UhfLastRssi", C.c_uint32),
+        ("UhfLastValidRxTimestamp", C.c_uint64),
+        ("UhfLastValidRssi", C.c_uint32),
+        ("SbandTxFrequency", C.c_uint32),
+        ("SbandRxFrequency", C.c_uint32),
+        ("SbandTxFrames", C.c_uint32),
+        ("SbandTxFramesFail", C.c_uint32),
+        ("SbandTxFramesDrop", C.c_uint32),
+        ("SbandRxFrames", C.c_uint32),
+        ("SbandRxFramesInval", C.c_uint32),
+        ("SbandRxFramesDrop", C.c_uint32),
+        ("SbandLastRxTimestamp", C.c_uint64),
+        ("SbandLastRssi", C.c_uint32),
+        ("SbandLastValidRxTimestamp", C.c_uint64),
+        ("SbandLastValidRssi", C.c_uint32),
+        ("BoolFlags", C.c_uint8 * 2),
+    ]
+
+
 class CommHk(C.LittleEndianStructure):
     """apps/commMC_app/fsw/inc/commMC_app_msg.h : COMMMC_HkTlm_Comm_t"""
     _fields_ = [
@@ -105,7 +152,7 @@ class CommHk(C.LittleEndianStructure):
         ("CommStale", C.c_uint8),
         ("Reserved", C.c_uint8 * 1),
         ("CurrentConnectionRate", C.c_uint32),
-        ("Readings", C.c_uint16 * 5),
+        ("Telemetry", CommTelemetryHk),
     ]
 
 
@@ -178,6 +225,8 @@ def flatten(name, hk_struct):
     only the first 10 (BoolFlag_0..9) are meaningful per spec, the rest are
     reserved/unused -- and the bit order itself is an assumption (the exact
     bit-to-flag mapping was never confirmed against real hardware docs).
+    Nested ctypes.Structure fields (e.g. Comm's embedded CANIOMC_CommTlmPayload_t)
+    are recursed into, with their own field names appended to the prefix.
     """
     row = []
     for field_name, field_type in hk_struct._fields_:
@@ -188,12 +237,41 @@ def flatten(name, hk_struct):
                 for b in range(8):
                     row.append((f"{name}_BoolFlag_{bit}", bool((byte_val >> b) & 1)))
                     bit += 1
+        elif isinstance(value, C.Structure):
+            row.extend(flatten(f"{name}_{field_name}", value))
         elif hasattr(value, "__len__"):
             for i, v in enumerate(value):
                 row.append((f"{name}_{field_name}_{i}", v))
         else:
             row.append((f"{name}_{field_name}", value))
     return row
+
+
+def _raw_values(value):
+    """Recursively flatten a ctypes value (struct/array/scalar) into a plain
+    list of scalars, matching flatten()'s traversal order. BoolFlags byte
+    arrays are bit-unpacked into individual 0/1 ints so length lines up with
+    the CSV's per-bit columns. Used by compare_with_automations(), which
+    compares against a flat list of expected values, not named columns.
+    """
+    if isinstance(value, C.Structure):
+        out = []
+        for field_name, _ in value._fields_:
+            field_value = getattr(value, field_name)
+            if field_name == "BoolFlags":
+                for byte_val in field_value:
+                    for b in range(8):
+                        out.append((byte_val >> b) & 1)
+            else:
+                out.extend(_raw_values(field_value))
+        return out
+    elif hasattr(value, "__len__"):
+        out = []
+        for v in value:
+            out.extend(_raw_values(v))
+        return out
+    else:
+        return [value]
 
 
 def read_exact(f, size, what):
@@ -320,16 +398,13 @@ def compare_with_automations(decoded, expected):
         if sender_id not in expected:
             continue
         hk_struct = decoded[name]
-        # Flatten array elements only, skipping counter/stale header fields, in field order
+        # Flatten array/nested-struct elements, skipping counter/stale header fields, in field order
         actual_values = []
         for field_name, field_type in hk_struct._fields_:
             if field_name in ("CmdCounter", "ErrCounter", "Reserved") or field_name.endswith("Stale"):
                 continue
             value = getattr(hk_struct, field_name)
-            if hasattr(value, "__len__"):
-                actual_values.extend(value)
-            else:
-                actual_values.append(value)
+            actual_values.extend(_raw_values(value))
 
         exp = expected[sender_id]
         exp_values = exp["values"]

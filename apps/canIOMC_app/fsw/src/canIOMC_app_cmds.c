@@ -259,10 +259,54 @@ void CANIOMC_PollAndPublishCanRx(void)
         {
             CANIOMC_CommTlmPayload_t *Comm = &CANIOMC_AppData.CommTlmPkt.Comm;
 
-            /* Parse reassembled payload into the typed struct: 5x uint16 readings. */
-            if (reassembledLen >= sizeof(Comm->Readings))
+            /* Parse reassembled payload (148 bytes, tightly packed) into the
+             * typed struct field-by-field with explicit offsets -- NOT a
+             * bulk memcpy -- because the wire format has no padding while
+             * the C struct may (e.g. between the two trailing uint8 fields
+             * and the next uint32). See CANIOMC_CommTlmPayload_t's comment. */
+            if (reassembledLen >= CANIOMC_COMM_TLM_WIRE_SIZE)
             {
-                memcpy(Comm->Readings, reassembledBuf, sizeof(Comm->Readings));
+                uint32 off = 0;
+
+                memcpy(&Comm->VinVoltage, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->VinCurrent, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->FpgaCurrent, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->Dig3v3Current, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->Rf5vCurrent, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->Emc1702Power, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->EfusesPower, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->VbatVoltage, reassembledBuf + off, 4); off += 4;
+
+                memcpy(&Comm->UhfIfaceState, reassembledBuf + off, 1); off += 1;
+                memcpy(&Comm->UhfFilter, reassembledBuf + off, 1); off += 1;
+
+                memcpy(&Comm->UhfTxFrequency, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfRxFrequency, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfTxFrames, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfTxFramesFail, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfTxFramesDrop, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfRxFrames, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfRxFramesInval, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfRxFramesDrop, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfLastRxTimestamp, reassembledBuf + off, 8); off += 8;
+                memcpy(&Comm->UhfLastRssi, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->UhfLastValidRxTimestamp, reassembledBuf + off, 8); off += 8;
+                memcpy(&Comm->UhfLastValidRssi, reassembledBuf + off, 4); off += 4;
+
+                memcpy(&Comm->SbandTxFrequency, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandRxFrequency, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandTxFrames, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandTxFramesFail, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandTxFramesDrop, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandRxFrames, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandRxFramesInval, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandRxFramesDrop, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandLastRxTimestamp, reassembledBuf + off, 8); off += 8;
+                memcpy(&Comm->SbandLastRssi, reassembledBuf + off, 4); off += 4;
+                memcpy(&Comm->SbandLastValidRxTimestamp, reassembledBuf + off, 8); off += 8;
+                memcpy(&Comm->SbandLastValidRssi, reassembledBuf + off, 4); off += 4;
+
+                memcpy(Comm->BoolFlags, reassembledBuf + off, 2); off += 2;
 
                 CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader));
                 CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader), true);

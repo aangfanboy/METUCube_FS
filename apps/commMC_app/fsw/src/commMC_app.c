@@ -227,7 +227,7 @@ CFE_Status_t COMMMC_appResetHkData(void)
     COMMMC_AppData.ErrCounter = 0;
     COMMMC_AppData.currentConnectionRate = 0;
     COMMMC_AppData.CommMissCount = 0;
-    memset(COMMMC_AppData.Readings, 0, sizeof(COMMMC_AppData.Readings));
+    memset(&COMMMC_AppData.Telemetry, 0, sizeof(COMMMC_AppData.Telemetry));
     COMMMC_AppData.IsImaging = false;
 
     return CFE_SUCCESS;
@@ -242,7 +242,7 @@ CFE_Status_t COMMMC_appPrepareHkPacket(void)
     HkPacketPayload->ErrCounter = COMMMC_AppData.ErrCounter;
     HkPacketPayload->CommStale  = (COMMMC_AppData.CommMissCount >= COMMMC_COMM_STALE_THRESHOLD) ? 1 : 0;
     HkPacketPayload->currentConnectionRate = COMMMC_AppData.currentConnectionRate;
-    memcpy(HkPacketPayload->Readings, COMMMC_AppData.Readings, sizeof(HkPacketPayload->Readings));
+    memcpy(&HkPacketPayload->Telemetry, &COMMMC_AppData.Telemetry, sizeof(HkPacketPayload->Telemetry));
 
     /* Fire-and-forget CAN request so the cache is refreshed for the next cycle */
     COMMMC_APP_SEND_HK_CAN_REQUEST_TO_SB();

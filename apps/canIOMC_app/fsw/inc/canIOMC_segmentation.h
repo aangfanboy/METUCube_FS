@@ -36,7 +36,7 @@
 /* ------------------------------------------------------------------ */
 
 /** Maximum payload bytes that can be reassembled (must be a multiple of 8) */
-#define CANIO_REASSEMBLY_BUF_SIZE   144
+#define CANIO_REASSEMBLY_BUF_SIZE   160
 
 /** Number of concurrent reassembly slots (one per active sender+msgid pair) */
 #define CANIO_MAX_REASSEMBLY_SLOTS   4
