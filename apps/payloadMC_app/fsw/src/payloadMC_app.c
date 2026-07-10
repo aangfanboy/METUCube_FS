@@ -56,6 +56,7 @@ void PAYLOADMC_appMain(void)
 CFE_Status_t PAYLOADMC_appInit(void)
 {
     CFE_Status_t status;
+    uint8        CamIndex;
 
     PAYLOADMC_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
@@ -150,14 +151,19 @@ CFE_Status_t PAYLOADMC_appInit(void)
         return status;
     }
 
-    /* Open the GVCP control socket toward camera 0 (Init only -- the actual
-     * take-control register sequence runs when the 0xA7 CAN trigger arrives) */
-    status = PAYLOADMC_GVCP_HAL_Init();
-    if (status != CFE_SUCCESS)
+    /* Open the GVCP control socket toward each of the 4 cameras (Init only --
+     * the actual take-control register sequence runs when the 0xA7 CAN
+     * trigger arrives) */
+    for (CamIndex = 0; CamIndex < PAYLOADMC_NUM_CAMERAS; CamIndex++)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "PAYLOADMC App: Error Initializing GVCP HAL, error 0x%08X", (unsigned int)status);
-        return status;
+        status = PAYLOADMC_GVCP_HAL_Init(CamIndex);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(PAYLOADMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC App: Error Initializing GVCP HAL for camera %u, error 0x%08X",
+                              (unsigned int)CamIndex, (unsigned int)status);
+            return status;
+        }
     }
 
     // register to table(s)
@@ -247,6 +253,7 @@ CFE_Status_t PAYLOADMC_appResetHkData(void)
     PAYLOADMC_AppData.PayloadMissCount = 0;
     memset(PAYLOADMC_AppData.Readings, 0, sizeof(PAYLOADMC_AppData.Readings));
     PAYLOADMC_AppData.IsImaging = false;
+    memset(PAYLOADMC_AppData.CamInitialized, 0, sizeof(PAYLOADMC_AppData.CamInitialized));
 
     return CFE_SUCCESS;
 }

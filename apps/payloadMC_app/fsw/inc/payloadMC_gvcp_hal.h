@@ -18,31 +18,36 @@
 #include "cfe.h"
 
 /**
- * @brief Open the GVCP control socket toward the configured camera.
+ * @brief Open the GVCP control socket toward camera CamIndex.
+ * @param CamIndex Camera index, 0..PAYLOADMC_NUM_CAMERAS-1.
  * @return CFE_SUCCESS on success, negative error code on failure.
  */
-int32 PAYLOADMC_GVCP_HAL_Init(void);
+int32 PAYLOADMC_GVCP_HAL_Init(uint8 CamIndex);
 
 /**
- * @brief Run the camera take-control/init register sequence: take
+ * @brief Run camera CamIndex's take-control/init register sequence: take
  * control, set stream destination IP/port, packet size, enable
  * continuous auto-exposure/auto-gain, start acquisition.
+ * @param CamIndex Camera index, 0..PAYLOADMC_NUM_CAMERAS-1.
  * @return CFE_SUCCESS on success, negative error code on failure.
  */
-int32 PAYLOADMC_GVCP_HAL_InitCamera(void);
+int32 PAYLOADMC_GVCP_HAL_InitCamera(uint8 CamIndex);
 
 /**
  * @brief Send one GVCP heartbeat (ReadReg on the CCP register) to keep
- * device control alive. Only meaningful while the camera is under our
- * control (after a successful PAYLOADMC_GVCP_HAL_InitCamera()).
+ * camera CamIndex's device control alive. Only meaningful while that
+ * camera is under our control (after a successful
+ * PAYLOADMC_GVCP_HAL_InitCamera() for the same index).
+ * @param CamIndex Camera index, 0..PAYLOADMC_NUM_CAMERAS-1.
  * @return CFE_SUCCESS on success, negative error code on failure.
  */
-int32 PAYLOADMC_GVCP_HAL_Heartbeat(void);
+int32 PAYLOADMC_GVCP_HAL_Heartbeat(uint8 CamIndex);
 
 /**
- * @brief Close the GVCP control socket and release resources.
+ * @brief Close camera CamIndex's GVCP control socket and release resources.
+ * @param CamIndex Camera index, 0..PAYLOADMC_NUM_CAMERAS-1.
  */
-void PAYLOADMC_GVCP_HAL_Deinit(void);
+void PAYLOADMC_GVCP_HAL_Deinit(uint8 CamIndex);
 
 /**
  * @brief Capture one complete GVSP frame from camera 0's stream as a P5

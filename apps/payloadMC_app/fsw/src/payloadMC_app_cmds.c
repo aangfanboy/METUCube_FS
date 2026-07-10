@@ -127,33 +127,52 @@ CFE_Status_t PAYLOADMC_ProcessPayloadHeartbeat(const CFE_SB_Buffer_t *SBBufPtr)
 
 void PAYLOADMC_takePhoto(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen)
 {
-    int32 status;
+    int32  status;
+    uint8  CamIndex;
+    uint8  okCount = 0;
+    uint16 CamSuccess[PAYLOADMC_NUM_CAMERAS];
 
     OS_printf("PAYLOADMC: Take photo trigger received (Sender=0x%02X, payload %u bytes) - "
-             "initializing camera 0...\n", (unsigned int)SenderID, (unsigned int)PayloadLen);
+             "initializing %u cameras...\n", (unsigned int)SenderID, (unsigned int)PayloadLen,
+             (unsigned int)PAYLOADMC_NUM_CAMERAS);
 
     if (Payload != NULL && PayloadLen > 0)
     {
         OS_printf("PAYLOADMC: Take photo payload[0] = 0x%02X\n", Payload[0]);
     }
 
-    status = PAYLOADMC_GVCP_HAL_InitCamera();
-    if (status != CFE_SUCCESS)
+    /* Run the same init sequence on all 4 cameras. Not all cameras may be
+     * physically wired up yet -- a per-camera failure is logged and that
+     * camera is left un-initialized (skipped by the heartbeat loop), but
+     * doesn't abort the rest of the batch. */
+    for (CamIndex = 0; CamIndex < PAYLOADMC_NUM_CAMERAS; CamIndex++)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "PAYLOADMC: GVCP camera init failed, status: 0x%08X", (unsigned int)status);
-        PAYLOADMC_AppData.ErrCounter++;
-        return;
+        status = PAYLOADMC_GVCP_HAL_InitCamera(CamIndex);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC: GVCP camera %u init failed, status: 0x%08X",
+                              (unsigned int)CamIndex, (unsigned int)status);
+            PAYLOADMC_AppData.ErrCounter++;
+            PAYLOADMC_AppData.CamInitialized[CamIndex] = false;
+            CamSuccess[CamIndex] = 0;
+            continue;
+        }
+
+        PAYLOADMC_AppData.CamInitialized[CamIndex] = true;
+        CamSuccess[CamIndex] = 1;
+        okCount++;
     }
 
     CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_INFORMATION,
-                      "PAYLOADMC: Camera 0 initialized, entering imaging mode");
+                      "PAYLOADMC: %u/%u cameras initialized, entering imaging mode",
+                      (unsigned int)okCount, (unsigned int)PAYLOADMC_NUM_CAMERAS);
 
-    PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(SenderID);
+    PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(SenderID, CamSuccess);
     PAYLOADMC_BroadcastImagingMode(true);
 }
 
-CFE_Status_t PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(uint8 ReceiverID)
+CFE_Status_t PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(uint8 ReceiverID, const uint16 CamSuccess[PAYLOADMC_NUM_CAMERAS])
 {
     CFE_Status_t          status = CFE_SUCCESS;
     CANIOMC_CanPacketSB_t AckPkt;
@@ -168,8 +187,9 @@ CFE_Status_t PAYLOADMC_APP_SEND_INIT_COMPLETE_ACK_TO_SB(uint8 ReceiverID)
     AckPkt.Header.ReceiverID = ReceiverID;
     AckPkt.Header.MessageID  = CANIOMC_PAYLOAD_INIT_COMPLETE_MSGID;
 
-    /* No payload — this is a pure ack frame */
-    AckPkt.PayloadLen = 0;
+    /* 8-byte payload: 4x uint16, one per camera in order, 1 = init OK / 0 = failed */
+    AckPkt.PayloadLen = (uint8)(PAYLOADMC_NUM_CAMERAS * sizeof(uint16));
+    memcpy(AckPkt.Payload, CamSuccess, AckPkt.PayloadLen);
 
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(AckPkt.MessageHeader));
 
@@ -211,18 +231,28 @@ void PAYLOADMC_BroadcastImagingMode(bool IsImaging)
 void PAYLOADMC_SendGvcpHeartbeatIfImaging(void)
 {
     int32 status;
+    uint8 CamIndex;
 
     if (!PAYLOADMC_AppData.IsImaging)
     {
         return;
     }
 
-    status = PAYLOADMC_GVCP_HAL_Heartbeat();
-    if (status != CFE_SUCCESS)
+    for (CamIndex = 0; CamIndex < PAYLOADMC_NUM_CAMERAS; CamIndex++)
     {
-        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "PAYLOADMC: GVCP heartbeat failed, status: 0x%08X", (unsigned int)status);
-        PAYLOADMC_AppData.ErrCounter++;
+        if (!PAYLOADMC_AppData.CamInitialized[CamIndex])
+        {
+            continue;
+        }
+
+        status = PAYLOADMC_GVCP_HAL_Heartbeat(CamIndex);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "PAYLOADMC: GVCP heartbeat failed for camera %u, status: 0x%08X",
+                              (unsigned int)CamIndex, (unsigned int)status);
+            PAYLOADMC_AppData.ErrCounter++;
+        }
     }
 }
 

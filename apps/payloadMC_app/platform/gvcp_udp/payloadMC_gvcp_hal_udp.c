@@ -59,11 +59,13 @@ typedef struct
 } GVCP_Header_t;
 #pragma pack(pop)
 
-static int                GvcpSocket     = -1;
-static uint16             GvcpReqCounter = 1;
-static struct sockaddr_in GvcpCamAddr;
+static const char *GvcpCamIps[PAYLOADMC_NUM_CAMERAS] = PAYLOADMC_CAM_IPS;
 
-static int32 GVCP_WriteReg(const char *label, uint32 addr, uint32 value)
+static int                GvcpSocket[PAYLOADMC_NUM_CAMERAS];
+static uint16              GvcpReqCounter[PAYLOADMC_NUM_CAMERAS];
+static struct sockaddr_in GvcpCamAddr[PAYLOADMC_NUM_CAMERAS];
+
+static int32 GVCP_WriteReg(uint8 CamIndex, const char *label, uint32 addr, uint32 value)
 {
     uint8          pkt[16];
     GVCP_Header_t *h = (GVCP_Header_t *)pkt;
@@ -77,77 +79,92 @@ static int32 GVCP_WriteReg(const char *label, uint32 addr, uint32 value)
     h->flags   = GVCP_FLAG_ACK;
     h->command = htons(GVCP_CMD_WRITEREG);
     h->length  = htons(8);
-    h->req_id  = htons(GvcpReqCounter);
+    h->req_id  = htons(GvcpReqCounter[CamIndex]);
     b[0]       = htonl(addr);
     b[1]       = htonl(value);
 
-    if (sendto(GvcpSocket, (char *)pkt, sizeof(pkt), 0, (struct sockaddr *)&GvcpCamAddr, sizeof(GvcpCamAddr)) < 0)
+    if (sendto(GvcpSocket[CamIndex], (char *)pkt, sizeof(pkt), 0, (struct sockaddr *)&GvcpCamAddr[CamIndex],
+               sizeof(GvcpCamAddr[CamIndex])) < 0)
     {
-        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (sendto: %s)\n",
-                 label, (unsigned int)addr, (unsigned int)value, strerror(errno));
+        OS_printf("PAYLOADMC GVCP: [cam%u %s] WriteReg addr=0x%08X value=0x%08X FAIL (sendto: %s)\n",
+                 (unsigned int)CamIndex, label, (unsigned int)addr, (unsigned int)value, strerror(errno));
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
-    n = recvfrom(GvcpSocket, (char *)ack, sizeof(ack), 0, (struct sockaddr *)&from, &fromLen);
-    GvcpReqCounter++;
+    n = recvfrom(GvcpSocket[CamIndex], (char *)ack, sizeof(ack), 0, (struct sockaddr *)&from, &fromLen);
+    GvcpReqCounter[CamIndex]++;
 
     if (n < 0)
     {
-        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (recvfrom: %s -- no ack from camera)\n",
-                 label, (unsigned int)addr, (unsigned int)value, strerror(errno));
+        OS_printf("PAYLOADMC GVCP: [cam%u %s] WriteReg addr=0x%08X value=0x%08X FAIL (recvfrom: %s -- no ack from camera)\n",
+                 (unsigned int)CamIndex, label, (unsigned int)addr, (unsigned int)value, strerror(errno));
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
     if (n < 8)
     {
-        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (short ack, %d bytes)\n",
-                 label, (unsigned int)addr, (unsigned int)value, n);
+        OS_printf("PAYLOADMC GVCP: [cam%u %s] WriteReg addr=0x%08X value=0x%08X FAIL (short ack, %d bytes)\n",
+                 (unsigned int)CamIndex, label, (unsigned int)addr, (unsigned int)value, n);
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
     if (ntohs(*(uint16 *)ack) != 0)
     {
-        OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X FAIL (camera status 0x%04X)\n",
-                 label, (unsigned int)addr, (unsigned int)value, (unsigned int)ntohs(*(uint16 *)ack));
+        OS_printf("PAYLOADMC GVCP: [cam%u %s] WriteReg addr=0x%08X value=0x%08X FAIL (camera status 0x%04X)\n",
+                 (unsigned int)CamIndex, label, (unsigned int)addr, (unsigned int)value,
+                 (unsigned int)ntohs(*(uint16 *)ack));
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
-    OS_printf("PAYLOADMC GVCP: [%s] WriteReg addr=0x%08X value=0x%08X OK (%d byte ack)\n",
-             label, (unsigned int)addr, (unsigned int)value, n);
+    OS_printf("PAYLOADMC GVCP: [cam%u %s] WriteReg addr=0x%08X value=0x%08X OK (%d byte ack)\n",
+             (unsigned int)CamIndex, label, (unsigned int)addr, (unsigned int)value, n);
     return CFE_SUCCESS;
 }
 
-int32 PAYLOADMC_GVCP_HAL_Init(void)
+int32 PAYLOADMC_GVCP_HAL_Init(uint8 CamIndex)
 {
     struct timeval tv = {1, 0};
 
-    GvcpSocket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (GvcpSocket < 0)
+    if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
     {
-        CFE_ES_WriteToSysLog("PAYLOADMC GVCP HAL: socket() failed\n");
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
-    setsockopt(GvcpSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    GvcpSocket[CamIndex] = socket(AF_INET, SOCK_DGRAM, 0);
+    if (GvcpSocket[CamIndex] < 0)
+    {
+        CFE_ES_WriteToSysLog("PAYLOADMC GVCP HAL: socket() failed for camera %u\n", (unsigned int)CamIndex);
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
 
-    memset(&GvcpCamAddr, 0, sizeof(GvcpCamAddr));
-    GvcpCamAddr.sin_family = AF_INET;
-    GvcpCamAddr.sin_port   = htons(PAYLOADMC_GVCP_PORT);
-    inet_pton(AF_INET, PAYLOADMC_CAM0_IP, &GvcpCamAddr.sin_addr);
+    setsockopt(GvcpSocket[CamIndex], SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+
+    memset(&GvcpCamAddr[CamIndex], 0, sizeof(GvcpCamAddr[CamIndex]));
+    GvcpCamAddr[CamIndex].sin_family = AF_INET;
+    GvcpCamAddr[CamIndex].sin_port   = htons(PAYLOADMC_GVCP_PORT);
+    inet_pton(AF_INET, GvcpCamIps[CamIndex], &GvcpCamAddr[CamIndex].sin_addr);
+
+    GvcpReqCounter[CamIndex] = 1;
 
     return CFE_SUCCESS;
 }
 
-int32 PAYLOADMC_GVCP_HAL_InitCamera(void)
+int32 PAYLOADMC_GVCP_HAL_InitCamera(uint8 CamIndex)
 {
     uint32 obcIp;
     int32  status;
 
+    if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
+    {
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
     inet_pton(AF_INET, PAYLOADMC_OBC_IP, &obcIp);
     obcIp = ntohl(obcIp);
 
-    OS_printf("PAYLOADMC GVCP: InitCamera starting -- CAM_IP=%s GVCP_PORT=%d OBC_IP=%s STREAM_PORT=%d\n",
-             PAYLOADMC_CAM0_IP, PAYLOADMC_GVCP_PORT, PAYLOADMC_OBC_IP, PAYLOADMC_STREAM_PORT);
+    OS_printf("PAYLOADMC GVCP: InitCamera starting -- CAM%u_IP=%s GVCP_PORT=%d OBC_IP=%s STREAM_PORT=%d\n",
+             (unsigned int)CamIndex, GvcpCamIps[CamIndex], PAYLOADMC_GVCP_PORT, PAYLOADMC_OBC_IP,
+             PAYLOADMC_STREAM_PORT);
 
     /*
     ** IMPORTANT (per reference capture): only take control, set the stream
@@ -155,52 +172,52 @@ int32 PAYLOADMC_GVCP_HAL_InitCamera(void)
     ** write PixelFormat/AcquisitionMode/ExposureTime/Gain/TestPattern —
     ** doing so put the sensor into an all-white state during bring-up.
     */
-    status = GVCP_WriteReg("CCP take control", GVCP_REG_CCP, GVCP_CCP_TAKE_CONTROL);
+    status = GVCP_WriteReg(CamIndex, "CCP take control", GVCP_REG_CCP, GVCP_CCP_TAKE_CONTROL);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("SCPS0 packet size", GVCP_REG_SCPS0, GVCP_SCPS0_1500);
+    status = GVCP_WriteReg(CamIndex, "SCPS0 packet size", GVCP_REG_SCPS0, GVCP_SCPS0_1500);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("SCDA0 stream dest", GVCP_REG_SCDA0, obcIp);
+    status = GVCP_WriteReg(CamIndex, "SCDA0 stream dest", GVCP_REG_SCDA0, obcIp);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("SCP0 stream port", GVCP_REG_SCP0, PAYLOADMC_STREAM_PORT);
+    status = GVCP_WriteReg(CamIndex, "SCP0 stream port", GVCP_REG_SCP0, PAYLOADMC_STREAM_PORT);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("Exposure auto ON", GVCP_REG_EXPOSURE_AUTO, GVCP_AUTO_CONTINUOUS);
+    status = GVCP_WriteReg(CamIndex, "Exposure auto ON", GVCP_REG_EXPOSURE_AUTO, GVCP_AUTO_CONTINUOUS);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("Gain auto ON", GVCP_REG_GAIN_AUTO, GVCP_AUTO_CONTINUOUS);
+    status = GVCP_WriteReg(CamIndex, "Gain auto ON", GVCP_REG_GAIN_AUTO, GVCP_AUTO_CONTINUOUS);
     if (status != CFE_SUCCESS)
     {
         return status;
     }
 
-    status = GVCP_WriteReg("Acquisition start", GVCP_REG_ACQ_START, GVCP_ACQ_START_FIRE);
+    status = GVCP_WriteReg(CamIndex, "Acquisition start", GVCP_REG_ACQ_START, GVCP_ACQ_START_FIRE);
     if (status == CFE_SUCCESS)
     {
-        OS_printf("PAYLOADMC GVCP: InitCamera sequence complete, all 7 steps OK\n");
+        OS_printf("PAYLOADMC GVCP: camera %u InitCamera sequence complete, all 7 steps OK\n", (unsigned int)CamIndex);
     }
 
     return status;
 }
 
-int32 PAYLOADMC_GVCP_HAL_Heartbeat(void)
+int32 PAYLOADMC_GVCP_HAL_Heartbeat(uint8 CamIndex)
 {
     uint8          pkt[12];
     GVCP_Header_t *h = (GVCP_Header_t *)pkt;
@@ -208,30 +225,41 @@ int32 PAYLOADMC_GVCP_HAL_Heartbeat(void)
     struct sockaddr_in from;
     socklen_t      fromLen = sizeof(from);
 
+    if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
+    {
+        return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
+    }
+
     h->key     = GVCP_KEY;
     h->flags   = GVCP_FLAG_ACK;
     h->command = htons(GVCP_CMD_READREG);
     h->length  = htons(4);
-    h->req_id  = htons(GvcpReqCounter++);
+    h->req_id  = htons(GvcpReqCounter[CamIndex]++);
     *(uint32 *)(pkt + 8) = htonl(GVCP_REG_CCP);
 
-    if (sendto(GvcpSocket, (char *)pkt, sizeof(pkt), 0, (struct sockaddr *)&GvcpCamAddr, sizeof(GvcpCamAddr)) < 0)
+    if (sendto(GvcpSocket[CamIndex], (char *)pkt, sizeof(pkt), 0, (struct sockaddr *)&GvcpCamAddr[CamIndex],
+               sizeof(GvcpCamAddr[CamIndex])) < 0)
     {
         return CFE_STATUS_EXTERNAL_RESOURCE_FAIL;
     }
 
     /* Best-effort: a missed heartbeat ack isn't fatal, the next scheduled one retries */
-    recvfrom(GvcpSocket, (char *)ack, sizeof(ack), 0, (struct sockaddr *)&from, &fromLen);
+    recvfrom(GvcpSocket[CamIndex], (char *)ack, sizeof(ack), 0, (struct sockaddr *)&from, &fromLen);
 
     return CFE_SUCCESS;
 }
 
-void PAYLOADMC_GVCP_HAL_Deinit(void)
+void PAYLOADMC_GVCP_HAL_Deinit(uint8 CamIndex)
 {
-    if (GvcpSocket >= 0)
+    if (CamIndex >= PAYLOADMC_NUM_CAMERAS)
     {
-        close(GvcpSocket);
-        GvcpSocket = -1;
+        return;
+    }
+
+    if (GvcpSocket[CamIndex] >= 0)
+    {
+        close(GvcpSocket[CamIndex]);
+        GvcpSocket[CamIndex] = -1;
     }
 }
 

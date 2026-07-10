@@ -33,11 +33,13 @@
 /* Number of HK cycles without a Payload response before PayloadStale flag is set */
 #define PAYLOADMC_PAYLOAD_STALE_THRESHOLD       5
 
-/* GVCP imaging camera network config -- up to 4 cameras on the payload's Eth
- * switch, only camera 0 is wired up for now. */
-#define PAYLOADMC_CAM0_IP        "192.168.1.11" /**< \brief Camera 0 IP address (static, set via MVS) */
+/* GVCP imaging camera network config -- 4 cameras on the payload's Eth switch. */
+#define PAYLOADMC_NUM_CAMERAS    4              /**< \brief Number of cameras on the payload's Eth switch */
 #define PAYLOADMC_OBC_IP         "192.168.1.50" /**< \brief OBC IP address (GVSP stream destination) */
 #define PAYLOADMC_GVCP_PORT      3956           /**< \brief GVCP control port (fixed by GigE Vision spec) */
 #define PAYLOADMC_STREAM_PORT    50001          /**< \brief GVSP stream destination port on the OBC */
+
+/** Per-camera static IP addresses (set via MVS), index = camera number 0..3 */
+#define PAYLOADMC_CAM_IPS { "192.168.1.11", "192.168.1.12", "192.168.1.13", "192.168.1.14" }
 
 #endif /* PAYLOADMC_CONFIG_H */
