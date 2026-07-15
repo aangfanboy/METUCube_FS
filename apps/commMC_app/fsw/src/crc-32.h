@@ -1,3 +1,6 @@
+#ifndef COMMMC_CRC_32_H
+#define COMMMC_CRC_32_H
+
 #include "cfe.h"
 
 struct Crc32 {
@@ -7,3 +10,5 @@ struct Crc32 {
 void crc32_init(struct Crc32 *ctx);
 void crc32_write(struct Crc32 *ctx, const void *data, size_t len);
 uint32 crc32_close(struct Crc32 *ctx);
+
+#endif /* COMMMC_CRC_32_H */
