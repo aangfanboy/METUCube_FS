@@ -407,6 +407,19 @@
  * It is logged when the application fails to transmit the final packet of a file transfer, which may be critical for the integrity of the transfer.
  */
 
+#define COMMMC_IMGXFER_INF_EID 223  // Image transfer progress/info
+/**
+ * @brief Informational events for the OBC->COMM image transfer state machine
+ * (start, per-step progress, completion). Type: Information.
+ */
+
+#define COMMMC_IMGXFER_ERR_EID 224  // Image transfer error/abort
+/**
+ * @brief Error events for the OBC->COMM image transfer (no cached image, file
+ * open/read failure, bad ack status, mismatched chunk index, timeout/abort).
+ * Type: Error.
+ */
+
 // -----------------------------------------
 
 // CommMC Application Critical Event IDs

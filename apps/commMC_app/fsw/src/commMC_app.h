@@ -1,6 +1,8 @@
 #ifndef _COMMMC_APP_H_
 #define _COMMMC_APP_H_
 
+#include <stdio.h>  /* FILE* used by the image-transfer state (below) */
+
 #include "cfe.h"
 #include "cfe_msg.h"
 #include "cfe_core_api_base_msgids.h"
@@ -14,6 +16,24 @@
 #include "commMC_app_dispatch.h"
 #include "commMC_app_cmds.h"
 #include "commMC_app_utils.h"
+
+/* ------------------------------------------------------------------ */
+/* Image transfer to the COMM card (control plane on CAN, bulk over SPI) */
+/* ------------------------------------------------------------------ */
+
+#define COMMMC_IMGXFER_MAX_PATH_LEN    128           /**< cached photo path buffer size            */
+#define COMMMC_IMGXFER_DEFAULT_CHUNK   2048          /**< chunk size OBC proposes (<= SPI max)     */
+#define COMMMC_IMGXFER_MAX_STUCK_TICKS 3             /**< idle SB timeouts with no progress -> abort */
+#define COMMMC_IMGXFER_PHOTO_PREFIX    "/cf/photos"  /**< DS photo destination dir (ds_file_tbl.c) */
+
+typedef enum
+{
+    COMMMC_IMGXFER_IDLE = 0,        /**< no transfer in progress                       */
+    COMMMC_IMGXFER_WAIT_BEGIN_ACK,  /**< sent IMG_XFER_BEGIN, waiting for begin ack    */
+    COMMMC_IMGXFER_WAIT_CHUNK_ACK,  /**< sent IMG_CHUNK_READY, waiting for chunk ack   */
+    COMMMC_IMGXFER_WAIT_SPI_DONE,   /**< chunk handed to CANIOMC, waiting for SPI done */
+    COMMMC_IMGXFER_WAIT_RESULT      /**< sent IMG_XFER_END, waiting for result         */
+} COMMMC_ImgXferState_t;
 
 /*************************************************************************/
 /*
@@ -48,6 +68,23 @@ typedef struct
     uint8                   CommMissCount;                   /**< \brief Cycles elapsed without a Comm HK response */
     CANIOMC_CommTlmPayload_t Telemetry;                      /**< \brief Cached Comm telemetry (power rails, UHF/S-Band link stats, bool flags) */
     bool                    IsImaging;                       /**< \brief Cached PayloadMC imaging-mode broadcast  */
+
+    /* --- Image transfer to the COMM card over SPI (control plane on CAN) --- */
+    COMMMC_ImgXferState_t   XferState;                       /**< \brief Transfer state machine state              */
+    bool                    HasLastPhoto;                    /**< \brief A completed photo path is cached          */
+    char                    LastPhotoPath[COMMMC_IMGXFER_MAX_PATH_LEN]; /**< \brief Last completed photo (from DS) */
+    uint32                  LastPhotoImageId;                /**< \brief DS sequence count of that file            */
+    uint8                   XferPeerNode;                    /**< \brief CAN node the image is being sent to       */
+    uint8                   XferSession;                     /**< \brief Session id from IMG_XFER_BEGIN_ACK        */
+    FILE *                  XferFile;                        /**< \brief Open file handle during a transfer        */
+    uint32                  XferTotalSize;                   /**< \brief Image file size in bytes                  */
+    uint32                  XferCrc32;                       /**< \brief CRC32 of the image file                   */
+    uint32                  XferImageId;                     /**< \brief image_id sent in IMG_XFER_BEGIN           */
+    uint16                  XferChunkSize;                   /**< \brief Negotiated chunk size                     */
+    uint32                  XferTotalChunks;                 /**< \brief ceil(size / chunk_size)                   */
+    uint32                  XferCurChunk;                    /**< \brief Chunk currently in flight                 */
+    uint16                  XferStuckTicks;                  /**< \brief Consecutive idle timeouts (abort guard)   */
+    CANIOMC_SpiTxPkt_t      XferSpiScratch;                  /**< \brief Scratch for building SPI-TX messages      */
 
     CFE_ES_MemHandle_t      MemPoolHandle; /**< \brief HK mempool handle for output pkts */
     uint32                  RunStatus;     /**< \brief HK App run status */

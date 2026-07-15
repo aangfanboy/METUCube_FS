@@ -112,4 +112,14 @@ void PAYLOADMC_SendGvcpHeartbeatIfImaging(void);
  */
 void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadLen);
 
+/**
+ * @brief Command DS to close the photo destination file.
+ *
+ * Called at the end of PAYLOADMC_captureFrame so each capture is archived as
+ * its own standalone .ds file (DS opens a fresh sequence-numbered file on the
+ * next capture). Sent on DS_CMD_MID with function code DS_CLOSE_FILE_CC for
+ * PAYLOADMC_DS_PHOTO_FILE_INDEX.
+ */
+void PAYLOADMC_APP_CLOSE_DS_PHOTO_FILE(void);
+
 #endif /* PAYLOADMC_APP_CMDS_H */

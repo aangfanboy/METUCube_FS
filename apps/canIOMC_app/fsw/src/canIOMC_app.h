@@ -36,6 +36,7 @@ typedef struct
     CANIOMC_PayloadHeartbeatPacket_t PayloadHeartbeatPkt; /**< \brief Payload heartbeat notice published to SB */
     CANIOMC_AdcsTlmPacket_t          AdcsTlmPkt;          /**< \brief ADCS HK data published to SB          */
     CANIOMC_CommTlmPacket_t          CommTlmPkt;          /**< \brief Comm HK data published to SB          */
+    CANIOMC_SpiTxDonePkt_t           SpiTxDonePkt;        /**< \brief SPI write completion notice to COMMMC */
 
     CFE_SB_PipeId_t         CmdPipe;
 

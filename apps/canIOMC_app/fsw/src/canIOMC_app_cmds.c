@@ -5,6 +5,7 @@
 #include "canIOMC_app_header_defs.h"
 #include "canIOMC_app_router.h"
 #include "canIOMC_hal.h"
+#include "canIOMC_spi_hal.h"
 #include "canIOMC_segmentation.h"
 
 #include "cfe.h"
@@ -151,6 +152,41 @@ CFE_Status_t CANIOMC_APP_SEND_HEARTBEAT(void)
 
     CANIOMC_AppData.CmdCounter++;
     return CFE_SUCCESS;
+}
+
+CFE_Status_t CANIOMC_ProcessSpiTx(const CFE_SB_Buffer_t *SBBufPtr)
+{
+    const CANIOMC_SpiTxPkt_t *Pkt;
+    uint16                    dataLen;
+    int32                     status;
+
+    if (SBBufPtr == NULL)
+    {
+        return CFE_STATUS_BAD_COMMAND_CODE;
+    }
+
+    Pkt     = (const CANIOMC_SpiTxPkt_t *)SBBufPtr;
+    dataLen = (Pkt->DataLen <= CANIOMC_SPI_MAX_CHUNK) ? Pkt->DataLen : CANIOMC_SPI_MAX_CHUNK;
+
+    status = CANIOMC_SPI_HAL_Write(Pkt->Data, dataLen);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC: SPI write failed for chunk %u, status: 0x%08X",
+                          (unsigned int)Pkt->ChunkIdx, (unsigned int)status);
+        CANIOMC_AppData.ErrCounter++;
+    }
+
+    /* Notify COMMMC the write is done (success or failure) so it can advance
+     * or abort. CFE_MSG_Init already ran once at appInit; only the payload
+     * fields change per call. */
+    CANIOMC_AppData.SpiTxDonePkt.ChunkIdx = Pkt->ChunkIdx;
+    CANIOMC_AppData.SpiTxDonePkt.Status   = (status == CFE_SUCCESS) ? 0 : 1;
+
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(CANIOMC_AppData.SpiTxDonePkt.TelemetryHeader));
+    CFE_SB_TransmitMsg(CFE_MSG_PTR(CANIOMC_AppData.SpiTxDonePkt.TelemetryHeader), true);
+
+    return status;
 }
 
 void CANIOMC_PollAndPublishCanRx(void)

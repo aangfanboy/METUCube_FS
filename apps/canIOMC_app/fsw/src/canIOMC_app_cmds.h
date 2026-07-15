@@ -35,4 +35,17 @@ void CANIOMC_PollAndPublishCanRx(void);
  */
 CFE_Status_t CANIOMC_APP_SEND_HEARTBEAT(void);
 
+/**
+ * @brief Clock one image chunk out over SPI on behalf of COMMMC, then reply.
+ *
+ * Handles CANIOMC_SPI_TX_MID: writes the CANIOMC_SpiTxPkt_t's Data[0..DataLen-1]
+ * to the COMM card via the SPI HAL, then publishes a CANIOMC_SpiTxDonePkt_t on
+ * CANIOMC_SPI_TX_DONE_MID so COMMMC advances to the next chunk only once the
+ * bytes are on the wire.
+ *
+ * @param SBBufPtr Pointer to the raw SB buffer containing a CANIOMC_SpiTxPkt_t.
+ * @return CFE_SUCCESS on success, error code on failure.
+ */
+CFE_Status_t CANIOMC_ProcessSpiTx(const CFE_SB_Buffer_t *SBBufPtr);
+
 #endif /* CANIOMC_APP_CMDS_H */

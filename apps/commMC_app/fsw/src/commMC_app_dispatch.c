@@ -1,9 +1,11 @@
 #include "commMC_app.h"
 #include "commMC_app_dispatch.h"
+#include "commMC_app_imgxfer.h"
 #include "commMC_app_extern_typedefs.h"
 #include "canIOMC_app_msgids.h"
 #include "payloadMC_app_msgids.h"
 #include "payloadMC_app_msg.h"
+#include "ds_msgids.h"
 
 #include "hk_msgids.h"
 
@@ -67,6 +69,33 @@ void COMMMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             COMMMC_AppData.IsImaging = ImagingPkt->IsImaging;
             break;
         }
+
+        /* --- Image transfer to the COMM card over SPI --- */
+        case DS_COMP_TLM_MID:
+            /* DS finished a file; remember it if it's a photo */
+            COMMMC_ImgXfer_OnDsFileComplete(SBBufPtr);
+            break;
+
+        case CANIOMC_COMM_IMG_REQUEST_MID:
+            /* COMM asked for the last payload image — start the transfer */
+            COMMMC_ImgXfer_OnRequest(SBBufPtr);
+            break;
+
+        case CANIOMC_IMG_XFER_BEGIN_ACK_MID:
+            COMMMC_ImgXfer_OnBeginAck(SBBufPtr);
+            break;
+
+        case CANIOMC_IMG_CHUNK_ACK_MID:
+            COMMMC_ImgXfer_OnChunkAck(SBBufPtr);
+            break;
+
+        case CANIOMC_IMG_XFER_RESULT_MID:
+            COMMMC_ImgXfer_OnResult(SBBufPtr);
+            break;
+
+        case CANIOMC_SPI_TX_DONE_MID:
+            COMMMC_ImgXfer_OnSpiDone(SBBufPtr);
+            break;
 
         default:
             CFE_EVS_SendEvent(COMMMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,

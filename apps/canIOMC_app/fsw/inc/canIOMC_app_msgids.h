@@ -26,6 +26,16 @@
 #define CANIOMC_PAYLOAD_TAKEPHOTO_MID 0xDCB  /**< Routed trigger: PayloadMC take-photo command */
 #define CANIOMC_PAYLOAD_CAPTURE_FRAME_MID 0xDCC  /**< Routed trigger: PayloadMC capture-frame command */
 
+/* OBC <-> COMM image transfer (see canIOMC_app_header_defs.h). The four inbound
+ * COMM->OBC control messages are forwarded to COMMMC via the generic router;
+ * the SPI-TX pair is CANIOMC's byte-transport service for COMMMC. */
+#define CANIOMC_COMM_IMG_REQUEST_MID   0xDCD  /**< Routed: COMM->OBC "send last image" request       */
+#define CANIOMC_IMG_XFER_BEGIN_ACK_MID 0xDCE  /**< Routed: COMM->OBC begin ack                        */
+#define CANIOMC_IMG_CHUNK_ACK_MID      0xDCF  /**< Routed: COMM->OBC chunk ack                        */
+#define CANIOMC_IMG_XFER_RESULT_MID    0xDD0  /**< Routed: COMM->OBC transfer result                  */
+#define CANIOMC_SPI_TX_MID             0xDD1  /**< COMMMC->CANIOMC: clock these bytes out over SPI    */
+#define CANIOMC_SPI_TX_DONE_MID        0xDD2  /**< CANIOMC->COMMMC: SPI write completed (idx, status) */
+
 #define CANIOMC_SEND_HK_MID_NAME        "CANIOMC_SEND_C"
 
 #endif /* CANIOMC_MSGIDS_H */

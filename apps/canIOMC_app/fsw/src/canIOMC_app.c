@@ -1,4 +1,5 @@
 #include "canIOMC_app.h"
+#include "canIOMC_spi_hal.h"
 #include "payloadMC_app_msgids.h"
 
 CANIOMC_AppData_t         CANIOMC_AppData;
@@ -81,6 +82,9 @@ CFE_Status_t CANIOMC_appInit(void)
     CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.CommTlmPkt.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_COMM_TLM_MID),
                  sizeof(CANIOMC_AppData.CommTlmPkt));
 
+    CFE_MSG_Init(CFE_MSG_PTR(CANIOMC_AppData.SpiTxDonePkt.TelemetryHeader), CFE_SB_ValueToMsgId(CANIOMC_SPI_TX_DONE_MID),
+                 sizeof(CANIOMC_AppData.SpiTxDonePkt));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {
@@ -142,6 +146,15 @@ CFE_Status_t CANIOMC_appInit(void)
         return status;
     }
 
+    // Subscribe to COMMMC's SPI-TX requests (image transfer byte transport)
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(CANIOMC_SPI_TX_MID), CANIOMC_AppData.CmdPipe);
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC App: Error Subscribing to SPI TX, RC = 0x%08X\n", status);
+        return status;
+    }
+
     /* Initialize CAN hardware */
     status = CANIO_HAL_Init();
     if (status != CFE_SUCCESS)
@@ -149,6 +162,17 @@ CFE_Status_t CANIOMC_appInit(void)
         CFE_EVS_SendEvent(CANIOMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CANIOMC: CAN HAL init failed, status: 0x%08X", (unsigned int)status);
         return status;
+    }
+
+    /* Initialize SPI hardware (image-transfer byte transport to the COMM card).
+     * Non-fatal: if the spidev node isn't present yet, keep running so CAN
+     * still works; SPI writes will just fail until the link is available. */
+    status = CANIOMC_SPI_HAL_Init();
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CANIOMC_INIT_HK_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CANIOMC: SPI HAL init failed, status: 0x%08X (image transfer unavailable)",
+                          (unsigned int)status);
     }
 
     // register to table(s)

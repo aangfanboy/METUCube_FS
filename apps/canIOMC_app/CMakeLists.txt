@@ -7,15 +7,17 @@ set(APP_SRC_FILES
   fsw/src/canIOMC_app_router.c
   fsw/src/canIOMC_segmentation.c
   platform/socketcan/canIOMC_hal_socketcan.c
+  platform/spidev/canIOMC_spi_hal_spidev.c
 )
 
 # Create the app module
 add_cfe_app(canIOMC_app ${APP_SRC_FILES})
 
-# Public headers (fsw/inc) and platform-specific SocketCAN include path
+# Public headers (fsw/inc) and platform-specific include paths
 target_include_directories(canIOMC_app PUBLIC
   fsw/inc
   platform/socketcan
+  platform/spidev
 )
 target_include_directories(canIOMC_app PUBLIC ../payloadMC_app/fsw/inc)
 

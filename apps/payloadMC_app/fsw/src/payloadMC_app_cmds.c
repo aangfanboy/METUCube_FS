@@ -8,6 +8,10 @@
 #include "canIOMC_app_msgids.h"
 #include "canIOMC_app_header_defs.h"
 
+#include "ds_msg.h"
+#include "ds_msgids.h"
+#include "ds_msgdefs.h"
+
 #include "cfe.h"
 #include <string.h>
 #include <stdlib.h>
@@ -366,5 +370,48 @@ void PAYLOADMC_captureFrame(uint8 SenderID, const uint8 *Payload, uint8 PayloadL
         PAYLOADMC_AppData.ErrCounter++;
     }
 
+    /* Close the DS photo file so each capture lands in its own .ds file (the
+     * next capture opens a fresh one with the next sequence number). This is
+     * what lets COMMMC treat "the last completed photo file" as "the last
+     * image" when the COMM card later requests it. */
+    PAYLOADMC_APP_CLOSE_DS_PHOTO_FILE();
+
     PAYLOADMC_AppData.CmdCounter++;
+}
+
+void PAYLOADMC_APP_CLOSE_DS_PHOTO_FILE(void)
+{
+    DS_CloseFileCmd_t CloseCmd;
+    int32             status;
+    uint32            retry;
+
+    /* CFE_MSG_Init memsets the whole struct -- set fields AFTER it. */
+    CFE_MSG_Init(CFE_MSG_PTR(CloseCmd.CommandHeader), CFE_SB_ValueToMsgId(DS_CMD_MID), sizeof(CloseCmd));
+    CFE_MSG_SetFcnCode(CFE_MSG_PTR(CloseCmd.CommandHeader), DS_CLOSE_FILE_CC);
+    CloseCmd.Payload.FileTableIndex = PAYLOADMC_DS_PHOTO_FILE_INDEX;
+    CloseCmd.Payload.Padding        = 0;
+    CFE_MSG_GenerateChecksum(CFE_MSG_PTR(CloseCmd.CommandHeader));
+
+    /* Sent on DS's single command pipe, which also carries the just-queued
+     * photo chunks, so DS processes all chunks first, then this close. Retry
+     * briefly in case the SB pool is momentarily drained by the chunk burst. */
+    status = CFE_SB_TransmitMsg(CFE_MSG_PTR(CloseCmd.CommandHeader), true);
+    for (retry = 0; status != CFE_SUCCESS && retry < PAYLOADMC_PHOTO_CHUNK_MAX_RETRIES; retry++)
+    {
+        OS_TaskDelay(PAYLOADMC_PHOTO_CHUNK_RETRY_DELAY_MS);
+        status = CFE_SB_TransmitMsg(CFE_MSG_PTR(CloseCmd.CommandHeader), true);
+    }
+
+    if (status != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_HK_SEND_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "PAYLOADMC: Failed to send DS close-file command, status: 0x%08X", (unsigned int)status);
+        PAYLOADMC_AppData.ErrCounter++;
+    }
+    else
+    {
+        CFE_EVS_SendEvent(PAYLOADMC_APP_HK_SEND_SUCCESS_EID, CFE_EVS_EventType_DEBUG,
+                          "PAYLOADMC: Requested DS close of photo file index %d",
+                          (int)PAYLOADMC_DS_PHOTO_FILE_INDEX);
+    }
 }

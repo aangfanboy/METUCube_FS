@@ -38,6 +38,11 @@ void CANIOMC_appTaskPipe(const CFE_SB_Buffer_t *SBBufPtr)
             break;
         }
 
+        case CANIOMC_SPI_TX_MID:
+            /* Image-transfer chunk from COMMMC — clock it out over SPI and ack */
+            CANIOMC_ProcessSpiTx(SBBufPtr);
+            break;
+
         default:
             CFE_EVS_SendEvent(CANIOMC_UNKNOWN_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CANIOMC: invalid packet,MID = 0x%x", (unsigned int)CFE_SB_MsgIdToValue(MsgId));

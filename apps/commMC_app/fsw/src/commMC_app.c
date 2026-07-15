@@ -1,6 +1,8 @@
 #include "commMC_app.h"
+#include "commMC_app_imgxfer.h"
 #include "canIOMC_app_msgids.h"
 #include "payloadMC_app_msgids.h"
+#include "ds_msgids.h"
 #include <string.h>
 
 COMMMC_AppData_t         COMMMC_AppData;
@@ -33,8 +35,9 @@ void COMMMC_appMain(void)
         }
         else if (status == CFE_SB_TIME_OUT)
         {
-            // No message received, continue to next iteration
-            // if desired, you can add a table check here
+            /* Idle tick — drives the image-transfer timeout/abort guard so a
+             * lost COMM ack or SPI-done can't hang a transfer forever. */
+            COMMMC_ImgXfer_OnTick();
             continue;
         }
         else
@@ -122,6 +125,34 @@ CFE_Status_t COMMMC_appInit(void)
                           "COMMMC App: Error Subscribing to Imaging Mode, RC = 0x%08X\n", status);
         return status;
     }
+
+    /* Image transfer to the COMM card: the request trigger + the three COMM->OBC
+     * acks (all routed by CANIOMC), the SPI-write completion from CANIOMC, and
+     * DS's file-complete telemetry (source of the last photo file path). */
+    {
+        const uint16 XferMids[] = {
+            CANIOMC_COMM_IMG_REQUEST_MID,
+            CANIOMC_IMG_XFER_BEGIN_ACK_MID,
+            CANIOMC_IMG_CHUNK_ACK_MID,
+            CANIOMC_IMG_XFER_RESULT_MID,
+            CANIOMC_SPI_TX_DONE_MID,
+            DS_COMP_TLM_MID
+        };
+        unsigned int i;
+        for (i = 0; i < (sizeof(XferMids) / sizeof(XferMids[0])); i++)
+        {
+            status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(XferMids[i]), COMMMC_AppData.CmdPipe);
+            if (status != CFE_SUCCESS)
+            {
+                CFE_EVS_SendEvent(COMMMC_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "COMMMC App: Error Subscribing to img-xfer MID 0x%03X, RC = 0x%08X\n",
+                                  (unsigned int)XferMids[i], (unsigned int)status);
+                return status;
+            }
+        }
+    }
+
+    COMMMC_ImgXfer_Init();
 
     // register to table(s)
     status = COMMMC_appTableInit(&COMMMC_AppData.ConfigTableHandle, &COMMMC_Config_TablePtr);

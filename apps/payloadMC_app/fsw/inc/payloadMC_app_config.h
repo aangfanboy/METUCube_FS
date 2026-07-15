@@ -33,6 +33,11 @@
 /* Number of HK cycles without a Payload response before PayloadStale flag is set */
 #define PAYLOADMC_PAYLOAD_STALE_THRESHOLD       5
 
+/* DS destination-file-table index for the photo dump (PHOTO_DATA_FILE in
+ * apps/DS/fsw/tables/ds_filter_tbl.c / ds_file_tbl.c). PayloadMC commands DS
+ * to close this file after every capture so each image is its own .ds file. */
+#define PAYLOADMC_DS_PHOTO_FILE_INDEX           1
+
 /* GVCP imaging camera network config -- 4 cameras on the payload's Eth switch. */
 #define PAYLOADMC_NUM_CAMERAS    4              /**< \brief Number of cameras on the payload's Eth switch */
 #define PAYLOADMC_OBC_IP         "192.168.1.50" /**< \brief OBC IP address (GVSP stream destination) */

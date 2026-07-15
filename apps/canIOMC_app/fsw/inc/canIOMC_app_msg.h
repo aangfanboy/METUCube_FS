@@ -283,4 +283,31 @@ typedef struct
     uint8                     Payload[CANIOMC_SB_MAX_PAYLOAD];
 } CANIOMC_RouteTriggerPkt_t;
 
+/*
+** OBC->COMM image transfer, SPI byte-transport service.
+**
+** COMMMC owns the image file (path from DS, CRC, chunking, CAN handshake);
+** CANIOMC owns the SPI link. For every chunk COMMMC reads from the file it
+** sends a CANIOMC_SpiTxPkt_t on CANIOMC_SPI_TX_MID; CANIOMC clocks Data[0..
+** DataLen-1] out over SPI to the COMM card and replies with a
+** CANIOMC_SpiTxDonePkt_t on CANIOMC_SPI_TX_DONE_MID so COMMMC only advances
+** to the next chunk once the bytes are physically on the wire.
+*/
+#define CANIOMC_SPI_MAX_CHUNK  4096  /**< Max image-chunk bytes per SPI-TX SB message */
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    uint16                    ChunkIdx;                    /**< Which chunk this is (for correlation) */
+    uint16                    DataLen;                     /**< Valid bytes in Data                   */
+    uint8                     Data[CANIOMC_SPI_MAX_CHUNK]; /**< Raw image bytes to clock out over SPI */
+} CANIOMC_SpiTxPkt_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TelemetryHeader;
+    uint16                    ChunkIdx;   /**< Echoes the request's ChunkIdx        */
+    uint8                     Status;     /**< 0 = SPI write OK, nonzero = failed    */
+} CANIOMC_SpiTxDonePkt_t;
+
 #endif /* CANIOMC_MSG_H_ */
