@@ -259,6 +259,7 @@ void COMMMC_ImgXfer_OnRequest(const CFE_SB_Buffer_t *SBBufPtr)
     uint32                           crc  = 0;
     uint32                           size = 0;
     uint16                           chunk;
+    char                             localPath[OS_MAX_LOCAL_PATH_LEN];
 
     if (SBBufPtr == NULL)
     {
@@ -282,19 +283,30 @@ void COMMMC_ImgXfer_OnRequest(const CFE_SB_Buffer_t *SBBufPtr)
         return;
     }
 
-    if (ComputeFileCrcAndSize(COMMMC_AppData.LastPhotoPath, &crc, &size) != CFE_SUCCESS || size == 0)
+    /* DS reports the OSAL *virtual* path (e.g. "/cf/photos/..."); translate it
+     * to the host path before opening it with plain fopen (the virtual "/cf"
+     * maps to "./cf" relative to where cFS was launched). */
+    if (OS_TranslatePath(COMMMC_AppData.LastPhotoPath, localPath) != OS_SUCCESS)
     {
         CFE_EVS_SendEvent(COMMMC_IMGXFER_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "COMMMC IMGXFER: cannot read image '%s' (size=%u)",
-                          COMMMC_AppData.LastPhotoPath, (unsigned int)size);
+                          "COMMMC IMGXFER: cannot translate image path '%s'", COMMMC_AppData.LastPhotoPath);
         return;
     }
 
-    COMMMC_AppData.XferFile = fopen(COMMMC_AppData.LastPhotoPath, "rb");
+    if (ComputeFileCrcAndSize(localPath, &crc, &size) != CFE_SUCCESS || size == 0)
+    {
+        CFE_EVS_SendEvent(COMMMC_IMGXFER_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "COMMMC IMGXFER: cannot read image '%s' (local '%s', size=%u)",
+                          COMMMC_AppData.LastPhotoPath, localPath, (unsigned int)size);
+        return;
+    }
+
+    COMMMC_AppData.XferFile = fopen(localPath, "rb");
     if (COMMMC_AppData.XferFile == NULL)
     {
         CFE_EVS_SendEvent(COMMMC_IMGXFER_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "COMMMC IMGXFER: cannot open image '%s' for transfer", COMMMC_AppData.LastPhotoPath);
+                          "COMMMC IMGXFER: cannot open image '%s' (local '%s') for transfer",
+                          COMMMC_AppData.LastPhotoPath, localPath);
         return;
     }
 
