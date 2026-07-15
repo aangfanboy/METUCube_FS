@@ -19,7 +19,10 @@
 
 #define CANIOMC_PERFORMANCE_ID            0xD001     /**< \brief Performance ID for CANIOMC application performance monitoring */
 
-#define CANIOMC_SB_TIMEOUT                100         /**< \brief Software bus timeout in milliseconds for CANIOMC application -- also the CAN RX poll interval, see CANIOMC_appMain() */
+#define CANIOMC_SB_TIMEOUT                10          /**< \brief Software bus timeout in milliseconds for CANIOMC application -- also the CAN RX poll interval, see CANIOMC_appMain().
+                                                       *          Kept low so inbound CAN replies (e.g. image-transfer chunk ACKs)
+                                                       *          are picked up within ~10ms instead of waiting a full poll cycle;
+                                                       *          this is what paces the per-chunk handshake during an image transfer. */
 // Set to CFE_SB_PEND_FOREVER if you want to wait indefinitely for a message, note that cfe.h needs to be included for this definition
 
 #define CANIOMC_MAX_COMBINED_PACKET_SIZE  1024       /**< \brief Maximum size of combined packets in bytes for CANIOMC application */

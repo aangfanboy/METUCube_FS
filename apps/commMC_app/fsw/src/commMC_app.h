@@ -22,7 +22,14 @@
 /* ------------------------------------------------------------------ */
 
 #define COMMMC_IMGXFER_MAX_PATH_LEN    128           /**< cached photo path buffer size            */
-#define COMMMC_IMGXFER_DEFAULT_CHUNK   2048          /**< chunk size OBC proposes (<= SPI max)     */
+/* Chunk size the OBC proposes in IMG_XFER_BEGIN (the COMM card echoes it back
+ * in the ack; we adopt whatever it returns, clamped to CANIOMC_SPI_MAX_CHUNK).
+ * Set to CANIOMC_SPI_MAX_CHUNK (4096) -- the largest chunk that still clocks
+ * out in ONE spidev transfer (single CS assertion, <= the driver's default
+ * bufsiz), so the COMM card receives each chunk as one clean SPI frame. Bigger
+ * would force the SPI HAL to split a chunk across two CS-framed transfers.
+ * Larger chunks = fewer CAN round-trips = a faster transfer. */
+#define COMMMC_IMGXFER_DEFAULT_CHUNK   CANIOMC_SPI_MAX_CHUNK
 #define COMMMC_IMGXFER_MAX_STUCK_TICKS 3             /**< idle SB timeouts with no progress -> abort */
 #define COMMMC_IMGXFER_PHOTO_PREFIX    "/cf/photos"  /**< DS photo destination dir (ds_file_tbl.c) */
 
